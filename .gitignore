@@ -1,2 +1,5 @@
 lib/
 out/
+.idea/kotlinc.xml
+.idea/libraries/
+.idea/workspace.xml
