@@ -12,7 +12,7 @@ procedure Day05 is
    begin
       Instance.Inputs.Append (Input);
       Instance.Run;
-      return Instance.Last_Output;
+      return Instance.Outputs.Last_Element;
    end Run_Diagnostics;
 begin
    Put_Line (Run_Diagnostics (1)'Image);

@@ -20,7 +20,7 @@ procedure Day07 is
             Instance.Inputs.Append (Phase);
             Instance.Inputs.Append (Power);
             Instance.Run;
-            Power := Instance.Last_Output;
+            Power := Instance.Outputs.Last_Element;
          end;
       end loop;
       

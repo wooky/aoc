@@ -36,29 +36,31 @@ package body Intcode is
    function Instantiate (Compiler : Intcode_Compiler) return Intcode_Instance is
    begin
       return
-        (Opcodes => Compiler.Opcodes,
-         Inputs => Integer_Vectors.Empty_Vector,
-         Last_Output => 0);
+        (Opcodes => Compiler.Opcodes, others => <>);
    end Instantiate;
    
+   function Get_Opcode (Instance : Intcode_Instance; Immediate : Boolean := True; Offset : Integer := 0) return Integer is
+   begin
+      return (if Immediate then Instance.Opcodes (Instance.IP+Offset) else Instance.Opcodes (Instance.Opcodes (Instance.IP+Offset)));
+   end Get_Opcode;
+   
    procedure Run (Instance : in out Intcode_Instance) is
-      IP : Natural := 0;
    begin
       loop
          declare
             type Valid_Opcode is (Add, Multiply, Input, Output, JIT, JIF, LT, EQ, Halt);
             for Valid_Opcode use (1, 2, 3, 4, 5, 6, 7, 8, 99);
-            Instruction : Natural := Instance.Opcodes (IP);
+            Instruction : Natural := Instance.Get_Opcode;
             Opcode : Valid_Opcode := Valid_Opcode'Enum_Val (Instruction mod 100);
             Immediate_1 : Boolean := (Instruction / 100) mod 2 = 1;
             Skip : Natural := 2;
          begin
             case Opcode is
             when Input =>
-               Instance.Opcodes (Instance.Opcodes (IP+1)) := Instance.Inputs.First_Element;
+               Instance.Opcodes (Instance.Opcodes (Instance.IP+1)) := Instance.Inputs.First_Element;
                Instance.Inputs.Delete_First;
             when Output =>
-               Instance.Last_Output := (if Immediate_1 then Instance.Opcodes (IP+1) else Instance.Opcodes (Instance.Opcodes (IP+1)));
+               Instance.Outputs.Append (Instance.Get_Opcode (Immediate_1, 1));
             when Halt =>
                exit;
             when others =>
@@ -66,8 +68,8 @@ package body Intcode is
                
                declare
                   Immediate_2 : Boolean := (Instruction / 1000) mod 2 = 1;
-                  Val_1 : Integer := (if Immediate_1 then Instance.Opcodes (IP+1) else Instance.Opcodes (Instance.Opcodes (IP+1)));
-                  Val_2 : Integer := (if Immediate_2 then Instance.Opcodes (IP+2) else Instance.Opcodes (Instance.Opcodes (IP+2)));
+                  Val_1 : Integer := Instance.Get_Opcode (Immediate_1, 1);
+                  Val_2 : Integer := Instance.Get_Opcode (Immediate_2, 2);
                   Result : Integer;
                   Store : Boolean := True;
                begin
@@ -79,7 +81,7 @@ package body Intcode is
                   when JIT =>
                      Store := False;
                      if Val_1 /= 0 then
-                        IP := Val_2;
+                        Instance.IP := Val_2;
                         Skip := 0;
                      else
                         Skip := 3;
@@ -87,7 +89,7 @@ package body Intcode is
                   when JIF =>
                      Store := False;
                      if Val_1 = 0 then
-                        IP := Val_2;
+                        Instance.IP := Val_2;
                         Skip := 0;
                      else
                         Skip := 3;
@@ -101,12 +103,12 @@ package body Intcode is
                   end case;
                   
                   if Store then
-                     Instance.Opcodes (Instance.Opcodes (IP+3)) := Result;
+                     Instance.Opcodes (Instance.Opcodes (Instance.IP+3)) := Result;
                   end if;
                end;
             end case;
             
-            IP := IP + Skip;
+            Instance.IP := Instance.IP + Skip;
          end;
       end loop;
    end Run;
