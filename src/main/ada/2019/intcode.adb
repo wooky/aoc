@@ -46,6 +46,12 @@ package body Intcode is
    
    procedure Run (Instance : in out Intcode_Instance) is
    begin
+      if Instance.State = Halted then
+         return;
+      else
+         Instance.State := Running;
+      end if;
+      
       loop
          declare
             type Valid_Opcode is (Add, Multiply, Input, Output, JIT, JIF, LT, EQ, Halt);
@@ -57,12 +63,18 @@ package body Intcode is
          begin
             case Opcode is
             when Input =>
-               Instance.Opcodes (Instance.Opcodes (Instance.IP+1)) := Instance.Inputs.First_Element;
-               Instance.Inputs.Delete_First;
+               if Instance.Inputs.Is_Empty then
+                  Instance.State := Need_Input;
+                  return;
+               else
+                  Instance.Opcodes (Instance.Opcodes (Instance.IP+1)) := Instance.Inputs.First_Element;
+                  Instance.Inputs.Delete_First;
+               end if;
             when Output =>
                Instance.Outputs.Append (Instance.Get_Opcode (Immediate_1, 1));
             when Halt =>
-               exit;
+               Instance.State := Halted;
+               return;
             when others =>
                Skip := 4;
                

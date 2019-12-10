@@ -8,35 +8,19 @@ procedure Day07 is
    Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day07.txt");
    
    type Phases is array (0 .. 4) of Integer;
-   Phase_Permutations : constant Phases := (0, 1, 2, 3, 4);
    
-   function Get_Power (Phase_Permutation : Phases) return Integer is
-      Power : Integer := 0;
-   begin
-      for Phase of Phase_Permutation loop
-         declare
-            Instance : Intcode_Instance := Instantiate (Compiler);
-         begin
-            Instance.Inputs.Append (Phase);
-            Instance.Inputs.Append (Power);
-            Instance.Run;
-            Power := Instance.Outputs.Last_Element;
-         end;
-      end loop;
-      
-      return Power;
-   end Get_Power;
+   type Power_Func is access function (Phase_Permutations : Phases) return Integer;
    
    -- Uses Heap's algorithm
-   function Get_Max_Power (K : Natural; A : in out Phases) return Integer is
+   function Get_Max_Power (K : Natural; A : in out Phases; F : Power_Func) return Integer is
       Max_Power : Integer := 0;
    begin
       if K = 1 then
-         return Get_Power (A);
+         return F (A);
       end if;
       
       declare
-         Max_Power : Integer := Get_Max_Power (K - 1, A);
+         Max_Power : Integer := Get_Max_Power (K - 1, A, F);
          Temp : Integer;
       begin
          for I in 0 .. K-2 loop
@@ -49,7 +33,7 @@ procedure Day07 is
             end if;
             A (K-1) := Temp;
             
-            Max_Power := Integer'Max (Max_Power, Get_Max_Power (K - 1, A));
+            Max_Power := Integer'Max (Max_Power, Get_Max_Power (K - 1, A, F));
          end loop;
          
          return Max_Power;
@@ -57,8 +41,68 @@ procedure Day07 is
    end Get_Max_Power;
 begin
    declare
-      Phase_Permutation : Phases := Phase_Permutations;
+      Phase_Permutation : Phases := (0, 1, 2, 3, 4);
+      
+      function Get_Power (Phase_Permutation : Phases) return Integer is
+         Power : Integer := 0;
+      begin
+         for Phase of Phase_Permutation loop
+            declare
+               Instance : Intcode_Instance := Instantiate (Compiler);
+            begin
+               Instance.Inputs.Append (Phase);
+               Instance.Inputs.Append (Power);
+               Instance.Run;
+               Power := Instance.Outputs.Last_Element;
+            end;
+         end loop;
+      
+         return Power;
+      end Get_Power;
    begin
-      Put_Line (Get_Max_Power (Phase_Permutation'Length, Phase_Permutation)'Image);
+      Put_Line (Get_Max_Power (Phase_Permutation'Length, Phase_Permutation, Get_Power'Unrestricted_Access)'Image);
+   end;
+   
+   declare
+      Phase_Permutation : Phases := (5, 6, 7, 8, 9);
+      
+      function Get_Power (Phase_Permutation : Phases) return Integer is
+         Power : Integer := 0;
+         
+         type Instance_Array is array (Phases'Range) of Intcode_Instance;
+         Instances : Instance_Array := (others => Instantiate (Compiler));
+         
+         All_Halted : Boolean := False;
+      begin
+         for I in Phases'Range loop
+            Instances (I).Inputs.Append (Phase_Permutation (I));
+         end loop;
+         Instances (Instances'First).Inputs.Append (0);
+         
+         while not All_Halted loop
+            All_Halted := True;
+            for I in Phases'Range loop
+               Instances (I).Run;
+               
+               if I = Phases'Last then
+                  if not Instances (I).Outputs.Is_Empty then
+                     Instances (Phases'First).Inputs.Append (Instances (I).Outputs);
+                     Power := Instances (I).Outputs.Last_Element;
+                  end if;
+               else
+                  Instances (I+1).Inputs.Append (Instances (I).Outputs);
+               end if;
+               Instances (I).Outputs.Clear;
+               
+               if Instances (I).State /= Halted then
+                  All_Halted := False;
+               end if;
+            end loop;
+         end loop;
+         
+         return Power;
+      end Get_Power;
+   begin
+      Put_Line (Get_Max_Power (Phase_Permutation'Length, Phase_Permutation, Get_Power'Unrestricted_Access)'Image);
    end;
 end Day07;
