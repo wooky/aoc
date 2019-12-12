@@ -9,7 +9,7 @@ package body Intcode is
       use GNAT;
       Opcode_Set : String_Split.Slice_Set;
       
-      Opcodes : Integer_Vectors.Vector;
+      Opcodes : Opcode_Vectors.Map;
    begin
       Open (File => File,
             Mode => In_File,
@@ -25,7 +25,7 @@ package body Intcode is
       end;
       
       for I in 1 .. String_Split.Slice_Count (Opcode_Set) loop
-         Opcodes.Append (Integer'Value (String_Split.Slice (Opcode_Set, I)));
+         Opcodes.Include (Index (I)-1, Element'Value (String_Split.Slice (Opcode_Set, I)));
       end loop;
       
       Close (File);
@@ -39,10 +39,25 @@ package body Intcode is
         (Opcodes => Compiler.Opcodes, others => <>);
    end Instantiate;
    
-   function Get_Opcode (Instance : Intcode_Instance; Immediate : Boolean := True; Offset : Integer := 0) return Integer is
+   function Get_Or_Set_Value_At_Address (Instance : in out Intcode_Instance; Address : Index; Default_Value : Element := 0; Force_Set : Boolean := False) return Element is
    begin
-      return (if Immediate then Instance.Opcodes (Instance.IP+Offset) else Instance.Opcodes (Instance.Opcodes (Instance.IP+Offset)));
-   end Get_Opcode;
+      if not Instance.Opcodes.Contains (Address) then
+         Instance.Opcodes.Include (Address, Default_Value);
+         return Default_Value;
+      elsif Force_Set then
+         Instance.Opcodes (Address) := Default_Value;
+         return Default_Value;
+      end if;
+      return Instance.Opcodes (Address);
+   end Get_Or_Set_Value_At_Address;
+   
+   function Get_Value (Instance : in out Intcode_Instance; Mode : Opcode_Mode := Immediate; Offset : Element := 0) return Element is
+   begin
+      return Instance.Get_Or_Set_Value_At_Address (case Mode is
+                                                      when Position => Instance.Get_Or_Set_Value_At_Address (Instance.IP + Offset),
+                                                      when Immediate => Instance.IP + Offset,
+                                                      when Relative => Instance.IP + Instance.Relative_Base + Offset);
+   end Get_Value;
    
    procedure Run (Instance : in out Intcode_Instance) is
    begin
@@ -54,12 +69,14 @@ package body Intcode is
       
       loop
          declare
-            type Valid_Opcode is (Add, Multiply, Input, Output, JIT, JIF, LT, EQ, Halt);
-            for Valid_Opcode use (1, 2, 3, 4, 5, 6, 7, 8, 99);
-            Instruction : Natural := Instance.Get_Opcode;
+            type Valid_Opcode is (Add, Multiply, Input, Output, JIT, JIF, LT, EQ, ARB, Halt);
+            for Valid_Opcode use (1, 2, 3, 4, 5, 6, 7, 8, 9, 99);
+            Instruction : Element := Instance.Get_Value;
             Opcode : Valid_Opcode := Valid_Opcode'Enum_Val (Instruction mod 100);
-            Immediate_1 : Boolean := (Instruction / 100) mod 2 = 1;
-            Skip : Natural := 2;
+            Mode_1 : Opcode_Mode := Opcode_Mode'Val ((Instruction / 100) mod Opcode_Mode'Size);
+            Val_1 : Element := Instance.Get_Value (Mode_1, 1);
+            Skip : Element := 2;
+            Junk : Element;
          begin
             case Opcode is
             when Input =>
@@ -67,11 +84,13 @@ package body Intcode is
                   Instance.State := Need_Input;
                   return;
                else
-                  Instance.Opcodes (Instance.Opcodes (Instance.IP+1)) := Instance.Inputs.First_Element;
+                  Junk := Instance.Get_Or_Set_Value_At_Address (Instance.Get_Value (Offset => 1), Instance.Inputs.First_Element, True);
                   Instance.Inputs.Delete_First;
                end if;
             when Output =>
-               Instance.Outputs.Append (Instance.Get_Opcode (Immediate_1, 1));
+               Instance.Outputs.Append (Val_1);
+            when ARB =>
+               Instance.Relative_Base := Instance.Relative_Base + Val_1;
             when Halt =>
                Instance.State := Halted;
                return;
@@ -79,10 +98,9 @@ package body Intcode is
                Skip := 4;
                
                declare
-                  Immediate_2 : Boolean := (Instruction / 1000) mod 2 = 1;
-                  Val_1 : Integer := Instance.Get_Opcode (Immediate_1, 1);
-                  Val_2 : Integer := Instance.Get_Opcode (Immediate_2, 2);
-                  Result : Integer;
+                  Mode_2 : Opcode_Mode := Opcode_Mode'Val ((Instruction / 1000) mod Opcode_Mode'Size);
+                  Val_2 : Element := Instance.Get_Value (Mode_2, 2);
+                  Result : Element;
                   Store : Boolean := True;
                begin
                   case Opcode is
@@ -114,9 +132,7 @@ package body Intcode is
                      raise Constraint_Error with "Undefined opcode";
                   end case;
                   
-                  if Store then
-                     Instance.Opcodes (Instance.Opcodes (Instance.IP+3)) := Result;
-                  end if;
+                  Junk := Instance.Get_Or_Set_Value_At_Address (Instance.Get_Value (Offset => 3), Result, Store);
                end;
             end case;
             

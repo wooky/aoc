@@ -7,7 +7,7 @@ procedure Day05 is
    
    Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day05.txt");
    
-   function Run_Diagnostics (Input : Integer) return Integer is
+   function Run_Diagnostics (Input : Element) return Element is
       Instance : Intcode_Instance := Instantiate (Compiler);
    begin
       Instance.Inputs.Append (Input);

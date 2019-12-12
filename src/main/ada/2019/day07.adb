@@ -7,21 +7,21 @@ procedure Day07 is
    
    Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day07.txt");
    
-   type Phases is array (0 .. 4) of Integer;
+   type Phases is array (0 .. 4) of Element;
    
-   type Power_Func is access function (Phase_Permutations : Phases) return Integer;
+   type Power_Func is access function (Phase_Permutations : Phases) return Element;
    
    -- Uses Heap's algorithm
-   function Get_Max_Power (K : Natural; A : in out Phases; F : Power_Func) return Integer is
-      Max_Power : Integer := 0;
+   function Get_Max_Power (K : Natural; A : in out Phases; F : Power_Func) return Element is
+      Max_Power : Element := 0;
    begin
       if K = 1 then
          return F (A);
       end if;
       
       declare
-         Max_Power : Integer := Get_Max_Power (K - 1, A, F);
-         Temp : Integer;
+         Max_Power : Element := Get_Max_Power (K - 1, A, F);
+         Temp : Element;
       begin
          for I in 0 .. K-2 loop
             if K mod 2 = 0 then
@@ -33,7 +33,7 @@ procedure Day07 is
             end if;
             A (K-1) := Temp;
             
-            Max_Power := Integer'Max (Max_Power, Get_Max_Power (K - 1, A, F));
+            Max_Power := Element'Max (Max_Power, Get_Max_Power (K - 1, A, F));
          end loop;
          
          return Max_Power;
@@ -43,8 +43,8 @@ begin
    declare
       Phase_Permutation : Phases := (0, 1, 2, 3, 4);
       
-      function Get_Power (Phase_Permutation : Phases) return Integer is
-         Power : Integer := 0;
+      function Get_Power (Phase_Permutation : Phases) return Element is
+         Power : Element := 0;
       begin
          for Phase of Phase_Permutation loop
             declare
@@ -66,8 +66,8 @@ begin
    declare
       Phase_Permutation : Phases := (5, 6, 7, 8, 9);
       
-      function Get_Power (Phase_Permutation : Phases) return Integer is
-         Power : Integer := 0;
+      function Get_Power (Phase_Permutation : Phases) return Element is
+         Power : Element := 0;
          
          type Instance_Array is array (Phases'Range) of Intcode_Instance;
          Instances : Instance_Array := (others => Instantiate (Compiler));

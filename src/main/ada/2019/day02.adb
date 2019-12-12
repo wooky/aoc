@@ -7,21 +7,21 @@ procedure Day02 is
    
    Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day02.txt");
    
-   function Compute_Output (Noun, Verb : Integer) return Integer is
+   function Compute_Output (Noun, Verb : Integer) return Element is
       Instance : Intcode_Instance := Instantiate (Compiler);
    begin
-      Instance.Opcodes (1) := Noun;
-      Instance.Opcodes (2) := Verb;
+      Instance.Opcodes (1) := Element (Noun);
+      Instance.Opcodes (2) := Element (Verb);
       
       Instance.Run;
       
       return Instance.Opcodes (0);
    end Compute_Output;
 begin
-   Put_Line (Integer'Image (Compute_Output (12, 2)));
+   Put_Line (Compute_Output (12, 2)'Image);
    
    declare
-      Result : Integer;
+      Result : Element;
    begin
       Gravity_Assist: for Noun in 0 .. 99 loop
          for Verb in 0 .. 99 loop

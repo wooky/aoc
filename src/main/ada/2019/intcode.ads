@@ -1,21 +1,29 @@
+with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 
 package Intcode is
-   package Integer_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Natural,
-      Element_Type => Integer);
-   use Integer_Vectors;
+   subtype Element is Long_Long_Integer;
+   subtype Index is Element range 0 .. Element'Last;
+   
+   package Opcode_Vectors is new Ada.Containers.Ordered_Maps
+     (Key_Type => Index,
+      Element_Type => Element);
+   
+   package Data_Vectors is new Ada.Containers.Vectors
+     (Index_Type => Index,
+      Element_Type => Element);
    
    type Intcode_Compiler is limited private;
    
    type Instance_State is (Not_Started, Running, Need_Input, Halted);
    
    type Intcode_Instance is tagged limited record
-      Opcodes : Vector;
-      Inputs : Vector := Empty_Vector;
-      Outputs : Vector := Empty_Vector;
-      IP : Integer := 0;
+      Opcodes : Opcode_Vectors.Map;
+      Inputs : Data_Vectors.Vector := Data_Vectors.Empty_Vector;
+      Outputs : Data_Vectors.Vector := Data_Vectors.Empty_Vector;
+      IP : Index := 0;
       State : Instance_State := Not_Started;
+      Relative_Base : Element := 0;
    end record;
 
    function Compile (Filename : String) return Intcode_Compiler;
@@ -25,6 +33,8 @@ package Intcode is
    procedure Run (Instance : in out Intcode_Instance);
 private
    type Intcode_Compiler is limited record
-      Opcodes : Integer_Vectors.Vector;
+      Opcodes : Opcode_Vectors.Map;
    end record;
+   
+   type Opcode_Mode is (Position, Immediate, Relative);
 end Intcode;
