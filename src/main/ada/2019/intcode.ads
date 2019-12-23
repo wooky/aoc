@@ -13,7 +13,8 @@ package Intcode is
      (Index_Type => Index,
       Element_Type => Element);
    
-   type Intcode_Compiler is limited private;
+   --     type Intcode_Compiler is limited private;
+   type Intcode_Compiler is private;  -- TODO remove this and uncomment the line above
    
    type Instance_State is (Not_Started, Running, Need_Input, Halted);
    
@@ -32,7 +33,8 @@ package Intcode is
    
    procedure Run (Instance : in out Intcode_Instance);
 private
-   type Intcode_Compiler is limited record
+   --     type Intcode_Compiler is limited record
+   type Intcode_Compiler is record  -- TODO same thing here
       Opcodes : Opcode_Vectors.Map;
    end record;
    

@@ -2,7 +2,7 @@ with Intcode;
 
 package body AOC.AOC_2019.Day05 is
    use Intcode;
-   Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day05.txt");
+   Compiler : Intcode_Compiler;
    
    function Run_Diagnostics (Input : Element) return Element is
       Instance : Intcode_Instance := Instantiate (Compiler);
@@ -12,9 +12,9 @@ package body AOC.AOC_2019.Day05 is
       return Instance.Outputs.Last_Element;
    end Run_Diagnostics;
    
-   procedure Init (D : Day_05) is
+   procedure Init (D : Day_05; Root : String) is
    begin
-      null;
+      Compiler := Compile (Root & "/input/2019/day05.txt");
    end Init;
    
    function Part_1 (D : Day_05) return String is

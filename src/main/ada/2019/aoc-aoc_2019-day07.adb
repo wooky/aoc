@@ -2,7 +2,7 @@ with Intcode;
 
 package body AOC.AOC_2019.Day07 is
    use Intcode;
-   Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day07.txt");
+   Compiler : Intcode_Compiler;
    
    type Phases is array (0 .. 4) of Element;
    
@@ -37,9 +37,9 @@ package body AOC.AOC_2019.Day07 is
       end;
    end Get_Max_Power;
    
-   procedure Init (D : Day_07) is
+   procedure Init (D : Day_07; Root : String) is
    begin
-      null;
+      Compiler := Compile (Root & "/input/2019/day07.txt");
    end Init;
    
    function Part_1 (D : Day_07) return String is

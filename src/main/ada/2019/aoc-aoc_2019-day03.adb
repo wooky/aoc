@@ -68,13 +68,13 @@ package body AOC.AOC_2019.Day03 is
       return Wire_Segments;
    end Create_Wire_Segments;
    
-   procedure Init (D : Day_03) is
+   procedure Init (D : Day_03; Root : String) is
       use Ada.Text_IO;
       File : File_Type;
    begin
       Open (File => File,
             Mode => In_File,
-            Name => "src/main/resources/2019/day03.txt");
+            Name => Root & "/input/2019/day03.txt");
    
       First_Wire_Segments := Create_Wire_Segments (Get_Line (File));
       for Second_Wire_Segment of Create_Wire_Segments (Get_Line (File)) loop

@@ -12,13 +12,13 @@ package body AOC.AOC_2019.Day08 is
    Checksum : Natural;
    Result : Layer := (others => '2');
    
-   procedure Init (D : Day_08) is
+   procedure Init (D : Day_08; Root : String) is
       use Ada.Text_IO;
       File : File_Type;
    begin
       Open (File => File,
             Mode => In_File,
-            Name => "src/main/resources/2019/day08.txt");
+            Name => Root & "/input/2019/day08.txt");
    
       declare
          Image : String := Get_Line (File);

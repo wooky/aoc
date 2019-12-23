@@ -2,7 +2,16 @@ project Aoc is
 
    for Source_Dirs use ("src/main/ada/**");
    for Object_Dir use "out";
-   for Main use ("day04", "day09", "main.adb");
+   for Main use ("main", "day04", "day09");
+
+   package Gnattest is
+      for Harness_Dir use ".";
+      for Tests_Root use "../src/test/ada";
+   end Gnattest;
+
+   package Ide is
+      for Vcs_Kind use "git";
+   end Ide;
 
 end Aoc;
 

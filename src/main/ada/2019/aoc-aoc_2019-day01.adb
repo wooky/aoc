@@ -7,7 +7,7 @@ package body AOC.AOC_2019.Day01 is
    Total_Fuel : Fuel := 0;
    Abhorrent_Total_Fuel : Fuel := 0;
 
-   procedure Init (D : Day_01) is
+   procedure Init (D : Day_01; Root : String) is
       function Calc_Fuel (M : Mass) return Fuel is
          Result : Integer;
       begin
@@ -20,7 +20,7 @@ package body AOC.AOC_2019.Day01 is
    begin
       Open (File => File,
             Mode => In_File,
-            Name => "src/main/resources/2019/day01.txt");
+            Name => Root & "/input/2019/day01.txt");
       while not End_Of_File (File) loop
          declare
             Current_Mass : Mass := Mass (Integer'Value (Get_Line (File)));

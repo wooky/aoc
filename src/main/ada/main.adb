@@ -15,7 +15,7 @@ begin
    if Day in null then
       raise Constraint_Error with "Invalid day";
    end if;
-   Day.Init;
+   Day.Init (".");
    Put_Line (Day.Part_1);
    Put_Line (Day.Part_2);
 end Main;

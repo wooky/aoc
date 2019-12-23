@@ -41,13 +41,13 @@ package body AOC.AOC_2019.Day06 is
    You_Path : Orbit_Paths.Vector;
    San_Path : Orbit_Paths.Vector;
    
-   procedure Init (D : Day_06) is
+   procedure Init (D : Day_06; Root : String) is
       use Ada.Text_IO;
       File : File_Type;
    begin
       Open (File => File,
             Mode => In_File,
-            Name => "src/main/resources/2019/day06.txt");
+            Name => Root & "/input/2019/day06.txt");
       while not End_Of_File (File) loop
          declare
             use GNAT;
