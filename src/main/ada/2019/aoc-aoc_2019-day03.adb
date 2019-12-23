@@ -2,10 +2,7 @@ with Ada.Containers.Vectors;
 with Ada.Text_IO;
 with GNAT.String_Split;
 
-procedure Day03 is
-   use Ada.Text_IO;
-   File : File_Type;
-   
+package body AOC.AOC_2019.Day03 is
    type Wire_Segment is record
       Is_Horizontal: Boolean;
       Distance_Travelled : Integer;
@@ -16,7 +13,6 @@ procedure Day03 is
      (Index_Type => Natural,
       Element_Type => Wire_Segment);
    
-   use Wire_Segment_Vectors;
    First_Wire_Segments : Wire_Segment_Vectors.Vector;
    
    Shortest_Distance : Integer := Integer'Last;
@@ -71,27 +67,39 @@ procedure Day03 is
       
       return Wire_Segments;
    end Create_Wire_Segments;
-begin
-   Open (File => File,
-         Mode => In_File,
-         Name => "src/main/resources/2019/day03.txt");
    
-   First_Wire_Segments := Create_Wire_Segments (Get_Line (File));
-   for Second_Wire_Segment of Create_Wire_Segments (Get_Line (File)) loop
-      for First_Wire_Segment of First_Wire_Segments loop
-         if Second_Wire_Segment.Is_Horizontal /= First_Wire_Segment.Is_Horizontal and not (Second_Wire_Segment.Stable = 0 and First_Wire_Segment.Stable = 0) and Second_Wire_Segment.Stable in First_Wire_Segment.P1..First_Wire_Segment.P2 and First_Wire_Segment.Stable in Second_Wire_Segment.P1..Second_Wire_Segment.P2 then
-            Shortest_Distance := Integer'Min (Shortest_Distance, abs Second_Wire_Segment.Stable + abs First_Wire_Segment.Stable);
-            Fastest_Distance := Integer'Min
-              (Fastest_Distance,
-               Second_Wire_Segment.Distance_Travelled + First_Wire_Segment.Distance_Travelled
-               + abs (Second_Wire_Segment.Time_Start - First_Wire_Segment.Stable)
-               + abs (First_Wire_Segment.Time_Start - Second_Wire_Segment.Stable));
-         end if;
+   procedure Init (D : Day_03) is
+      use Ada.Text_IO;
+      File : File_Type;
+   begin
+      Open (File => File,
+            Mode => In_File,
+            Name => "src/main/resources/2019/day03.txt");
+   
+      First_Wire_Segments := Create_Wire_Segments (Get_Line (File));
+      for Second_Wire_Segment of Create_Wire_Segments (Get_Line (File)) loop
+         for First_Wire_Segment of First_Wire_Segments loop
+            if Second_Wire_Segment.Is_Horizontal /= First_Wire_Segment.Is_Horizontal and not (Second_Wire_Segment.Stable = 0 and First_Wire_Segment.Stable = 0) and Second_Wire_Segment.Stable in First_Wire_Segment.P1..First_Wire_Segment.P2 and First_Wire_Segment.Stable in Second_Wire_Segment.P1..Second_Wire_Segment.P2 then
+               Shortest_Distance := Integer'Min (Shortest_Distance, abs Second_Wire_Segment.Stable + abs First_Wire_Segment.Stable);
+               Fastest_Distance := Integer'Min
+                 (Fastest_Distance,
+                  Second_Wire_Segment.Distance_Travelled + First_Wire_Segment.Distance_Travelled
+                  + abs (Second_Wire_Segment.Time_Start - First_Wire_Segment.Stable)
+                  + abs (First_Wire_Segment.Time_Start - Second_Wire_Segment.Stable));
+            end if;
+         end loop;
       end loop;
-   end loop;
    
-   Close (File);
+      Close (File);
+   end Init;
    
-   Put_Line (Shortest_Distance'Image);
-   Put_Line (Fastest_Distance'Image);
-end Day03;
+   function Part_1 (D : Day_03) return String is
+   begin
+      return Shortest_Distance'Image;
+   end Part_1;
+   
+   function Part_2 (D : Day_03) return String is
+   begin
+      return Fastest_Distance'Image;
+   end Part_2;
+end AOC.AOC_2019.Day03;

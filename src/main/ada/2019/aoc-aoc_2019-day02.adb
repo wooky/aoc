@@ -1,10 +1,7 @@
-with Ada.Text_IO;
 with Intcode;
 
-procedure Day02 is
-   use Ada.Text_IO;
+package body AOC.AOC_2019.Day02 is
    use Intcode;
-   
    Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day02.txt");
    
    function Compute_Output (Noun, Verb : Integer) return Element is
@@ -17,20 +14,29 @@ procedure Day02 is
       
       return Instance.Opcodes (0);
    end Compute_Output;
-begin
-   Put_Line (Compute_Output (12, 2)'Image);
    
-   declare
+   procedure Init (D : Day_02) is
+   begin
+      null;
+   end Init;
+   
+   function Part_1 (D : Day_02) return String is
+   begin
+      return Compute_Output (12, 2)'Image;
+   end Part_1;
+   
+   function Part_2 (D : Day_02) return String is
       Result : Element;
    begin
-      Gravity_Assist: for Noun in 0 .. 99 loop
+      for Noun in 0 .. 99 loop
          for Verb in 0 .. 99 loop
             Result := Compute_Output (Noun, Verb);
             if Result = 19690720 then
-               Put_Line (Integer'Image (100 * Noun + Verb));
-               exit Gravity_Assist;
+               return Integer'Image (100 * Noun + Verb);
             end if;
          end loop;
-      end loop Gravity_Assist;
-   end;
-end Day02;
+      end loop;
+      
+      raise Program_Error with "Output was not found!";
+   end Part_2;
+end AOC.AOC_2019.Day02;

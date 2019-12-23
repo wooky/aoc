@@ -1,10 +1,7 @@
-with Ada.Text_IO;
 with Intcode;
 
-procedure Day05 is
-   use Ada.Text_IO;
+package body AOC.AOC_2019.Day05 is
    use Intcode;
-   
    Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day05.txt");
    
    function Run_Diagnostics (Input : Element) return Element is
@@ -14,7 +11,19 @@ procedure Day05 is
       Instance.Run;
       return Instance.Outputs.Last_Element;
    end Run_Diagnostics;
-begin
-   Put_Line (Run_Diagnostics (1)'Image);
-   Put_Line (Run_Diagnostics (5)'Image);
-end Day05;
+   
+   procedure Init (D : Day_05) is
+   begin
+      null;
+   end Init;
+   
+   function Part_1 (D : Day_05) return String is
+   begin
+      return Run_Diagnostics (1)'Image;
+   end Part_1;
+   
+   function Part_2 (D : Day_05) return String is
+   begin
+      return Run_Diagnostics (5)'Image;
+   end Part_2;
+end AOC.AOC_2019.Day05;

@@ -1,4 +1,4 @@
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;
 
 package body AOC.AOC_2019.Day01 is
    type Mass is mod 2 ** 32;
@@ -15,6 +15,7 @@ package body AOC.AOC_2019.Day01 is
          return Fuel (if Result < 0 then 0 else Result);
       end Calc_Fuel;
 
+      use Ada.Text_IO;
       File : File_Type;
    begin
       Open (File => File,

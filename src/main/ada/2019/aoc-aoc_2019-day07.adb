@@ -1,10 +1,7 @@
-with Ada.Text_IO;
 with Intcode;
 
-procedure Day07 is
-   use Ada.Text_IO;
+package body AOC.AOC_2019.Day07 is
    use Intcode;
-   
    Compiler : Intcode_Compiler := Compile ("src/main/resources/2019/day07.txt");
    
    type Phases is array (0 .. 4) of Element;
@@ -39,8 +36,13 @@ procedure Day07 is
          return Max_Power;
       end;
    end Get_Max_Power;
-begin
-   declare
+   
+   procedure Init (D : Day_07) is
+   begin
+      null;
+   end Init;
+   
+   function Part_1 (D : Day_07) return String is
       Phase_Permutation : Phases := (0, 1, 2, 3, 4);
       
       function Get_Power (Phase_Permutation : Phases) return Element is
@@ -60,10 +62,10 @@ begin
          return Power;
       end Get_Power;
    begin
-      Put_Line (Get_Max_Power (Phase_Permutation'Length, Phase_Permutation, Get_Power'Unrestricted_Access)'Image);
-   end;
+      return Get_Max_Power (Phase_Permutation'Length, Phase_Permutation, Get_Power'Unrestricted_Access)'Image;
+   end Part_1;
    
-   declare
+   function Part_2 (D : Day_07) return String is
       Phase_Permutation : Phases := (5, 6, 7, 8, 9);
       
       function Get_Power (Phase_Permutation : Phases) return Element is
@@ -103,6 +105,6 @@ begin
          return Power;
       end Get_Power;
    begin
-      Put_Line (Get_Max_Power (Phase_Permutation'Length, Phase_Permutation, Get_Power'Unrestricted_Access)'Image);
-   end;
-end Day07;
+      return Get_Max_Power (Phase_Permutation'Length, Phase_Permutation, Get_Power'Unrestricted_Access)'Image;
+   end Part_2;
+end AOC.AOC_2019.Day07;
