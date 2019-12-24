@@ -49,6 +49,27 @@ package body Intcode.Test_Data.Tests is
    end Test_Compile;
 --  end read only
 
+
+--  begin read only
+   procedure Test_Compile_From_String (Gnattest_T : in out Test);
+   procedure Test_Compile_From_String_2808ba (Gnattest_T : in out Test) renames Test_Compile_From_String;
+--  id:2.2/2808ba8ce1b051f3/Compile_From_String/1/0/
+   procedure Test_Compile_From_String (Gnattest_T : in out Test) is
+   --  intcode.ads:43:4:Compile_From_String
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      AUnit.Assertions.Assert
+        (Gnattest_Generated.Default_Assert_Value,
+         "Test not implemented.");
+
+--  begin read only
+   end Test_Compile_From_String;
+--  end read only
+
 --  begin read only
 --  id:2.2/02/
 --

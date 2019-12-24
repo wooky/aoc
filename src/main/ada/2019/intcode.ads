@@ -39,4 +39,6 @@ private
    end record;
    
    type Opcode_Mode is (Position, Immediate, Relative);
+   
+   function Compile_From_String (S : String) return Intcode_Compiler;
 end Intcode;

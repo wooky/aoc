@@ -5,11 +5,6 @@ package body Intcode is
    function Compile (Filename : String) return Intcode_Compiler is
       use Ada.Text_IO;
       File : File_Type;
-      
-      use GNAT;
-      Opcode_Set : String_Split.Slice_Set;
-      
-      Opcodes : Opcode_Vectors.Map;
    begin
       Open (File => File,
             Mode => In_File,
@@ -17,21 +12,30 @@ package body Intcode is
       
       declare
          Opcode_Contents : String := Get_Line (File);
+         Compiler : Intcode_Compiler := Compile_From_String (Opcode_Contents);
       begin
-         String_Split.Create (S => Opcode_Set,
-                              From => Opcode_Contents,
-                              Separators => ",",
-                              Mode => String_Split.Multiple);
+         Close (File);
+         return Compiler;
       end;
+   end Compile;
+   
+   function Compile_From_String (S : String) return Intcode_Compiler is
+      use GNAT;
+      Opcode_Set : String_Split.Slice_Set;
+      
+      Opcodes : Opcode_Vectors.Map;
+   begin
+      String_Split.Create (S => Opcode_Set,
+                           From => S,
+                           Separators => ",",
+                           Mode => String_Split.Multiple);
       
       for I in 1 .. String_Split.Slice_Count (Opcode_Set) loop
          Opcodes.Include (Index (I)-1, Element'Value (String_Split.Slice (Opcode_Set, I)));
       end loop;
       
-      Close (File);
-      
       return (Opcodes => Opcodes);
-   end Compile;
+   end Compile_From_String;
    
    function Instantiate (Compiler : Intcode_Compiler) return Intcode_Instance is
    begin

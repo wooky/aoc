@@ -1,2 +1,3 @@
 *.ads
 aoc-aoc_????-day??-day_??_test_data*.adb
+*test_data.adb
