@@ -3,7 +3,7 @@
 --  Such changes will be kept during further regeneration of this file.
 --  All code placed outside of test routine bodies will be lost. The
 --  code intended to set up and tear down the test environment should be
---  placed into Intcode.Test_Data.
+--  placed into Intcode.Test_Data.Tests.Compilers.Compiler_Test_Data.
 
 with AUnit.Assertions; use AUnit.Assertions;
 with System.Assertions;
@@ -17,7 +17,7 @@ with System.Assertions;
 
 --  begin read only
 --  end read only
-package body Intcode.Test_Data.Tests is
+package body Intcode.Test_Data.Tests.Compilers.Compiler_Test_Data.Compiler_Tests is
 
 --  begin read only
 --  id:2.2/01/
@@ -30,11 +30,11 @@ package body Intcode.Test_Data.Tests is
 --  end read only
 
 --  begin read only
-   procedure Test_Compile (Gnattest_T : in out Test);
-   procedure Test_Compile_8fc19b (Gnattest_T : in out Test) renames Test_Compile;
---  id:2.2/8fc19b4c47be0d89/Compile/1/0/
-   procedure Test_Compile (Gnattest_T : in out Test) is
-   --  intcode.ads:30:4:Compile
+   procedure Test_Compile (Gnattest_T : in out Test_Compiler);
+   procedure Test_Compile_9ba484 (Gnattest_T : in out Test_Compiler) renames Test_Compile;
+--  id:2.2/9ba484c8d1d216af/Compile/1/0/
+   procedure Test_Compile (Gnattest_T : in out Test_Compiler) is
+   --  intcode.ads:34:7:Compile
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -51,11 +51,32 @@ package body Intcode.Test_Data.Tests is
 
 
 --  begin read only
-   procedure Test_Compile_From_String (Gnattest_T : in out Test);
-   procedure Test_Compile_From_String_2808ba (Gnattest_T : in out Test) renames Test_Compile_From_String;
---  id:2.2/2808ba8ce1b051f3/Compile_From_String/1/0/
-   procedure Test_Compile_From_String (Gnattest_T : in out Test) is
-   --  intcode.ads:43:4:Compile_From_String
+   procedure Test_Instantiate (Gnattest_T : in out Test_Compiler);
+   procedure Test_Instantiate_f7d1c7 (Gnattest_T : in out Test_Compiler) renames Test_Instantiate;
+--  id:2.2/f7d1c70ad5abb651/Instantiate/1/0/
+   procedure Test_Instantiate (Gnattest_T : in out Test_Compiler) is
+   --  intcode.ads:35:7:Instantiate
+--  end read only
+
+      pragma Unreferenced (Gnattest_T);
+
+   begin
+
+      AUnit.Assertions.Assert
+        (Gnattest_Generated.Default_Assert_Value,
+         "Test not implemented.");
+
+--  begin read only
+   end Test_Instantiate;
+--  end read only
+
+
+--  begin read only
+   procedure Test_Compile_From_String (Gnattest_T : in out Test_Compiler);
+   procedure Test_Compile_From_String_97394b (Gnattest_T : in out Test_Compiler) renames Test_Compile_From_String;
+--  id:2.2/97394bbdab562724/Compile_From_String/1/0/
+   procedure Test_Compile_From_String (Gnattest_T : in out Test_Compiler) is
+   --  intcode.ads:41:7:Compile_From_String
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -80,4 +101,4 @@ begin
    null;
 --  begin read only
 --  end read only
-end Intcode.Test_Data.Tests;
+end Intcode.Test_Data.Tests.Compilers.Compiler_Test_Data.Compiler_Tests;

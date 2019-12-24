@@ -30,32 +30,11 @@ package body AOC.AOC_2019.Day01.Test_Data.Tests is
 --  end read only
 
 --  begin read only
-   procedure Test_Create (Gnattest_T : in out Test);
-   procedure Test_Create_207f7c (Gnattest_T : in out Test) renames Test_Create;
---  id:2.2/207f7cf139ae95ae/Create/1/0/
-   procedure Test_Create (Gnattest_T : in out Test) is
-   --  aoc-aoc_2019-day01.ads:4:4:Create
---  end read only
-
-      pragma Unreferenced (Gnattest_T);
-
-   begin
-
-      AUnit.Assertions.Assert
-        (Gnattest_Generated.Default_Assert_Value,
-         "Test not implemented.");
-
---  begin read only
-   end Test_Create;
---  end read only
-
-
---  begin read only
    procedure Test_Calc_Fuel (Gnattest_T : in out Test);
    procedure Test_Calc_Fuel_9e45f9 (Gnattest_T : in out Test) renames Test_Calc_Fuel;
 --  id:2.2/9e45f9acf0400023/Calc_Fuel/1/0/
    procedure Test_Calc_Fuel (Gnattest_T : in out Test) is
-   --  aoc-aoc_2019-day01.ads:17:4:Calc_Fuel
+   --  aoc-aoc_2019-day01.ads:16:4:Calc_Fuel
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -82,7 +61,7 @@ package body AOC.AOC_2019.Day01.Test_Data.Tests is
    procedure Test_Calc_Abhorrent_Fuel_324660 (Gnattest_T : in out Test) renames Test_Calc_Abhorrent_Fuel;
 --  id:2.2/324660d21572cbdb/Calc_Abhorrent_Fuel/1/0/
    procedure Test_Calc_Abhorrent_Fuel (Gnattest_T : in out Test) is
-   --  aoc-aoc_2019-day01.ads:18:4:Calc_Abhorrent_Fuel
+   --  aoc-aoc_2019-day01.ads:17:4:Calc_Abhorrent_Fuel
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
