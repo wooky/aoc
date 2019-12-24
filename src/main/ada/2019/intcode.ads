@@ -9,36 +9,35 @@ package Intcode is
      (Key_Type => Index,
       Element_Type => Element);
    
-   package Data_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Index,
-      Element_Type => Element);
+   package Instances is
+      package Data_Vectors is new Ada.Containers.Vectors
+        (Index_Type => Index,
+         Element_Type => Element);
+      
+      type State is (Not_Started, Running, Need_Input, Halted);
+      
+      type Instance is tagged limited record
+         Opcodes : Opcode_Vectors.Map;
+         Inputs : Data_Vectors.Vector := Data_Vectors.Empty_Vector;
+         Outputs : Data_Vectors.Vector := Data_Vectors.Empty_Vector;
+         IP : Index := 0;
+         S : State := Not_Started;
+         Relative_Base : Element := 0;
+      end record;
+      
+      procedure Run (I : in out Instance);
+   end Instances;
    
-   --     type Intcode_Compiler is limited private;
-   type Intcode_Compiler is private;  -- TODO remove this and uncomment the line above
-   
-   type Instance_State is (Not_Started, Running, Need_Input, Halted);
-   
-   type Intcode_Instance is tagged limited record
-      Opcodes : Opcode_Vectors.Map;
-      Inputs : Data_Vectors.Vector := Data_Vectors.Empty_Vector;
-      Outputs : Data_Vectors.Vector := Data_Vectors.Empty_Vector;
-      IP : Index := 0;
-      State : Instance_State := Not_Started;
-      Relative_Base : Element := 0;
-   end record;
-
-   function Compile (Filename : String) return Intcode_Compiler;
-   
-   function Instantiate (Compiler : Intcode_Compiler) return Intcode_Instance;
-   
-   procedure Run (Instance : in out Intcode_Instance);
-private
-   --     type Intcode_Compiler is limited record
-   type Intcode_Compiler is record  -- TODO same thing here
-      Opcodes : Opcode_Vectors.Map;
-   end record;
-   
-   type Opcode_Mode is (Position, Immediate, Relative);
-   
-   function Compile_From_String (S : String) return Intcode_Compiler;
+   package Compilers is
+      type Compiler is tagged limited private;
+      
+      procedure Compile (C : in out Compiler; Filename : String);
+      function Instantiate (C : Compiler) return Instances.Instance;
+   private
+      type Compiler is tagged limited record
+         Opcodes : Opcode_Vectors.Map := Opcode_Vectors.Empty_Map;
+      end record;
+      
+      procedure Compile_From_String (C : in out Compiler; S : String);
+   end Compilers;
 end Intcode;

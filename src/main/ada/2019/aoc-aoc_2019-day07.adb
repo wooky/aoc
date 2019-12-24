@@ -1,8 +1,5 @@
-with Intcode;
-
 package body AOC.AOC_2019.Day07 is
    use Intcode;
-   Compiler : Intcode_Compiler;
    
    type Phases is array (0 .. 4) of Element;
    
@@ -39,7 +36,7 @@ package body AOC.AOC_2019.Day07 is
    
    procedure Init (D : in out Day_07; Root : String) is
    begin
-      Compiler := Compile (Root & "/input/2019/day07.txt");
+      D.Compiler.Compile (Root & "/input/2019/day07.txt");
    end Init;
    
    function Part_1 (D : Day_07) return String is
@@ -50,7 +47,7 @@ package body AOC.AOC_2019.Day07 is
       begin
          for Phase of Phase_Permutation loop
             declare
-               Instance : Intcode_Instance := Instantiate (Compiler);
+               Instance : Instances.Instance := D.Compiler.Instantiate;
             begin
                Instance.Inputs.Append (Phase);
                Instance.Inputs.Append (Power);
@@ -69,10 +66,12 @@ package body AOC.AOC_2019.Day07 is
       Phase_Permutation : Phases := (5, 6, 7, 8, 9);
       
       function Get_Power (Phase_Permutation : Phases) return Element is
+         use Instances;
+         
          Power : Element := 0;
          
-         type Instance_Array is array (Phases'Range) of Intcode_Instance;
-         Instances : Instance_Array := (others => Instantiate (Compiler));
+         type Instance_Array is array (Phases'Range) of Instance;
+         Instances : Instance_Array := (others => D.Compiler.Instantiate);
          
          All_Halted : Boolean := False;
       begin
@@ -96,7 +95,7 @@ package body AOC.AOC_2019.Day07 is
                end if;
                Instances (I).Outputs.Clear;
                
-               if Instances (I).State /= Halted then
+               if Instances (I).S /= Halted then
                   All_Halted := False;
                end if;
             end loop;

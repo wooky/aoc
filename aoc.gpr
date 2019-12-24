@@ -7,6 +7,7 @@ project Aoc is
    package Gnattest is
       for Harness_Dir use ".";
       for Tests_Root use "../src/test/ada";
+      for Skeletons_Default use "pass";
    end Gnattest;
 
    package Ide is

@@ -10,7 +10,7 @@ package body AOC.AOC_2019 is
    function Get_Day (R : Runner_2019; Day_Number : Natural) return Day.Access_Day is
    begin
       return (case Day_Number is
-                 when 1 => Day01.Create,
+                 when 1 => new Day01.Day_01,
                  when 2 => new Day02.Day_02,
                  when 3 => new Day03.Day_03,
                  when 5 => new Day05.Day_05,
