@@ -1,2 +1,2 @@
-*-tests*.ads
-*-test_data.ads
+*.ads
+aoc-aoc_????-day??-day_??_test_data*.adb

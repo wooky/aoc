@@ -34,7 +34,7 @@ package body Intcode.Intcode_Instance_Test_Data.Intcode_Instance_Tests is
    procedure Test_Instantiate_767b56 (Gnattest_T : in out Test_Intcode_Instance) renames Test_Instantiate;
 --  id:2.2/767b561ac18aae82/Instantiate/1/0/
    procedure Test_Instantiate (Gnattest_T : in out Test_Intcode_Instance) is
-   --  intcode.ads:31:4:Instantiate
+   --  intcode.ads:32:4:Instantiate
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -55,7 +55,7 @@ package body Intcode.Intcode_Instance_Test_Data.Intcode_Instance_Tests is
    procedure Test_Run_d5af6c (Gnattest_T : in out Test_Intcode_Instance) renames Test_Run;
 --  id:2.2/d5af6cecb8b3b4cf/Run/1/0/
    procedure Test_Run (Gnattest_T : in out Test_Intcode_Instance) is
-   --  intcode.ads:33:4:Run
+   --  intcode.ads:34:4:Run
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
