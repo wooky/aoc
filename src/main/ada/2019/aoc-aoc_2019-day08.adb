@@ -12,7 +12,7 @@ package body AOC.AOC_2019.Day08 is
    Checksum : Natural;
    Result : Layer := (others => '2');
    
-   procedure Init (D : Day_08; Root : String) is
+   procedure Init (D : in out Day_08; Root : String) is
       use Ada.Text_IO;
       File : File_Type;
    begin

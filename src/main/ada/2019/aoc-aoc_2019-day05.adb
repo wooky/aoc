@@ -12,7 +12,7 @@ package body AOC.AOC_2019.Day05 is
       return Instance.Outputs.Last_Element;
    end Run_Diagnostics;
    
-   procedure Init (D : Day_05; Root : String) is
+   procedure Init (D : in out Day_05; Root : String) is
    begin
       Compiler := Compile (Root & "/input/2019/day05.txt");
    end Init;

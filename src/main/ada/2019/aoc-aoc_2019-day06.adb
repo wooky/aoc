@@ -41,7 +41,7 @@ package body AOC.AOC_2019.Day06 is
    You_Path : Orbit_Paths.Vector;
    San_Path : Orbit_Paths.Vector;
    
-   procedure Init (D : Day_06; Root : String) is
+   procedure Init (D : in out Day_06; Root : String) is
       use Ada.Text_IO;
       File : File_Type;
    begin

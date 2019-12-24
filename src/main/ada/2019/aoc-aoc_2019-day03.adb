@@ -68,7 +68,7 @@ package body AOC.AOC_2019.Day03 is
       return Wire_Segments;
    end Create_Wire_Segments;
    
-   procedure Init (D : Day_03; Root : String) is
+   procedure Init (D : in out Day_03; Root : String) is
       use Ada.Text_IO;
       File : File_Type;
    begin

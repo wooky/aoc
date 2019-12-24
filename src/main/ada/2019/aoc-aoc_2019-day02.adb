@@ -15,7 +15,7 @@ package body AOC.AOC_2019.Day02 is
       return Instance.Opcodes (0);
    end Compute_Output;
    
-   procedure Init (D : Day_02; Root : String) is
+   procedure Init (D : in out Day_02; Root : String) is
    begin
       Compiler := Compile (Root & "/input/2019/day02.txt");
    end Init;
