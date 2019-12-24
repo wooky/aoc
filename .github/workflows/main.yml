@@ -10,6 +10,8 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - uses: ada-actions/toolchain@v0.1.0
+      with:
+        distrib: community
     - name: Build Ada executable
       run: gprbuild -Paoc.gpr -p main
     - name: Generate and build Ada tests
