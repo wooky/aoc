@@ -19,4 +19,6 @@ jobs:
         gnat test -dd -Paoc.gpr -r --exit-status=on
         gprbuild -Pout/test_driver.gpr
     - name: Run Ada tests
-      run: ./out/test_runner
+      run: |
+        cd out
+        ./test_runner
