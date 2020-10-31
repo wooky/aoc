@@ -1,0 +1,12 @@
+Problem: vzbxkghb
+
+Considering that the problem has no illegal letters, but also doesn't have an
+increasing straight or repeating letters, we can fulfill all the requirements
+by having the last 5 letters be in the form 00122. The 5th last letter is x, so
+we can set the last 5 letters to xxyzz, making the next password
+  >> vzbxxyzz
+
+xyz is the last increasing straight we can make in the alphabet, so we increment
+the 6th last letter. This allows the last 5 letters to use the smallest possible
+combination, which is aabcc. Hence, the next passwod becomes
+  >> vzcaabcc
