@@ -51,6 +51,10 @@ pub fn StringTable(comptime V: type) type {
             }
         }
 
+        pub fn iterator(self: *Self) StringBackingMap.Iterator {
+            return self.backing.iterator();
+        }
+
         pub fn deinit(self: Self) void {
             var iter = self.backing.iterator();
             while (iter.next()) |kv| {

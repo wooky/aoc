@@ -30,13 +30,18 @@ const Part1 = struct {
     }
 };
 
-const LetterPairs = std.AutoHashMap([2]u8, usize);
 const Part2 = struct {
+    const LetterPairs = std.AutoHashMap([2]u8, usize);
+
     last0: u8 = 0,
     last1: u8 = 0,
     saw_pair: bool = false,
     saw_repeat: bool = false,
-    pairs: LetterPairs = LetterPairs.init(std.heap.page_allocator),
+    pairs: LetterPairs,
+
+    fn init(allocator: *std.mem.Allocator) Part2 {
+        return Part2 { .pairs = LetterPairs.init(allocator) };
+    }
 
     fn deinit(self: *Part2) void {
         self.pairs.deinit();
@@ -72,7 +77,7 @@ pub fn run(problem: *aoc.Problem) !void {
 
     while (problem.line()) |line| {
         var part1 = Part1 {};
-        var part2 = Part2 {};
+        var part2 = Part2.init(problem.allocator);
         defer part2.deinit();
         for (line) |c, idx| {
             part1.feed(c);

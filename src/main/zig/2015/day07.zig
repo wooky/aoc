@@ -39,13 +39,17 @@ const Operation = struct {
 const OutputMap = std.StringHashMap(Operation);
 
 const WireCache = struct {
-    backing: WireCacheBacking = WireCacheBacking.init(std.heap.page_allocator),
+    backing: WireCacheBacking,
     outputs: OutputMap,
 
     const WireCacheBacking = std.StringHashMap(u16);
 
-    fn init(outputs: OutputMap) WireCache {
-        return WireCache { .outputs = outputs };
+    fn init(allocator: *std.mem.Allocator, outputs: OutputMap) WireCache {
+        return WireCache { .backing = WireCacheBacking.init(allocator), .outputs = outputs };
+    }
+
+    fn deinit(self: *WireCache) void {
+        self.backing.deinit();
     }
 
     fn get(self: *WireCache, output: []const u8) u16 {
@@ -64,7 +68,7 @@ const TokenState = enum {
 };
 
 pub fn run(problem: *aoc.Problem) !void {
-    var outputs = OutputMap.init(std.heap.page_allocator);
+    var outputs = OutputMap.init(problem.allocator);
     defer outputs.deinit();
 
     while (problem.line()) |line| {
@@ -117,10 +121,14 @@ pub fn run(problem: *aoc.Problem) !void {
         _ = try outputs.put(output, operation);
     }
 
-    const part1 = outputs.getValue("a").?.evaluate(&WireCache.init(outputs));
+    var cache1 = WireCache.init(problem.allocator, outputs);
+    defer cache1.deinit();
+    const part1 = outputs.getValue("a").?.evaluate(&cache1);
 
     outputs.get("b").?.value.op1.constant = part1;
-    const part2 = outputs.getValue("a").?.evaluate(&WireCache.init(outputs));
+    var cache2 = WireCache.init(problem.allocator, outputs);
+    defer cache2.deinit();
+    const part2 = outputs.getValue("a").?.evaluate(&cache2);
 
     std.debug.warn("{}\n{}\n", .{part1, part2});
 }

@@ -24,12 +24,12 @@ const Address = struct {
 
 pub fn run(problem: *aoc.Problem) void {
     var count_solo: u16 = 0;
-    var visited_solo = VisitedMap.init(std.heap.page_allocator);
+    var visited_solo = VisitedMap.init(problem.allocator);
     defer visited_solo.deinit();
     var santa_solo = Address {}; santa_solo.advance(&visited_solo, &count_solo, 0);
 
     var count_pair: u16 = 0;
-    var visited_pair = VisitedMap.init(std.heap.page_allocator);
+    var visited_pair = VisitedMap.init(problem.allocator);
     defer visited_pair.deinit();
     var santa_pair = Address {}; santa_pair.advance(&visited_pair, &count_pair, 0);
     var robot_pair = Address {}; robot_pair.advance(&visited_pair, &count_pair, 0);

@@ -18,7 +18,7 @@ const Solution = struct {
 };
 
 pub fn run(problem: *aoc.Problem) !void {
-    var json = std.json.Parser.init(std.heap.page_allocator, false);
+    var json = std.json.Parser.init(problem.allocator, false);
     defer json.deinit();
     const solution = switch ((try json.parse(problem.input)).root) {
         std.json.Value.Array => |arr| parse_array(arr),

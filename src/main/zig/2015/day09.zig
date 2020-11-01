@@ -5,10 +5,8 @@ const PathMap = aoc.StringTable(u8);
 const Datum = struct { locations: [][]const u8, paths: *PathMap, min_dist: u16, max_dist: u16 };
 
 pub fn run(problem: *aoc.Problem) !void {
-    var paths = PathMap.init(std.heap.page_allocator);
+    var paths = PathMap.init(problem.allocator);
     defer paths.deinit();
-    var locations = std.StringHashMap(void).init(std.heap.page_allocator);
-    defer locations.deinit();
 
     while (problem.line()) |line| {
         var tokens = std.mem.tokenize(line, " ");
@@ -20,13 +18,11 @@ pub fn run(problem: *aoc.Problem) !void {
 
         _ = try paths.put(loc1, loc2, distance);
         _ = try paths.put(loc2, loc1, distance);
-        _ = try locations.put(loc1, {});
-        _ = try locations.put(loc2, {});
     }
 
-    var location_permutation = std.ArrayList([] const u8).init(std.heap.page_allocator);
+    var location_permutation = std.ArrayList([] const u8).init(problem.allocator);
     defer location_permutation.deinit();
-    var location_iter = locations.iterator();
+    var location_iter = paths.iterator();
     while (location_iter.next()) |kv| {
         try location_permutation.append(kv.key);
     }
