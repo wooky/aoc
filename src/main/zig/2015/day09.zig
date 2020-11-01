@@ -20,45 +20,17 @@ pub fn run(problem: *aoc.Problem) !void {
         _ = try paths.put(loc2, loc1, distance);
     }
 
-    var location_permutation = std.ArrayList([] const u8).init(problem.allocator);
-    defer location_permutation.deinit();
-    var location_iter = paths.iterator();
-    while (location_iter.next()) |kv| {
-        try location_permutation.append(kv.key);
-    }
-
-    var datum = Datum { .locations = location_permutation.items, .paths = &paths, .min_dist = std.math.maxInt(u16), .max_dist = 0 };
-    compute_dists(location_permutation.items.len, &datum);
-    std.debug.warn("{}\n{}\n", .{datum.min_dist, datum.max_dist});
-}
-
-// Heap's Algorithm
-fn compute_dists(k: usize, datum: *Datum) void {
-    var i: usize = 0;
-    if (k == 1) {
+    var min_dist: u16 = std.math.maxInt(u16);
+    var max_dist: u16 = std.math.minInt(u16);
+    var permutator = try aoc.Permutator([]const u8).fromHashMapKeys(problem.allocator, PathMap, paths);
+    defer permutator.deinit();
+    while (permutator.next()) |locations| {
         var dist: u16 = 0;
-        while (i < datum.locations.len - 1) : (i += 1) {
-            dist += datum.paths.get(datum.locations[i], datum.locations[i + 1]);
+        for (locations[1..]) |_, idx| {
+            dist += paths.get(locations[idx], locations[idx + 1]);
         }
-        datum.min_dist = std.math.min(datum.min_dist, dist);
-        datum.max_dist = std.math.max(datum.max_dist, dist);
+        min_dist = std.math.min(min_dist, dist);
+        max_dist = std.math.max(max_dist, dist);
     }
-    else {
-        compute_dists(k - 1, datum);
-        while (i < k-1) : (i += 1) {
-            if (k % 2 == 0) {
-                swap(datum.locations, i, k-1);
-            }
-            else {
-                swap(datum.locations, 0, k-1);
-            }
-            compute_dists(k - 1, datum);
-        }
-    }
-}
-
-fn swap(arr: [][]const u8, a: usize, b: usize) void {
-    var tmp = arr[a];
-    arr[a] = arr[b];
-    arr[b] = tmp;
+    std.debug.warn("{}\n{}\n", .{min_dist, max_dist});
 }
