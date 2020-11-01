@@ -1,3 +1,4 @@
+const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const TokenState = enum {
@@ -11,15 +12,10 @@ const Light = struct {
     p1: bool, p2: u8,
 };
 
-pub fn main() !void {
+pub fn run(problem: *aoc.Problem) !void {
     var lights = [_]Light{Light { .p1 = false, .p2 = 0 }} ** 1_000_000;
 
-    var buf: [16384]u8 = undefined;
-    var file = try std.fs.cwd().openFile("input/2015/day06.txt", .{});
-    defer file.close();
-    var size = try file.read(&buf);
-    var lines = std.mem.tokenize(buf[0..size], "\n");
-    while (lines.next()) |line| {
+    while (problem.line()) |line| {
         var left: u16 = undefined;
         var top: u16 = undefined;
         var right: u16 = undefined;

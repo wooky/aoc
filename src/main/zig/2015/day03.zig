@@ -1,3 +1,4 @@
+const aoc = @import("../aoc.zig");
 const std = @import("std");
 const VisitedMap = std.AutoHashMap(Address, void);
 
@@ -21,7 +22,7 @@ const Address = struct {
     }
 };
 
-pub fn main() !void {
+pub fn run(problem: *aoc.Problem) void {
     var count_solo: u16 = 0;
     var visited_solo = VisitedMap.init(std.heap.page_allocator);
     defer visited_solo.deinit();
@@ -34,11 +35,7 @@ pub fn main() !void {
     var robot_pair = Address {}; robot_pair.advance(&visited_pair, &count_pair, 0);
     var santa_turn = true;
 
-    var buf: [8192]u8 = undefined;
-    const file = try std.fs.cwd().openFile("input/2015/day03.txt", .{});
-    defer file.close();
-    const size = try file.read(&buf);
-    for (buf[0..size]) |c| {
+    for (problem.input) |c| {
         santa_solo.advance(&visited_solo, &count_solo, c);
         (if (santa_turn) santa_pair else robot_pair).advance(&visited_pair, &count_pair, c);
         santa_turn = !santa_turn;

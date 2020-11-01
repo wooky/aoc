@@ -1,14 +1,14 @@
-const problem = "ckczppom";
+const aoc = @import("../aoc.zig");
 const std = @import("std");
 
-pub fn main() !void {
+pub fn run(problem: *aoc.Problem) !void {
     var counter: u32 = 1;
     var five: u32 = 0;
     var six: u32 = 0;
     var buf: [32]u8 = undefined;
     var hash: [16]u8 = undefined;
     while (true) {
-        const input = try std.fmt.bufPrint(&buf, "{}{}", .{problem, counter});
+        const input = try std.fmt.bufPrint(&buf, "{}{}", .{problem.input, counter});
         std.crypto.Md5.hash(input, &hash);
         var str_hash = try std.fmt.bufPrint(&buf, "{x}", .{hash});
         if (five == 0 and std.mem.startsWith(u8, str_hash, "00000")) {

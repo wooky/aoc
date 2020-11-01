@@ -1,3 +1,4 @@
+const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Operand = union(enum) {
@@ -62,16 +63,11 @@ const TokenState = enum {
     operand1_not, gate_arrow, operand2, arrow, output
 };
 
-pub fn main() !void {
+pub fn run(problem: *aoc.Problem) !void {
     var outputs = OutputMap.init(std.heap.page_allocator);
     defer outputs.deinit();
 
-    var buf: [8192]u8 = undefined;
-    const file = try std.fs.cwd().openFile("input/2015/day07.txt", .{});
-    defer file.close();
-    const size = try file.read(&buf);
-    var lines = std.mem.tokenize(buf[0..size], "\n");
-    while (lines.next()) |line| {
+    while (problem.line()) |line| {
         var operation = Operation {};
         var output: []const u8 = undefined;
         var state = TokenState.operand1_not;

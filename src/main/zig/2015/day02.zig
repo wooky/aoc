@@ -1,14 +1,10 @@
+const aoc = @import("../aoc.zig");
 const std = @import("std");
 
-pub fn main() !void {
+pub fn run(problem: *aoc.Problem) !void {
     var wrapping_paper: u64 = 0;
     var ribbon: u64 = 0;
-    var buf: [8192]u8 = undefined;
-    const file = try std.fs.cwd().openFile("input/2015/day02.txt", .{});
-    defer file.close();
-    const size = try file.read(&buf);
-    var lines = std.mem.tokenize(buf[0..size], "\n");
-    while (lines.next()) |line| {
+    while (problem.line()) |line| {
         var dimensions = std.mem.tokenize(line, "x");
         const dim1 = try std.fmt.parseInt(u32, dimensions.next().?, 10);
         const dim2 = try std.fmt.parseInt(u32, dimensions.next().?, 10);

@@ -1,3 +1,4 @@
+const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Part1 = struct {
@@ -65,16 +66,11 @@ const Part2 = struct {
     }
 };
 
-pub fn main() !void {
+pub fn run(problem: *aoc.Problem) !void {
     var nice1: u16 = 0;
     var nice2: u16 = 0;
 
-    var buf: [32768]u8 = undefined;
-    var file = try std.fs.cwd().openFile("input/2015/day05.txt", .{});
-    defer file.close();
-    var size = try file.read(&buf);
-    var lines = std.mem.tokenize(buf[0..size], "\n");
-    while (lines.next()) |line| {
+    while (problem.line()) |line| {
         var part1 = Part1 {};
         var part2 = Part2 {};
         defer part2.deinit();

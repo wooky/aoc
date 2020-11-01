@@ -1,3 +1,4 @@
+const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Solution = struct {
@@ -16,23 +17,13 @@ const Solution = struct {
     }
 };
 
-pub fn main() !void {
-    var buf: [65536]u8 = undefined;
-    const file = try std.fs.cwd().openFile("input/2015/day12.txt", .{});
-    defer file.close();
-    const slice = buf[0..try file.read(&buf)];
+pub fn run(problem: *aoc.Problem) !void {
     var json = std.json.Parser.init(std.heap.page_allocator, false);
     defer json.deinit();
-    const solution = switch ((try json.parse(slice)).root) {
+    const solution = switch ((try json.parse(problem.input)).root) {
         std.json.Value.Array => |arr| parse_array(arr),
         else => unreachable,
     };
-    // while (try json.next()) |token| {
-    //     switch (token) {
-    //         std.json.Token.Number => |n| sum += try std.fmt.parseInt(i32, n.slice(slice, json.i-1), 10),
-    //         else => {}
-    //     }
-    // }
     std.debug.warn("{}\n{}\n", .{solution.all, solution.nonred});
 }
 

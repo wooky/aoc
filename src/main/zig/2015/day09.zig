@@ -1,49 +1,16 @@
+const aoc = @import("../aoc.zig");
 const std = @import("std");
 
-const PathMap = struct {
-    backing: PathBackingMap = PathBackingMap.init(std.heap.page_allocator),
-
-    const PathBackingSubmap = std.StringHashMap(u8);
-    const PathBackingMap = std.StringHashMap(PathBackingSubmap);
-
-    fn get(self: *PathMap, k1: []const u8, k2: []const u8) u8 {
-        return self.backing.getValue(k1).?.getValue(k2).?;
-    }
-
-    fn put(self: *PathMap, k1: []const u8, k2: [] const u8, v: u8) !void {
-        var opt_submap = self.backing.get(k1);
-        if (opt_submap) |kv| {
-            _ = try kv.value.put(k2, v);
-        }
-        else {
-            var submap = PathBackingSubmap.init(std.heap.page_allocator);
-            _ = try submap.put(k2, v);
-            _ = try self.backing.put(k1, submap);
-        }
-    }
-
-    fn deinit(self: *PathMap) void {
-        var iter = self.backing.iterator();
-        while (iter.next()) |kv| {
-            kv.value.deinit();
-        }
-        self.backing.deinit();
-    }
-};
-
+const PathMap = aoc.StringTable(u8);
 const Datum = struct { locations: [][]const u8, paths: *PathMap, min_dist: u16, max_dist: u16 };
 
-pub fn main() !void {
-    var paths = PathMap {};
+pub fn run(problem: *aoc.Problem) !void {
+    var paths = PathMap.init(std.heap.page_allocator);
     defer paths.deinit();
     var locations = std.StringHashMap(void).init(std.heap.page_allocator);
     defer locations.deinit();
 
-    var buf: [1024]u8 = undefined;
-    const file = try std.fs.cwd().openFile("input/2015/day09.txt", .{});
-    const size = try file.read(&buf);
-    var lines = std.mem.tokenize(buf[0..size], "\n");
-    while (lines.next()) |line| {
+    while (problem.line()) |line| {
         var tokens = std.mem.tokenize(line, " ");
         const loc1 = tokens.next().?;
         _ = tokens.next().?;
