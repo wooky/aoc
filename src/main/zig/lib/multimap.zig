@@ -1,0 +1,40 @@
+const std = @import("std");
+const Allocator = std.mem.Allocator;
+
+pub fn StringMultimap(comptime V: type) type {
+    return struct {
+        const Self = @This();
+        const BackingSubList = std.ArrayList(V);
+        const BackingMap = std.StringHashMap(BackingSubList);
+
+        backing: BackingMap,
+
+        pub fn init(allocator: *Allocator) Self {
+            return Self { .backing = BackingMap.init(allocator) };
+        }
+
+        pub fn deinit(self: *Self) void {
+            var iterator = self.backing.iterator();
+            while (iterator.next()) |kv| {
+                kv.value.deinit();
+            }
+            self.backing.deinit();
+        }
+
+        pub fn get(self: Self, key: []u8) []V {
+            return self.backing.getValue(key).?;
+        }
+
+        pub fn put(self: *Self, key: []u8, value: V) !void {
+            var opt_sublist = self.backing.get(key);
+            if (opt_sublist) |kv| {
+                try kv.value.append(value);
+            }
+            else {
+                var sublist = BackingSubList.init(self.backing.allocator);
+                try sublist.append(value);
+                _ = try self.backing.put(key, sublist);
+            }
+        }
+    };
+}

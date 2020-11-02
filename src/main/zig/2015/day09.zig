@@ -27,7 +27,7 @@ pub fn run(problem: *aoc.Problem) !void {
     while (permutator.next()) |locations| {
         var dist: u16 = 0;
         for (locations[1..]) |_, idx| {
-            dist += paths.get(locations[idx], locations[idx + 1]);
+            dist += paths.get(locations[idx], locations[idx + 1]).?;
         }
         min_dist = std.math.min(min_dist, dist);
         max_dist = std.math.max(max_dist, dist);

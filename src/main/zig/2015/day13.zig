@@ -36,10 +36,10 @@ pub fn run(problem: *aoc.Problem) !void {
 fn get_max_happiness(permutator: *HappinessPermutator, happiness: HappinessTable) i16 {
     var max_happiness: i16 = 0;
     while (permutator.next()) |seating| {
-        var this_happiness: i16 = happiness.get(seating[0], seating[seating.len - 1]) + happiness.get(seating[seating.len - 1], seating[0]);
+        var this_happiness: i16 = happiness.get(seating[0], seating[seating.len - 1]).? + happiness.get(seating[seating.len - 1], seating[0]).?;
         for (seating[0..seating.len - 1]) |p1, idx| {
             const p2 = seating[idx + 1];
-            this_happiness += happiness.get(p1, p2) + happiness.get(p2, p1);
+            this_happiness += happiness.get(p1, p2).? + happiness.get(p2, p1).?;
         }
         max_happiness = std.math.max(max_happiness, this_happiness);
     }
