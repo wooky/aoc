@@ -11,6 +11,7 @@ pub fn main() !void {
     const day = std.fmt.parseInt(u16, args[2], 10) catch usage(args);
 
     var problem = try aoc.Problem.init(year, day, std.heap.page_allocator);
+    defer problem.deinit();
 
     try switch (year) {
         2015 => switch (day) {
@@ -30,6 +31,7 @@ pub fn main() !void {
             15 => @import("2015/day15.zig").run(&problem),
             16 => @import("2015/day16.zig").run(&problem),
             17 => @import("2015/day17.zig").run(&problem),
+            18 => @import("2015/day18.zig").run(&problem),
             else => invalid("day", day),
         },
         else => invalid("year", year),

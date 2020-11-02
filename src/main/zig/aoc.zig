@@ -3,16 +3,20 @@ const Allocator = std.mem.Allocator;
 
 pub const Problem = struct {
     input: []const u8 = undefined, allocator: *Allocator,
-    buf: [65536]u8 = undefined, tokenizer: ?std.mem.TokenIterator = null,
+    buf: []u8, tokenizer: ?std.mem.TokenIterator = null,
 
     pub fn init(year: u16, day: u16, allocator: *Allocator) !Problem {
-        var problem = Problem { .allocator = allocator };
+        var problem = Problem { .allocator = allocator, .buf = try allocator.alloc(u8, 65536) };
         var buf: [32]u8 = undefined;
         const filename = try std.fmt.bufPrint(&buf, "input/{}/day{:0>2}.txt", .{year, day});
         const file = try std.fs.cwd().openFile(filename, .{});
         defer file.close();
-        problem.input = problem.buf[0..try file.read(&problem.buf)];
+        problem.input = problem.buf[0..try file.read(problem.buf)];
         return problem;
+    }
+
+    pub fn deinit(self: *Problem) void {
+        self.allocator.free(self.buf);
     }
 
     pub fn line(self: *Problem) ?[]const u8 {
