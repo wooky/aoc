@@ -33,6 +33,7 @@ pub fn main() !void {
             17 => @import("2015/day17.zig").run(&problem),
             18 => @import("2015/day18.zig").run(&problem),
             19 => @import("2015/day19.zig").run(&problem),
+            21 => @import("2015/day21.zig").run(&problem),
             else => invalid("day", day),
         },
         else => invalid("year", year),
