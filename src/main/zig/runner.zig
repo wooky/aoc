@@ -1,6 +1,13 @@
 const aoc = @import("aoc.zig");
 const std = @import("std");
 
+pub fn run(problem: *aoc.Problem, year: u16, day: u16) !aoc.Solution {
+    return try switch (year) {
+        2015 => @import("2015/runner.zig").run(problem, day),
+        else => unreachable,
+    };
+}
+
 pub fn main() !void {
     const args = try std.process.argsAlloc(std.heap.page_allocator);
     defer std.process.argsFree(std.heap.page_allocator, args);
@@ -19,10 +26,7 @@ pub fn main() !void {
     };
     defer problem.deinit();
 
-    const solution = try switch (year) {
-        2015 => @import("2015/runner.zig").run(&problem, day),
-        else => unreachable,
-    };
+    const solution = try run(&problem, year, day);
     std.debug.warn("{}\n{}\n", .{solution.p1, solution.p2});
 }
 
