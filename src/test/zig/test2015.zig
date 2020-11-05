@@ -11,9 +11,9 @@ fn assertSolution(day: u16, p1: usize, p2: usize) !void {
 }
 
 test "2015 day 1" { try assertSolution(1, 280, 1797); }
-test "2015 day 2" {try assertSolution(2, 1598415, 3812909); }
+test "2015 day 2" { try assertSolution(2, 1598415, 3812909); }
 test "2015 day 3" { try assertSolution(3, 2565, 2639); }
-test "2015 day 4" {    try assertSolution(4, 117946, 3938038); }
+// test "2015 day 4" { try assertSolution(4, 117946, 3938038); } TAKES TOO DAMN LONG
 test "2015 day 5" { try assertSolution(5, 255, 55); }
 test "2015 day 6" { try assertSolution(6, 400410, 15343601); }
 test "2015 day 7" { try assertSolution(7, 3176, 14710); }

@@ -4,6 +4,7 @@ const std = @import("std");
 pub fn run(problem: *aoc.Problem, year: u16, day: u16) !aoc.Solution {
     return try switch (year) {
         2015 => @import("2015/runner.zig").run(problem, day),
+        2019 => @import("2019/runner.zig").run(problem, day),
         else => unreachable,
     };
 }
