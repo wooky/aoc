@@ -13,7 +13,7 @@ const Buffer = struct {
     }
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var buf1 = try Buffer.init(problem.allocator); defer buf1.deinit();
     var buf2 = try Buffer.init(problem.allocator); defer buf2.deinit();
     buf1.next = &buf2; buf2.next = &buf1;
@@ -42,5 +42,5 @@ pub fn run(problem: *aoc.Problem) !void {
         }
     }
 
-    std.debug.warn("{}\n{}\n", .{fourty, curr.size});
+    return aoc.Solution { .p1 = fourty, .p2 = curr.size };
 }

@@ -6,7 +6,7 @@ const Fab = aoc.StringMultimap([]const u8);
 const MoleculeList = std.ArrayList([]const u8);
 const MoleculeSet = std.StringHashMap(void);
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var fab = Fab.init(problem.allocator);
     defer fab.deinit();
     var defab = Defab.init(problem.allocator);
@@ -103,9 +103,8 @@ pub fn run(problem: *aoc.Problem) !void {
     //         dest = tmp;
     //     }
     // };
-    const fastestFabrication = "TODO";
 
-    std.debug.warn("{}\n{}\n", .{uniquePossibilities, fastestFabrication});
+    return aoc.Solution{ .p1 = uniquePossibilities, .p2 = 0 };
 }
 
 fn nextAtom(molecule: []const u8, idx: usize) ?usize {

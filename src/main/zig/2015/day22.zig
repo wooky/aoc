@@ -24,7 +24,7 @@ const spells = [_]Spell {
     .{ .cost = 229, .mana_timer = 5 },
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var tokens = std.mem.tokenize(problem.input, ": \n");
     _ = tokens.next().?; _ = tokens.next().?;
     const boss_hp = try std.fmt.parseInt(u8, tokens.next().?, 10);
@@ -36,7 +36,7 @@ pub fn run(problem: *aoc.Problem) !void {
         Spell { .cost = 0, .instant_heal = @intCast(u8, boss_atk) }, // Disgusting hack
         std.math.maxInt(Mana), 0
     );
-    std.debug.warn("{}\n", .{min_mana_used});
+    return aoc.Solution{ .p1 = min_mana_used, .p2 = 0 };
 }
 
 fn performSpell(state: State, spell: Spell, min_mana_used: Mana, spaces: u8) Mana {

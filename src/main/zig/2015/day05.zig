@@ -71,7 +71,7 @@ const Part2 = struct {
     }
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var nice1: u16 = 0;
     var nice2: u16 = 0;
 
@@ -87,5 +87,5 @@ pub fn run(problem: *aoc.Problem) !void {
         nice2 += part2.eval();
     }
 
-    std.debug.warn("{}\n{}\n", .{nice1, nice2});
+    return aoc.Solution{ .p1 = nice1, .p2 = nice2 };
 }

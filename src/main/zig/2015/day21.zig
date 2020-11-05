@@ -3,7 +3,7 @@ const std = @import("std");
 
 const Item = struct { cost: u16, atk: i8 = 0, def: i8 = 0 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const player_hp: u8 = 100;
     const weapons = [_]Item {
         .{ .cost = 8, .atk = 4 },
@@ -66,5 +66,5 @@ pub fn run(problem: *aoc.Problem) !void {
             }
         }
     }
-    std.debug.warn("{}\n{}\n", .{cheapest_win, expensive_lose});
+    return aoc.Solution { .p1 = cheapest_win, .p2 = expensive_lose };
 }

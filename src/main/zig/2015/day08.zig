@@ -1,7 +1,7 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
 
-pub fn run(problem: *aoc.Problem) void {
+pub fn run(problem: *aoc.Problem) aoc.Solution {
     var unprintable: usize = 0;
     var extra: u16 = 0;
 
@@ -34,5 +34,5 @@ pub fn run(problem: *aoc.Problem) void {
         }
         extra += 2;
     }
-    std.debug.warn("{}\n{}\n", .{unprintable, extra});
+    return .{ .p1 = unprintable, .p2 = extra };
 }

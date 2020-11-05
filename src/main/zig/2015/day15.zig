@@ -16,7 +16,7 @@ const Params = struct {
     }
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var params = Params {};
     var ingredients_idx: usize = 0;
     while (problem.line()) |line| {
@@ -54,7 +54,7 @@ pub fn run(problem: *aoc.Problem) !void {
             }
         }
     }
-    std.debug.warn("{}\n{}\n", .{best, best_500});
+    return aoc.Solution{ .p1 = @intCast(usize, best), .p2 = @intCast(u16, best_500) };
 }
 
 fn int_from_tokens(tokens: *std.mem.TokenIterator, offset: usize) !i32 {

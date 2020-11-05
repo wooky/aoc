@@ -21,7 +21,7 @@ const Reindeer = struct {
     }
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var reindeer_buf: [16]Reindeer = undefined;
     var reindeer_size: u8 = 0;
     while (problem.line()) |line| {
@@ -53,5 +53,5 @@ pub fn run(problem: *aoc.Problem) !void {
         }
     }
 
-    std.debug.warn("{}\n{}\n", .{furthest, most_points});
+    return aoc.Solution{ .p1 = furthest, .p2 = most_points };
 }

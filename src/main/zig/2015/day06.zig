@@ -12,7 +12,7 @@ const Light = struct {
     p1: bool, p2: u8,
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var lights = [_]Light{Light { .p1 = false, .p2 = 0 }} ** 1_000_000;
 
     while (problem.line()) |line| {
@@ -25,25 +25,25 @@ pub fn run(problem: *aoc.Problem) !void {
         var tokens = std.mem.tokenize(line, " ");
         while (tokens.next()) |token| {
             switch (state) {
-                TokenState.turn_toggle => {
+                .turn_toggle => {
                     if (std.mem.eql(u8, token, "turn")) {
-                        state = TokenState.on_off;
+                        state = .on_off;
                     }
                     else {
-                        state = TokenState.start_coord;
-                        command = Command.toggle;
+                        state = .start_coord;
+                        command = .toggle;
                     }
                 },
-                TokenState.on_off => {
-                    state = TokenState.start_coord;
-                    command = if (std.mem.eql(u8, token, "on")) Command.turn_on else Command.turn_off;
+                .on_off => {
+                    state = .start_coord;
+                    command = if (std.mem.eql(u8, token, "on")) .turn_on else .turn_off;
                 },
-                TokenState.start_coord => {
+                .start_coord => {
                     try parse_coords(token, &left, &top);
-                    state = TokenState.through;
+                    state = .through;
                 },
-                TokenState.through => { state = TokenState.end_coord; },
-                TokenState.end_coord => try parse_coords(token, &right, &bottom),
+                .through => { state = .end_coord; },
+                .end_coord => try parse_coords(token, &right, &bottom),
             }
         }
         var row = top;
@@ -52,9 +52,9 @@ pub fn run(problem: *aoc.Problem) !void {
             while (col <= right) : (col += 1) {
                 var light = &lights[@intCast(usize, row) * 1000 + col];
                 switch (command) {
-                    Command.turn_on => {light.p1 = true; light.p2 += 1;},
-                    Command.turn_off => {light.p1 = false; if (light.p2 > 0) light.p2 -= 1;},
-                    Command.toggle => {light.p1 = !light.p1; light.p2 += 2;},
+                    .turn_on => {light.p1 = true; light.p2 += 1;},
+                    .turn_off => {light.p1 = false; if (light.p2 > 0) light.p2 -= 1;},
+                    .toggle => {light.p1 = !light.p1; light.p2 += 2;},
                 }
             }
         }
@@ -67,7 +67,7 @@ pub fn run(problem: *aoc.Problem) !void {
         }
         brightness += light.p2;
     }
-    std.debug.warn("{}\n{}\n", .{lights_on, brightness});
+    return aoc.Solution{ .p1 = lights_on, .p2 = brightness };
 }
 
 fn parse_coords(token: []const u8, x: *u16, y: *u16) !void {

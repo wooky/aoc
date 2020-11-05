@@ -17,14 +17,14 @@ const Solution = struct {
     }
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var json = std.json.Parser.init(problem.allocator, false);
     defer json.deinit();
     const solution = switch ((try json.parse(problem.input)).root) {
         std.json.Value.Array => |arr| parse_array(arr),
         else => unreachable,
     };
-    std.debug.warn("{}\n{}\n", .{solution.all, solution.nonred});
+    return aoc.Solution{ .p1 = @intCast(usize, solution.all), .p2 = @intCast(usize, solution.nonred) };
 }
 
 fn parse_object(obj: std.json.ObjectMap) Solution {

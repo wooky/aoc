@@ -1,7 +1,7 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var counter: u32 = 1;
     var five: u32 = 0;
     var six: u32 = 0;
@@ -25,5 +25,5 @@ pub fn run(problem: *aoc.Problem) !void {
         }
         counter += 1;
     }
-    std.debug.warn("{}\n{}\n", .{five, six});
+    return aoc.Solution{ .p1 = five, .p2 = six };
 }

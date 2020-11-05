@@ -1,7 +1,7 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
 
-pub fn run(problem: *aoc.Problem) void {
+pub fn run(problem: *aoc.Problem) aoc.Solution {
     var floor: i16 = 0;
     var basement_idx: usize = 0;
     for (problem.input) |c, idx| {
@@ -14,5 +14,5 @@ pub fn run(problem: *aoc.Problem) void {
             basement_idx = idx + 1;
         }
     }
-    std.debug.warn("{}\n{}\n", .{floor, basement_idx});
+    return .{ .p1 = @intCast(usize, floor), .p2 = basement_idx };
 }

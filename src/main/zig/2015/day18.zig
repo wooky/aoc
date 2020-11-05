@@ -53,7 +53,7 @@ const LightMap = struct {
     }
 };
 
-pub fn run(problem: *aoc.Problem) void {
+pub fn run(problem: *aoc.Problem) aoc.Solution {
     var map_good = LightMap {}; map_good.init();
     var map_bad = LightMap {}; map_bad.init();
     var map_idx: usize = 0;
@@ -62,7 +62,7 @@ pub fn run(problem: *aoc.Problem) void {
             '#' => { map_good.curr[map_idx] = true;  map_bad.curr[map_idx] = true;  map_idx += 1; },
             '.' => { map_good.curr[map_idx] = false; map_bad.curr[map_idx] = false; map_idx += 1; },
             '\n' => {},
-            else => {std.debug.warn("wtf {} @ {}\n", .{c, map_idx}); unreachable;},
+            else => unreachable,
         }
     }
     map_bad.makeDefective();
@@ -74,5 +74,5 @@ pub fn run(problem: *aoc.Problem) void {
         map_bad.makeDefective();
     }
 
-    std.debug.warn("{}\n{}\n", .{map_good.getLightCount(), map_bad.getLightCount()});
+    return .{ .p1 = map_good.getLightCount(), .p2 = map_bad.getLightCount() };
 }

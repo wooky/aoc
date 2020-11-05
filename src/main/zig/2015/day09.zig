@@ -4,7 +4,7 @@ const std = @import("std");
 const PathMap = aoc.StringTable(u8);
 const Datum = struct { locations: [][]const u8, paths: *PathMap, min_dist: u16, max_dist: u16 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var paths = PathMap.init(problem.allocator);
     defer paths.deinit();
 
@@ -32,5 +32,5 @@ pub fn run(problem: *aoc.Problem) !void {
         min_dist = std.math.min(min_dist, dist);
         max_dist = std.math.max(max_dist, dist);
     }
-    std.debug.warn("{}\n{}\n", .{min_dist, max_dist});
+    return aoc.Solution { .p1 = min_dist, .p2 = max_dist};
 }

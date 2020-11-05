@@ -22,7 +22,7 @@ const Address = struct {
     }
 };
 
-pub fn run(problem: *aoc.Problem) void {
+pub fn run(problem: *aoc.Problem) aoc.Solution {
     var count_solo: u16 = 0;
     var visited_solo = VisitedMap.init(problem.allocator);
     defer visited_solo.deinit();
@@ -40,5 +40,5 @@ pub fn run(problem: *aoc.Problem) void {
         (if (santa_turn) santa_pair else robot_pair).advance(&visited_pair, &count_pair, c);
         santa_turn = !santa_turn;
     }
-    std.debug.warn("{}\n{}\n", .{count_solo, count_pair});
+    return .{ .p1 = count_solo, .p2 = count_pair };
 }

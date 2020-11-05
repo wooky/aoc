@@ -1,7 +1,7 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var wrapping_paper: u64 = 0;
     var ribbon: u64 = 0;
     while (problem.line()) |line| {
@@ -21,5 +21,5 @@ pub fn run(problem: *aoc.Problem) !void {
         wrapping_paper += 2 * (area1 + area2 + area3) + slack;
         ribbon += present_wrap + bow;
     }
-    std.debug.warn("{}\n{}\n", .{wrapping_paper, ribbon});
+    return aoc.Solution{ .p1 = wrapping_paper, .p2 = ribbon };
 }

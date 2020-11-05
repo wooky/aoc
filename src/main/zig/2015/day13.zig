@@ -4,7 +4,7 @@ const std = @import("std");
 const HappinessTable = aoc.StringTable(i16);
 const HappinessPermutator = aoc.Permutator([]const u8);
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var happiness = HappinessTable.init(problem.allocator);
     while (problem.line()) |line| {
         var tokens = std.mem.tokenize(line, " ");
@@ -30,10 +30,10 @@ pub fn run(problem: *aoc.Problem) !void {
     try permutator.elements.append(me);
     const included = get_max_happiness(&permutator, happiness);
     
-    std.debug.warn("{}\n{}\n", .{excluded, included});
+    return aoc.Solution { .p1 = excluded, .p2 = included };
 }
 
-fn get_max_happiness(permutator: *HappinessPermutator, happiness: HappinessTable) i16 {
+fn get_max_happiness(permutator: *HappinessPermutator, happiness: HappinessTable) u16 {
     var max_happiness: i16 = 0;
     while (permutator.next()) |seating| {
         var this_happiness: i16 = happiness.get(seating[0], seating[seating.len - 1]).? + happiness.get(seating[seating.len - 1], seating[0]).?;
@@ -43,5 +43,5 @@ fn get_max_happiness(permutator: *HappinessPermutator, happiness: HappinessTable
         }
         max_happiness = std.math.max(max_happiness, this_happiness);
     }
-    return max_happiness;
+    return @intCast(u16, max_happiness);
 }

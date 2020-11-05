@@ -7,7 +7,7 @@ const Params = struct {
     containers: []u8, combos: u16 = 0, smallest_container_qty: u8 = 255, smallest_container_combo: u8 = 255
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var containers: [21]u8 = undefined;
     containers[0] = 0;
     var container_idx: usize = 1;
@@ -18,7 +18,7 @@ pub fn run(problem: *aoc.Problem) !void {
 
     var params = Params { .containers = &containers };
     calcCombos(&params, 0, 0, 1);
-    std.debug.warn("{}\n{}\n", .{params.combos, params.smallest_container_combo});
+    return aoc.Solution{ .p1 = params.combos, .p2 = params.smallest_container_combo };
 }
 
 fn calcCombos(params: *Params, idx: usize, total_volume: u8, container_qty: u8) void {

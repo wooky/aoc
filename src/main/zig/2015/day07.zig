@@ -11,27 +11,27 @@ const Operand = union(enum) {
 
     fn evaluate(self: Operand, cache: *WireCache) u16 {
         return switch (self) {
-            Operand.wire => |w| cache.get(w),
-            Operand.constant => |c| c,
+            .wire => |w| cache.get(w),
+            .constant => |c| c,
         };
     }
 };
 
 const LogicGate = enum { AND, OR, LSHIFT, RSHIFT, NOT, BUFFER };
 const Operation = struct {
-    op1: Operand = Operand{.constant = 0}, op2: Operand = Operand{.constant = 0}, gate: LogicGate = undefined,
+    op1: Operand = .{.constant = 0}, op2: Operand = .{.constant = 0}, gate: LogicGate = undefined,
 
     fn evaluate(self: *Operation, cache: *WireCache) u16 {
         const op1 = self.op1.evaluate(cache);
         const op2 = self.op2.evaluate(cache);
 
         return switch (self.gate) {
-            LogicGate.AND    =>  op1 &  op2,
-            LogicGate.OR     =>  op1 |  op2,
-            LogicGate.LSHIFT =>  op1 << @intCast(u4, op2),
-            LogicGate.RSHIFT =>  op1 >> @intCast(u4, op2),
-            LogicGate.NOT    => ~op2,
-            LogicGate.BUFFER =>  op1,
+            .AND    =>  op1 &  op2,
+            .OR     =>  op1 |  op2,
+            .LSHIFT =>  op1 << @intCast(u4, op2),
+            .RSHIFT =>  op1 >> @intCast(u4, op2),
+            .NOT    => ~op2,
+            .BUFFER =>  op1,
         };
     }
 };
@@ -67,7 +67,7 @@ const TokenState = enum {
     operand1_not, gate_arrow, operand2, arrow, output
 };
 
-pub fn run(problem: *aoc.Problem) !void {
+pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var outputs = OutputMap.init(problem.allocator);
     defer outputs.deinit();
 
@@ -78,44 +78,44 @@ pub fn run(problem: *aoc.Problem) !void {
         var tokens = std.mem.tokenize(line, " ");
         while (tokens.next()) |token| {
             switch (state) {
-                TokenState.operand1_not => {
+                .operand1_not => {
                     if (std.mem.eql(u8, token, "NOT")) {
-                        operation.gate = LogicGate.NOT;
-                        state = TokenState.operand2;
+                        operation.gate = .NOT;
+                        state = .operand2;
                     }
                     else {
                         operation.op1 = Operand.parse(token);
-                        state = TokenState.gate_arrow;
+                        state = .gate_arrow;
                     }
                 },
-                TokenState.gate_arrow => {
+                .gate_arrow => {
                     if (std.mem.eql(u8, token, "->")) {
-                        operation.gate = LogicGate.BUFFER;
-                        state = TokenState.output;
+                        operation.gate = .BUFFER;
+                        state = .output;
                     }
                     else if (std.mem.eql(u8, token, "AND")) {
-                        operation.gate = LogicGate.AND;
-                        state = TokenState.operand2;
+                        operation.gate = .AND;
+                        state = .operand2;
                     }
                     else if (std.mem.eql(u8, token, "OR")) {
-                        operation.gate = LogicGate.OR;
-                        state = TokenState.operand2;
+                        operation.gate = .OR;
+                        state = .operand2;
                     }
                     else if (std.mem.eql(u8, token, "LSHIFT")) {
-                        operation.gate = LogicGate.LSHIFT;
-                        state = TokenState.operand2;
+                        operation.gate = .LSHIFT;
+                        state = .operand2;
                     }
                     else if (std.mem.eql(u8, token, "RSHIFT")) {
-                        operation.gate = LogicGate.RSHIFT;
-                        state = TokenState.operand2;
+                        operation.gate = .RSHIFT;
+                        state = .operand2;
                     }
                 },
-                TokenState.operand2 => {
+                .operand2 => {
                     operation.op2 = Operand.parse(token);
-                    state = TokenState.arrow;
+                    state = .arrow;
                 },
-                TokenState.arrow => state = TokenState.output,
-                TokenState.output => output = token,
+                .arrow => state = .output,
+                .output => output = token,
             }
         }
         _ = try outputs.put(output, operation);
@@ -130,5 +130,5 @@ pub fn run(problem: *aoc.Problem) !void {
     defer cache2.deinit();
     const part2 = outputs.getValue("a").?.evaluate(&cache2);
 
-    std.debug.warn("{}\n{}\n", .{part1, part2});
+    return aoc.Solution{ .p1 = part1, .p2 = part2 };
 }

@@ -27,6 +27,8 @@ pub const Problem = struct {
     }
 };
 
+pub const Solution = struct { p1: usize, p2: usize };
+
 pub const StringTable = @import("lib/table.zig").StringTable;
 pub const StringMultimap = @import("lib/multimap.zig").StringMultimap;
 pub const Permutator = @import("lib/permutator.zig").Permutator;
