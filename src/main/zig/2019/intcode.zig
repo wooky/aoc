@@ -6,15 +6,18 @@ pub const TapeIndex = usize;
 const Opcode = usize;
 const Tape = std.ArrayList(TapeElement);
 const Memory = std.AutoHashMap(TapeIndex, TapeElement);
+const Inputs = std.ArrayList(TapeElement);
 
 tape: Tape,
 memory: Memory,
-idx: TapeIndex = 0,
-input: TapeElement = undefined,
-output: ?TapeElement = null,
+inputs: Inputs,
+idx: TapeIndex = undefined,
+inputs_idx: usize = undefined,
+output: ?TapeElement = undefined,
 
 pub fn init(allocator: *std.mem.Allocator, code: []const u8) !Self {
-    var intcode = Self{ .tape = Tape.init(allocator), .memory = Memory.init(allocator) };
+    var intcode = Self{ .tape = Tape.init(allocator), .memory = Memory.init(allocator), .inputs = Inputs.init(allocator) };
+    intcode.reinit();
     var tokens = std.mem.tokenize(code, ",\n");
     while (tokens.next()) |token| {
         try intcode.tape.append(try std.fmt.parseInt(TapeElement, token, 10));
@@ -25,6 +28,7 @@ pub fn init(allocator: *std.mem.Allocator, code: []const u8) !Self {
 pub fn deinit(self: *Self) void {
     self.tape.deinit();
     self.memory.deinit();
+    self.inputs.deinit();
 }
 
 pub fn run(self: *Self) !?TapeElement {
@@ -60,8 +64,10 @@ fn math(self: *Self, idx: TapeIndex, opcode: Opcode, comptime alu_op: fn(comptim
 }
 
 fn readInputIntoMemory(self: *Self, idx: TapeIndex) !TapeIndex {
+    const value = self.inputs.items[self.inputs_idx];
+    self.inputs_idx += 1;
     const dest = @intCast(TapeIndex, self.getMemory(idx + 1));
-    try self.setMemory(dest, self.input);
+    try self.setMemory(dest, value);
     return idx + 2;
 }
 
@@ -108,6 +114,14 @@ fn getMemoryByOpcode(self: *const Self, idx: TapeIndex, opcode: Opcode) TapeElem
 }
 
 pub fn reset(self: *Self) void {
+    self.inputs.deinit();
+    self.reinit();
+}
+
+fn reinit(self: *Self) void {
     self.memory.clear();
+    self.inputs = Inputs.init(self.inputs.allocator);
     self.idx = 0;
+    self.inputs_idx = 0;
+    self.output = null;
 }

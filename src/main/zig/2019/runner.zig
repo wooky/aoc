@@ -5,6 +5,7 @@ pub fn run(problem: *aoc.Problem, day: u16) !aoc.Solution {
     return try switch (day) {
         2 => @import("day02.zig").run(problem),
         5 => @import("day05.zig").run(problem),
+        7 => @import("day07.zig").run(problem),
         else => unreachable,
     };
 }
