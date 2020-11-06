@@ -1,10 +1,12 @@
-const aoc = @import("aoc.zig");
+pub const aoc = @import("aoc.zig");
+pub const aoc2015 = @import("2015/runner.zig");
+pub const aoc2019 = @import("2019/runner.zig");
 const std = @import("std");
 
 pub fn run(problem: *aoc.Problem, year: u16, day: u16) !aoc.Solution {
     return try switch (year) {
-        2015 => @import("2015/runner.zig").run(problem, day),
-        2019 => @import("2019/runner.zig").run(problem, day),
+        2015 => aoc2015.run(problem, day),
+        2019 => aoc2019.run(problem, day),
         else => unreachable,
     };
 }

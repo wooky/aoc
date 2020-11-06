@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     try intcode.setMemory(1, 12);
     try intcode.setMemory(2, 2);
-    try intcode.run();
+    _ = try intcode.run();
     const ans1 = intcode.getMemory(0);
 
     var noun: Intcode.TapeElement = 0;
@@ -18,7 +18,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             intcode.reset();
             try intcode.setMemory(1, noun);
             try intcode.setMemory(2, verb);
-            try intcode.run();
+            _ = try intcode.run();
             if (intcode.getMemory(0) == 19690720) {
                 break :outer;
             }
