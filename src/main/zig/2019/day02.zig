@@ -4,27 +4,33 @@ const Intcode = @import("intcode.zig");
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var intcode = try Intcode.init(problem.allocator, problem.input);
     defer intcode.deinit();
+    
+    const res1 = blk: {
+        var state = intcode.newState();
+        defer state.deinit();
+        try state.memory.putNoClobber(1, 12);
+        try state.memory.putNoClobber(2, 2);
+        _ = try intcode.run(&state);
+        break :blk @intCast(usize, state.memory.getValue(0).?);
+    };
 
-    try intcode.setMemory(1, 12);
-    try intcode.setMemory(2, 2);
-    _ = try intcode.run();
-    const ans1 = intcode.getMemory(0);
-
-    var noun: Intcode.TapeElement = 0;
-    var verb: Intcode.TapeElement = undefined;
-    outer: while (noun <= 99) : (noun += 1) {
-        verb = 0;
-        while (verb <= 99) : (verb += 1) {
-            intcode.reset();
-            try intcode.setMemory(1, noun);
-            try intcode.setMemory(2, verb);
-            _ = try intcode.run();
-            if (intcode.getMemory(0) == 19690720) {
-                break :outer;
+    const res2 = blk: {
+        var noun: Intcode.TapeElement = 0;
+        var verb: Intcode.TapeElement = undefined;
+        while (noun <= 99) : (noun += 1) {
+            verb = 0;
+            while (verb <= 99) : (verb += 1) {
+                var state = intcode.newState();
+                try state.memory.putNoClobber(1, noun);
+                try state.memory.putNoClobber(2, verb);
+                _ = try intcode.run(&state);
+                if (state.memory.getValue(0).? == 19690720) {
+                    break :blk @intCast(usize, 100 * noun + verb);
+                }
             }
         }
-    }
-    const ans2 = 100 * noun + verb;
+        unreachable;
+    };
 
-    return aoc.Solution{ .p1 = @intCast(usize, ans1), .p2 = @intCast(usize, ans2) };
+    return aoc.Solution{ .p1 = res1, .p2 = res2 };
 }

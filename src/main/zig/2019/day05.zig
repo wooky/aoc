@@ -5,19 +5,24 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var intcode = try Intcode.init(problem.allocator, problem.input);
     defer intcode.deinit();
 
-    try intcode.inputs.append(1);
     const res1 = blk: {
+        var state = intcode.newState();
+        defer state.deinit();
+        try state.inputs.append(1);
         while (true) {
-            const diagnostic = (try intcode.run()).?;
+            const diagnostic = (try intcode.run(&state)).?;
             if (diagnostic != 0) {
-                break :blk diagnostic;
+                break :blk @intCast(usize, diagnostic);
             }
         }
     };
 
-    intcode.reset();
-    try intcode.inputs.append(5);
-    const res2 = (try intcode.run()).?;
+    const res2 = blk: {
+        var state = intcode.newState();
+        defer state.deinit();
+        try state.inputs.append(5);
+        break :blk @intCast(usize, (try intcode.run(&state)).?);
+    };
 
-    return aoc.Solution{ .p1 = @intCast(usize, res1), .p2 = @intCast(usize, res2) };
+    return aoc.Solution{ .p1 = res1, .p2 = res2 };
 }
