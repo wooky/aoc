@@ -9,6 +9,7 @@ pub const State = struct {
     inputs: Inputs,
     idx: TapeIndex = 0,
     inputs_idx: usize = 0,
+    relative_base_offset: TapeElement = 0,
 
     fn init(allocator: *Allocator) State {
         return State { .memory = Memory.init(allocator), .inputs = Inputs.init(allocator) };
@@ -52,12 +53,13 @@ pub fn run(self: *const Self, state: *State) !?TapeElement {
         const output = try switch (op % 100) {
             1 => self.math(state, op, std.math.add),
             2 => self.math(state, op, std.math.mul),
-            3 => self.readInputIntoMemory(state),
+            3 => self.readInputIntoMemory(state, op),
             4 => self.outputFromMemory(state, op),
             5 => self.jump(state, op, true),
             6 => self.jump(state, op, false),
             7 => self.cmp(state, op, std.math.CompareOperator.lt),
             8 => self.cmp(state, op, std.math.CompareOperator.eq),
+            9 => self.adj_relative_base(state, op),
             99 => return null,
             else => unreachable
         };
@@ -71,16 +73,16 @@ fn math(self: *const Self, state: *State, opcode: Opcode, comptime alu_op: fn(co
     const p1 = self.getMemoryByOpcode(state, state.idx + 1, opcode / 100);
     const p2 = self.getMemoryByOpcode(state, state.idx + 2, opcode / 1000);
     const res = try alu_op(TapeElement, p1, p2);
-    const dest = @intCast(TapeIndex, self.getMemory(state, state.idx + 3));
+    const dest = self.getDestByOpcode(state, state.idx + 3, opcode / 10000);
     _ = try state.memory.put(dest, res);
     state.idx += 4;
     return null;
 }
 
-fn readInputIntoMemory(self: *const Self, state: *State) !?TapeElement {
+fn readInputIntoMemory(self: *const Self, state: *State, opcode: Opcode) !?TapeElement {
     const value = state.inputs.items[state.inputs_idx];
     state.inputs_idx += 1;
-    const dest = @intCast(TapeIndex, self.getMemory(state, state.idx + 1));
+    const dest = self.getDestByOpcode(state, state.idx + 1, opcode / 100);
     _ = try state.memory.put(dest, value);
     state.idx += 2;
     return null;
@@ -107,24 +109,37 @@ fn cmp(self: *const Self, state: *State, opcode: Opcode, operator: std.math.Comp
     const p1 = self.getMemoryByOpcode(state, state.idx + 1, opcode / 100);
     const p2 = self.getMemoryByOpcode(state, state.idx + 2, opcode / 1000);
     const res: TapeElement = if (std.math.compare(p1, operator, p2)) 1 else 0;
-    const dest = @intCast(TapeIndex, self.getMemory(state, state.idx + 3));
+    const dest = self.getDestByOpcode(state, state.idx + 3, opcode / 10000);
     _ = try state.memory.put(dest, res);
     state.idx += 4;
     return null;
 }
 
-pub fn getMemory(self: *const Self, state: *const State, idx: TapeIndex) TapeElement {
-    return state.memory.getValue(idx) orelse self.tape.items[idx];
+fn adj_relative_base(self: *const Self, state: *State, opcode: Opcode) !?TapeElement {
+    const param = self.getMemoryByOpcode(state, state.idx + 1, opcode / 100);
+    state.relative_base_offset += param;
+    state.idx += 2;
+    return null;
 }
 
-fn getMemoryPositionMode(self: *const Self, state: *const State, idx: TapeIndex) TapeElement {
-    return self.getMemory(state, @intCast(TapeIndex, self.getMemory(state, idx)));
+pub fn getMemory(self: *const Self, state: *const State, idx: TapeIndex) TapeElement {
+    return state.memory.getValue(idx) orelse
+        if (idx < self.tape.items.len) self.tape.items[idx] else 0;
 }
 
 fn getMemoryByOpcode(self: *const Self, state: *const State, idx: TapeIndex, opcode: Opcode) TapeElement {
     return switch (opcode % 10) {
-        0 => self.getMemoryPositionMode(state, idx),
+        0 => self.getMemory(state, @intCast(TapeIndex, self.getMemory(state, idx))),
         1 => self.getMemory(state, idx),
+        2 => self.getMemory(state, @intCast(TapeIndex, self.getMemory(state, idx) + state.relative_base_offset)),
         else => unreachable
     };
+}
+
+fn getDestByOpcode(self: *const Self, state: *const State, idx: TapeIndex, opcode: Opcode) TapeIndex {
+    return @intCast(TapeIndex, switch (opcode % 10) {
+        0 => self.getMemory(state, idx),
+        2 => self.getMemory(state, idx) + state.relative_base_offset,
+        else => unreachable
+    });
 }
