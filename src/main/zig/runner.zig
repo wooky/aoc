@@ -30,7 +30,17 @@ pub fn main() !void {
     defer problem.deinit();
 
     const solution = try run(&problem, year, day);
-    std.debug.warn("{}\n{}\n", .{solution.p1, solution.p2});
+    std.debug.warn("{}\n", .{solution.p1});
+    if (solution.s2) |s2| {
+        const width = s2[0];
+        var idx: usize = 1;
+        while (idx < s2.len) : (idx += width) {
+            std.debug.warn("{}\n", .{s2[idx..idx+width]});
+        }
+    }
+    else {
+        std.debug.warn("{}\n", .{solution.p2});
+    }
 }
 
 fn usage(args: [][]const u8) noreturn {
