@@ -69,7 +69,7 @@ pub fn run(self: *const Self, state: *State) !?TapeElement {
     }
 }
 
-fn math(self: *const Self, state: *State, opcode: Opcode, comptime alu_op: fn(comptime type, var, var)TapeElement) !?TapeElement {
+fn math(self: *const Self, state: *State, opcode: Opcode, comptime alu_op: fn(comptime type, anytype, anytype)TapeElement) !?TapeElement {
     const p1 = self.getMemoryByOpcode(state, state.idx + 1, opcode / 100);
     const p2 = self.getMemoryByOpcode(state, state.idx + 2, opcode / 1000);
     const res = try alu_op(TapeElement, p1, p2);
@@ -123,7 +123,7 @@ fn adj_relative_base(self: *const Self, state: *State, opcode: Opcode) !?TapeEle
 }
 
 pub fn getMemory(self: *const Self, state: *const State, idx: TapeIndex) TapeElement {
-    return state.memory.getValue(idx) orelse
+    return state.memory.get(idx) orelse
         if (idx < self.tape.items.len) self.tape.items[idx] else 0;
 }
 

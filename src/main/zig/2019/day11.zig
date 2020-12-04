@@ -32,7 +32,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         while (y <= res.bottomright.y) : (y += 1) {
             var x = res.topleft.x;
             while (x <= res.bottomright.x) : (x += 1) {
-                const chr = res.wall.getValue(.{ .x = x, .y = y }) orelse 0;
+                const chr = res.wall.get(.{ .x = x, .y = y }) orelse 0;
                 reg[idx] = if (chr == 0) '.' else '#';
                 idx += 1;
             }
@@ -55,7 +55,7 @@ fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {
     var bottomright = Coord {};
 
     while (true) {
-        const input = wall.getValue(pos) orelse 0;
+        const input = wall.get(pos) orelse 0;
         try state.inputs.append(input);
         const color = (try intcode.run(&state)) orelse break;
         _ = try wall.put(pos, @intCast(u1, color));

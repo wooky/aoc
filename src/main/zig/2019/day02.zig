@@ -11,7 +11,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try state.memory.putNoClobber(1, 12);
         try state.memory.putNoClobber(2, 2);
         _ = try intcode.run(&state);
-        break :blk @intCast(usize, state.memory.getValue(0).?);
+        break :blk @intCast(usize, state.memory.get(0).?);
     };
 
     const res2 = blk: {
@@ -24,7 +24,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 try state.memory.putNoClobber(1, noun);
                 try state.memory.putNoClobber(2, verb);
                 _ = try intcode.run(&state);
-                if (state.memory.getValue(0).? == 19690720) {
+                if (state.memory.get(0).? == 19690720) {
                     break :blk @intCast(usize, 100 * noun + verb);
                 }
             }

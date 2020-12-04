@@ -14,12 +14,12 @@ pub fn StringTable(comptime V: type) type {
         }
 
         pub fn get(self: Self, k1: []const u8, k2: []const u8) ?V {
-            const sub = self.backing.getValue(k1) orelse return null;
-            return sub.getValue(k2);
+            const sub = self.backing.get(k1) orelse return null;
+            return sub.get(k2);
         }
 
         pub fn put(self: *Self, k1: []const u8, k2: [] const u8, v: V) !void {
-            var opt_submap = self.backing.get(k1);
+            var opt_submap = self.backing.getEntry(k1);
             if (opt_submap) |kv| {
                 _ = try kv.value.put(k2, v);
             }
@@ -35,11 +35,12 @@ pub fn StringTable(comptime V: type) type {
         }
 
         pub fn deinit(self: Self) void {
-            var iter = self.backing.iterator();
+            var backing = self.backing;
+            var iter = backing.iterator();
             while (iter.next()) |kv| {
                 kv.value.deinit();
             }
-            self.backing.deinit();
+            backing.deinit();
         }
     };
 }

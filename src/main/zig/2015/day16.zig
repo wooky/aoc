@@ -37,7 +37,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         _ = tokens.next().?;
         const sue = tokens.next().?;
         while (tokens.next()) |key| {
-            const comparer = target.getValue(key).?;
+            const comparer = target.get(key).?;
             const actual_value = try std.fmt.parseInt(u8, tokens.next().?, 10);
             if (comparer.value != actual_value) {
                 is_fake = false;

@@ -22,12 +22,12 @@ pub fn StringMultimap(comptime V: type) type {
         }
 
         pub fn get(self: Self, key: []const u8) ?[]V {
-            const sub = self.backing.getValue(key) orelse return null;
+            const sub = self.backing.get(key) orelse return null;
             return sub.items;
         }
 
         pub fn put(self: *Self, key: []const u8, value: V) !void {
-            var opt_sublist = self.backing.get(key);
+            var opt_sublist = self.backing.getEntry(key);
             if (opt_sublist) |kv| {
                 try kv.value.append(value);
             }

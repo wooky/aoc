@@ -53,7 +53,7 @@ const Part2 = struct {
         }
         if (!self.saw_pair) {
             const pair = [2]u8{ self.last1, c };
-            if (self.pairs.getValue(pair)) |inserted_idx| {
+            if (self.pairs.get(pair)) |inserted_idx| {
                 if (idx - inserted_idx > 1) {
                     self.saw_pair = true;
                 }

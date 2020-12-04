@@ -53,11 +53,11 @@ const WireCache = struct {
     }
 
     fn get(self: *WireCache, output: []const u8) u16 {
-        const cached_value = self.backing.getValue(output);
+        const cached_value = self.backing.get(output);
         if (cached_value) |v| {
             return v;
         }
-        const value = self.outputs.getValue(output).?.evaluate(self);
+        const value = self.outputs.get(output).?.evaluate(self);
         _ = self.backing.put(output, value) catch unreachable;
         return value;
     }
@@ -123,12 +123,12 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     var cache1 = WireCache.init(problem.allocator, outputs);
     defer cache1.deinit();
-    const part1 = outputs.getValue("a").?.evaluate(&cache1);
+    const part1 = outputs.get("a").?.evaluate(&cache1);
 
-    outputs.get("b").?.value.op1.constant = part1;
+    outputs.getEntry("b").?.value.op1.constant = part1;
     var cache2 = WireCache.init(problem.allocator, outputs);
     defer cache2.deinit();
-    const part2 = outputs.getValue("a").?.evaluate(&cache2);
+    const part2 = outputs.get("a").?.evaluate(&cache2);
 
     return aoc.Solution{ .p1 = part1, .p2 = part2 };
 }

@@ -9,7 +9,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var hash: [16]u8 = undefined;
     while (true) {
         const input = try std.fmt.bufPrint(&buf, "{}{}", .{problem.input, counter});
-        std.crypto.Md5.hash(input, &hash);
+        std.crypto.hash.Md5.hash(input, &hash, .{});
         var str_hash = try std.fmt.bufPrint(&buf, "{x}", .{hash});
         if (five == 0 and std.mem.startsWith(u8, str_hash, "00000")) {
             five = counter;
