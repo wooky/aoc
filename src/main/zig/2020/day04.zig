@@ -96,28 +96,21 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var present: usize = 0;
     var valid: usize = 0;
 
-    var fields_present: u8 = 0;
-    var all_valid: bool = true;
-    var lines = std.mem.split(problem.input, "\n");
-    while (lines.next()) |line| {
-        if (line.len == 0) {
-            if (fields_present == 7) {
-                present += 1;
-                if (all_valid) {
-                    valid += 1;
-                }
+    while (problem.group()) |group| {
+        var fields_present: u8 = 0;
+        var all_valid = true;
+        var tokens = std.mem.tokenize(group, ": \n");
+        while (tokens.next()) |field| {
+            const value = tokens.next().?;
+            if (validation.validate(field, value)) |validation_result| {
+                fields_present += 1;
+                all_valid = all_valid and validation_result;
             }
-            fields_present = 0;
-            all_valid = true;
         }
-        else {
-            var tokens = std.mem.tokenize(line, ": ");
-            while (tokens.next()) |field| {
-                const value = tokens.next().?;
-                if (validation.validate(field, value)) |validation_result| {
-                    fields_present += 1;
-                    all_valid = all_valid and validation_result;
-                }
+        if (fields_present == 7) {
+            present += 1;
+            if (all_valid) {
+                valid += 1;
             }
         }
     }

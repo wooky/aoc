@@ -4,6 +4,7 @@ const Allocator = std.mem.Allocator;
 pub const Problem = struct {
     input: []const u8 = undefined, allocator: *Allocator,
     buf: []u8, tokenizer: ?std.mem.TokenIterator = null,
+    splitter: ?std.mem.SplitIterator = null,
 
     pub fn init(year: u16, day: u16, allocator: *Allocator) !Problem {
         var problem = Problem { .allocator = allocator, .buf = try allocator.alloc(u8, 65536) };
@@ -24,6 +25,13 @@ pub const Problem = struct {
             self.tokenizer = std.mem.tokenize(self.input, "\n");
         }
         return self.tokenizer.?.next();
+    }
+
+    pub fn group(self: *Problem) ?[]const u8 {
+        if (self.splitter == null) {
+            self.splitter = std.mem.split(self.input, "\n\n");
+        }
+        return self.splitter.?.next();
     }
 };
 
