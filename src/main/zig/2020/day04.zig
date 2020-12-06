@@ -1,91 +1,48 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
+const regex = @cImport(
+    @cInclude("regex.h")
+);
 
 const Validation = struct {
-    const Validators = std.StringHashMap(fn (*const Validation, []const u8)bool);
-    const EyeColors = std.StringHashMap(void);
+    const regex_t = [48]u8; // translate-c can't convert regex.regex_t properly, so this abhorrent hack is used instead
+    const Validators = std.StringHashMap(regex_t);
 
     validators: Validators,
-    eye_colors: EyeColors,
 
     fn init(allocator: *std.mem.Allocator) !Validation {
-        var validation = Validation { .validators = Validators.init(allocator), .eye_colors = EyeColors.init(allocator) };
-
-        try validation.validators.putNoClobber("byr", birthYear);
-        try validation.validators.putNoClobber("iyr", issueYear);
-        try validation.validators.putNoClobber("eyr", expirationYear);
-        try validation.validators.putNoClobber("hgt", height);
-        try validation.validators.putNoClobber("hcl", hairColor);
-        try validation.validators.putNoClobber("ecl", eyeColor);
-        try validation.validators.putNoClobber("pid", passportId);
-
-        try validation.eye_colors.putNoClobber("amb", {});
-        try validation.eye_colors.putNoClobber("blu", {});
-        try validation.eye_colors.putNoClobber("brn", {});
-        try validation.eye_colors.putNoClobber("gry", {});
-        try validation.eye_colors.putNoClobber("grn", {});
-        try validation.eye_colors.putNoClobber("hzl", {});
-        try validation.eye_colors.putNoClobber("oth", {});
-
-        return validation;
+        var validation = Validation { .validators = Validators.init(allocator) };
+        return validation.addRegex("byr", "^(19[2-9][0-9]|200[0-2])$")
+                         .addRegex("iyr", "^20(1[0-9]|20)$")
+                         .addRegex("eyr", "^20(2[0-9]|30)$")
+                         .addRegex("hgt", "^((1[5-8][0-9]|19[0-3])cm|(59|6[0-9]|7[0-6])in)$")
+                         .addRegex("hcl", "^#[0-9a-f]{6}$")
+                         .addRegex("ecl", "^(amb|blu|brn|gry|grn|hzl|oth)$")
+                         .addRegex("pid", "^[0-9]{9}$");
     }
 
     fn deinit(self: *Validation) void {
+        var iter = self.validators.iterator();
+        while (iter.next()) |kv| {
+            regex.regfree(@ptrCast(*regex.regex_t, &kv.value));
+        }
+
         self.validators.deinit();
-        self.eye_colors.deinit();
     }
 
-    fn validate(self: *Validation, field: []const u8, value: []const u8) ?bool {
+    fn addRegex(self: *Validation, field: []const u8, pattern: [:0]const u8) Validation {
+        var r: regex_t = undefined;
+        _ = regex.regcomp(@ptrCast(*regex.regex_t, &r), pattern, regex.REG_EXTENDED);
+        self.validators.putNoClobber(field, r) catch unreachable;
+        return self.*;
+    }
+
+    fn validate(self: *const Validation, field: []const u8, value: []const u8) ?bool {
         const validator = self.validators.get(field) orelse return null;
-        return validator(self, value);
-    }
-
-    fn birthYear(self: *const Validation, value: []const u8) bool {
-        const year = std.fmt.parseInt(u16, value, 10) catch return false;
-        return year >= 1920 and year <= 2002;
-    }
-
-    fn issueYear(self: *const Validation, value: []const u8) bool {
-        const year = std.fmt.parseInt(u16, value, 10) catch return false;
-        return year >= 2010 and year <= 2020;
-    }
-
-    fn expirationYear(self: *const Validation, value: []const u8) bool {
-        const year = std.fmt.parseInt(u16, value, 10) catch return false;
-        return year >= 2020 and year <= 2030;
-    }
-
-    fn height(self: *const Validation, value: []const u8) bool {
-        const edge = value.len - 2;
-        const h = std.fmt.parseInt(u8, value[0..edge], 10) catch return false;
-        const units = value[edge..];
-        if (std.mem.eql(u8, units, "cm")) {
-            return h >= 150 and h <= 193;
-        }
-        if (std.mem.eql(u8, units, "in")) {
-            return h >= 59 and h <= 76;
-        }
-        return false;
-    }
-
-    fn hairColor(self: *const Validation, value: []const u8) bool {
-        if (value.len != 7 or value[0] != '#') {
-            return false;
-        }
-        _ = std.fmt.parseInt(u24, value[1..], 16) catch return false;
-        return true;
-    }
-
-    fn eyeColor(self: *const Validation, value: []const u8) bool {
-        return self.eye_colors.contains(value);
-    }
-
-    fn passportId(self: *const Validation, value: []const u8) bool {
-        if (value.len != 9) {
-            return false;
-        }
-        _ = std.fmt.parseInt(u32, value[1..], 10) catch return false;
-        return true;
+        var buf: [15:0]u8 = undefined;
+        std.mem.copy(u8, &buf, value);
+        buf[value.len] = 0;
+        return regex.regexec(@ptrCast(*const regex.regex_t, &validator), &buf, 0, null, 0) == 0;
     }
 };
 
