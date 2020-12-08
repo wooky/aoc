@@ -1,9 +1,9 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
 const Arena = std.heap.ArenaAllocator;
-const Defab = std.StringHashMap([] const u8);
+const Defab = std.StringHashMap([]const u8);
+const DefabOrder = std.ArrayList([]const u8);
 const Fab = aoc.StringMultimap([]const u8);
-const MoleculeList = std.ArrayList([]const u8);
 const MoleculeSet = std.StringHashMap(void);
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
@@ -11,7 +11,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer fab.deinit();
     var defab = Defab.init(problem.allocator);
     defer defab.deinit();
+    var defab_order = DefabOrder.init(problem.allocator);
+    defer defab_order.deinit();
     var medicine: []const u8 = undefined;
+
     while (problem.line()) |line| {
         if (line.len > 20) {
             medicine = line;
@@ -24,7 +27,9 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
         try fab.put(key, value);
         try defab.putNoClobber(value, key);
+        try defab_order.append(value);
     }
+    std.sort.sort([]const u8, defab_order.items, {}, compareLengths);
 
     const uniquePossibilities = blk: {
         var arena = Arena.init(problem.allocator);
@@ -44,67 +49,28 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         break :blk possibilities.count();
     };
 
-    // const fastestFabrication = blk : {
-    //     var arena = Arena.init(problem.allocator); defer arena.deinit();
-    //     var buf1 = MoleculeList.init(problem.allocator); defer buf1.deinit();
-    //     var buf2 = MoleculeList.init(problem.allocator); defer buf2.deinit();
-    //     var already_processed = MoleculeSet.init(problem.allocator); defer already_processed.deinit();
+    const fastestFabrication = blk: {
+        var replacements: usize = 0;
+        var buf: [512]u8 = undefined;
+        std.mem.copy(u8, &buf, medicine);
+        var buf_slice = buf[0..medicine.len];
+        outer: while (!std.mem.eql(u8, buf_slice, "e")) {
+            for (defab_order.items) |key| {
+                const count = std.mem.count(u8, buf_slice, key);
+                if (count != 0) {
+                    replacements += count;
+                    const value = defab.get(key).?;
+                    _ = std.mem.replace(u8, buf_slice, key, value, &buf);
+                    buf_slice.len -= (key.len - value.len) * count;
+                    continue :outer;
+                }
+            }
+            unreachable;
+        }
+        break :blk replacements;
+    };
 
-    //     var src = &buf1; var dest = &buf2;
-    //     try src.append(medicine);
-
-    //     var steps: usize = 1;
-    //     while (true) : (steps += 1) {
-    //         dest.items.len = 0;
-    //         for (src.items) |molecule| {
-    //             std.debug.warn("Process {}\n", .{molecule});
-    //             if (std.mem.eql(u8, molecule, "e")) {
-    //                 break :blk steps;
-    //             }
-
-    //             var idx: usize = 0;
-    //             var end_idx: usize = undefined;
-    //             while (idx < molecule.len) : (idx = end_idx) {
-    //                 end_idx = nextAtom(molecule, idx) orelse unreachable;
-    //                 const end_idx_2 = nextAtom(molecule, end_idx) orelse break;
-    //                 if (std.mem.eql(u8, molecule[end_idx..end_idx_2], "Rn")) {
-    //                     var this_end_idx = end_idx_2;
-    //                     var attempts: u8 = 0;
-    //                     while (attempts < 6) : (attempts += 1) {
-    //                         const next_end_idx = nextAtom(molecule, this_end_idx) orelse break;
-    //                         if (std.mem.eql(u8, molecule[this_end_idx..next_end_idx], "Ar")) {
-    //                             if (defab.getValue(molecule[idx..next_end_idx])) |replacement| {
-    //                                 const next_molecule = try replaceString(&arena, molecule, idx, next_end_idx, replacement);
-    //                                 if (!already_processed.contains(next_molecule)) {
-    //                                     std.debug.warn("\tWOW {}\n", .{next_molecule});
-    //                                     try already_processed.putNoClobber(next_molecule, {});
-    //                                     _ = try dest.append(next_molecule);
-    //                                     break;
-    //                                 }
-    //                             }
-    //                         }
-    //                         this_end_idx = next_end_idx;
-    //                     }
-    //                 }
-    //                 else if (molecule.len < 20) {
-    //                     if (defab.getValue(molecule[idx..end_idx_2])) |replacement| {
-    //                         const next_molecule = try replaceString(&arena, molecule, idx, end_idx_2, replacement);
-    //                         if (!already_processed.contains(next_molecule)) {
-    //                             std.debug.warn("\tPut {}\n", .{next_molecule});
-    //                             try already_processed.putNoClobber(next_molecule, {});
-    //                             _ = try dest.append(next_molecule);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         var tmp = src;
-    //         src = dest;
-    //         dest = tmp;
-    //     }
-    // };
-
-    return aoc.Solution{ .p1 = uniquePossibilities, .p2 = 0 };
+    return aoc.Solution{ .p1 = uniquePossibilities, .p2 = fastestFabrication };
 }
 
 fn nextAtom(molecule: []const u8, idx: usize) ?usize {
@@ -119,4 +85,8 @@ fn replaceString(arena: *Arena, molecule: []const u8, idx: usize, end_idx: usize
     return std.fmt.allocPrint(&arena.allocator, "{}{}{}", .{
         molecule[0..idx], replacement, molecule[end_idx..]
     });
+}
+
+fn compareLengths(context: void, a: []const u8, b: []const u8) bool {
+    return a.len > b.len;
 }
