@@ -1,109 +1,210 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
+
+const EffectTimer = u8;
+const HitPoints = u8;
 const Mana = u16;
 
-const shield_effect: i8 = 7;
-const damage_effect: u8 = 3;
-const mana_effect: u8 = 101;
-
-const Spell = struct {
-    cost: Mana, instant_damage: u8 = 0, instant_heal: u8 = 0,
-    shield_timer: u8 = 0, damage_timer: u8 = 0, mana_timer: u8 = 0
+const TurnResult = enum {
+    CONTINUE, WIN, FAIL,
 };
 
-const State = struct {
-    boss_hp: u8, boss_atk: i8, player_hp: u8 = 50, mana_used: Mana = 0, mana_remaining: Mana = 500,
-    shield_timer: u8 = 0, damage_timer: u8 = 0, mana_timer: u8 = 0
+const InstantSpell = struct { cost: Mana, heal: HitPoints, damage: HitPoints };
+const Spell = union(enum) {
+    Instant: InstantSpell,
+    Shield: void,
+    Poison: void,
+    Recharge: void,
+};
+
+const Player = struct {
+    const shield_effect: HitPoints = 7;
+    const recharge_effect: Mana = 101;
+
+    const shield_cost: Mana = 113;
+    const poison_cost: Mana = 173;
+    const rechage_cost: Mana = 229;
+
+    const shield_time: EffectTimer = 6;
+    const poison_time: EffectTimer = 6;
+    const recharge_time: EffectTimer = 5;
+
+    hp: HitPoints = 50,
+    mana_remaining: Mana = 500,
+    mana_used: Mana = 0,
+    shield_effect_timer: EffectTimer = 0,
+    recharge_effect_timer: EffectTimer = 0,
+    armor: HitPoints = undefined,
+
+    fn damage(self: *Player, dmg: HitPoints) bool {
+        if (dmg >= self.hp) {
+            return true;
+        }
+        self.hp -= dmg;
+        return false;
+    }
+
+    fn tick(self: *Player) void {
+        if (self.shield_effect_timer != 0) {
+            self.armor = shield_effect;
+            self.shield_effect_timer -= 1;
+        }
+        else {
+            self.armor = 0;
+        }
+        
+        if (self.recharge_effect_timer != 0) {
+            self.mana_remaining += recharge_effect;
+            self.recharge_effect_timer -= 1;
+        }
+    }
+
+    fn castSpell(self: *Player, spell: Spell, boss: *Boss) TurnResult {
+        return switch (spell) {
+            .Instant => |s| self.applyInstantSpell(s, boss),
+            .Shield => self.applyShieldEffect(),
+            .Poison => self.applyPoisonEffect(boss),
+            .Recharge => self.applyRechargeEffect(),
+        };
+    }
+
+    fn applyInstantSpell(self: *Player, spell: InstantSpell, boss: *Boss) TurnResult {
+        if (!self.consumeMana(spell.cost)) {
+            return .FAIL;
+        }
+        if (boss.damage(spell.damage)) {
+            return .WIN;
+        }
+        self.hp += spell.heal;
+        return .CONTINUE;
+    }
+
+    fn applyShieldEffect(self: *Player) TurnResult {
+        if (self.shield_effect_timer != 0 or !self.consumeMana(shield_cost)) {
+            return .FAIL;
+        }
+        self.shield_effect_timer = shield_time;
+        return .CONTINUE;
+    }
+
+    fn applyPoisonEffect(self: *Player, boss: *Boss) TurnResult {
+        if (boss.poison_effect_timer != 0 or !self.consumeMana(poison_cost)) {
+            return .FAIL;
+        }
+        boss.poison_effect_timer = poison_time;
+        return .CONTINUE;
+    }
+
+    fn applyRechargeEffect(self: *Player) TurnResult {
+        if (self.recharge_effect_timer != 0 or !self.consumeMana(rechage_cost)) {
+            return .FAIL;
+        }
+        self.recharge_effect_timer = recharge_time;
+        return .CONTINUE;
+    }
+
+    fn consumeMana(self: *Player, mana: Mana) bool {
+        if (mana > self.mana_remaining) {
+            return false;
+        }
+        self.mana_remaining -= mana;
+        self.mana_used += mana;
+        return true;
+    }
+};
+
+const Boss = struct {
+    const damage_effect: HitPoints = 3;
+
+    hp: HitPoints,
+    atk: HitPoints,
+    poison_effect_timer: EffectTimer = 0,
+
+    fn damage(self: *Boss, dmg: HitPoints) bool {
+        if (dmg >= self.hp) {
+            return true;
+        }
+        self.hp -= dmg;
+        return false;
+    }
+
+    fn tick(self: *Boss) bool {
+        if (self.poison_effect_timer != 0) {
+            if (self.damage(damage_effect)) {
+                return true;
+            }
+            self.poison_effect_timer -= 1;
+        }
+        return false;
+    }
+
+    fn attack(self: *Boss, player: *Player) bool {
+        return player.damage(self.atk - player.armor);
+    }
 };
 
 const spells = [_]Spell {
-    .{ .cost = 53, .instant_damage = 4 },
-    .{ .cost = 73, .instant_damage = 2, .instant_heal = 2 },
-    .{ .cost = 113, .shield_timer = 6 },
-    .{ .cost = 173, .damage_timer = 6 },
-    .{ .cost = 229, .mana_timer = 5 },
+    .{ .Instant = .{ .cost = 53, .heal = 0, .damage = 4 } },
+    .{ .Instant = .{ .cost = 73, .heal = 2, .damage = 2 } },
+    .{ .Shield = {} },
+    .{ .Poison = {} },
+    .{ .Recharge = {} },
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var tokens = std.mem.tokenize(problem.input, ": \n");
     _ = tokens.next().?; _ = tokens.next().?;
-    const boss_hp = try std.fmt.parseInt(u8, tokens.next().?, 10);
+    const boss_hp = try std.fmt.parseInt(HitPoints, tokens.next().?, 10);
     _ = tokens.next().?;
-    const boss_atk = try std.fmt.parseInt(i8, tokens.next().?, 10);
+    const boss_atk = try std.fmt.parseInt(HitPoints, tokens.next().?, 10);
 
-    const min_mana_used = performSpell(
-        State { .boss_hp = boss_hp, .boss_atk = boss_atk },
-        Spell { .cost = 0, .instant_heal = @intCast(u8, boss_atk) }, // Disgusting hack
-        std.math.maxInt(Mana), 0
-    );
-    return aoc.Solution{ .p1 = min_mana_used, .p2 = 0 };
+    const res1 = blk: {
+        var player = Player {};
+        var boss = Boss { .hp = boss_hp, .atk = boss_atk };
+        break :blk getMinManaUsed(&player, &boss, std.math.maxInt(Mana), 0);
+    };
+
+    const res2 = blk: {
+        var player = Player {};
+        var boss = Boss { .hp = boss_hp, .atk = boss_atk };
+        break :blk getMinManaUsed(&player, &boss, std.math.maxInt(Mana), 1);
+    };
+    
+    return aoc.Solution{ .p1 = res1, .p2 = res2 };
 }
 
-fn performSpell(state: State, spell: Spell, min_mana_used: Mana, spaces: u8) Mana {
-    // var i: u8 = 0; while (i < spaces) : (i += 1) std.debug.warn(" ", .{});
-    // std.debug.warn("{} {} {}\n", .{spell, state, min_mana_used});
-    var new_state = state;
+fn getMinManaUsed(player: *Player, boss: *Boss, max_mana: Mana, player_damage_per_turn: HitPoints) Mana {
+    var min_mana = max_mana;
 
-    // Apply effects, return on invalid state or if enemy dies from effect
-    var def: i8 = 0;
-    if (state.shield_timer > 0) {
-        if (spell.shield_timer > 0) {
-            // std.debug.warn("Can't reactivate shield\n", .{});
-            return min_mana_used;
+    if (player.damage(player_damage_per_turn)) {
+        return min_mana;
+    }
+    player.tick();
+    if (boss.tick()) {
+        return player.mana_used;
+    }
+
+    for (spells) |spell| {
+        var new_player = player.*;
+        var new_boss = boss.*;
+        const result = new_player.castSpell(spell, &new_boss);
+        if (new_player.mana_used >= min_mana or result == .FAIL) {
+            continue;
         }
-        new_state.shield_timer -= 1;
-        def = shield_effect;
-    }
-    if (state.damage_timer > 0) {
-        if (spell.damage_timer > 0) {
-            // std.debug.warn("Can't reactivate damage\n", .{});
-            return min_mana_used;
+        if (result == .WIN) {
+            min_mana = new_player.mana_used;
+            continue;
         }
-        if (damage_effect >= state.boss_hp) {
-            return state.mana_used;
+        new_player.tick();
+        if (new_boss.tick()) {
+            min_mana = new_player.mana_used;
+            continue;
         }
-        new_state.damage_timer -= 1;
-        new_state.boss_hp -= damage_effect;
-    }
-    if (state.mana_timer > 0) {
-        if (spell.mana_timer > 0) {
-            // std.debug.warn("Can't reactivate mana\n", .{});
-            return min_mana_used;
+        if (new_boss.attack(&new_player)) {
+            continue;
         }
-        new_state.mana_timer -= 1;
-        new_state.mana_remaining += mana_effect;
+        min_mana = getMinManaUsed(&new_player, &new_boss, min_mana, player_damage_per_turn);
     }
 
-    // Cast spell, return if it's too expensive
-    new_state.mana_used += spell.cost;
-    if (new_state.mana_used >= min_mana_used or new_state.mana_remaining < spell.cost) {
-        // std.debug.warn("Spell too expensive\n", .{});
-        return min_mana_used;
-    }
-    new_state.mana_remaining -= spell.cost;
-
-    // Apply damage and health, return if someone dies
-    if (spell.instant_damage >= new_state.boss_hp) {
-        return new_state.mana_used;
-    }
-    new_state.boss_hp -= spell.instant_damage;
-    new_state.player_hp += spell.instant_heal;
-    const boss_atk = @intCast(u8, std.math.max(state.boss_atk - def, 1));
-    if (boss_atk >= new_state.player_hp) {
-        // std.debug.warn("RIP\n", .{});
-        return min_mana_used;
-    }
-    new_state.player_hp -= boss_atk;
-
-    // Apply timers
-    new_state.shield_timer = std.math.max(new_state.shield_timer, spell.shield_timer);
-    new_state.damage_timer = std.math.max(new_state.damage_timer, spell.damage_timer);
-    new_state.mana_timer = std.math.max(new_state.mana_timer, spell.mana_timer);
-
-    // Iterate through next spells to get new min mana used
-    var new_min_mana_used = min_mana_used;
-    for (spells) |next_spell| {
-        new_min_mana_used = performSpell(new_state, next_spell, new_min_mana_used, spaces + 1);
-    }
-    return new_min_mana_used;
+    return min_mana;
 }
