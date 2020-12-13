@@ -1,2 +1,5 @@
+.gradle/
 .idea/
+build/
+gradle/
 zig-cache/

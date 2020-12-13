@@ -17,6 +17,9 @@ pub fn build(b: *Builder) void {
     exe.setBuildMode(mode);
     exe.install();
     exe.linkLibC();
+    exe.addIncludeDir("build/bin/linuxX64/releaseShared");
+    exe.addLibPath("build/bin/linuxX64/releaseShared");
+    exe.linkSystemLibrary("aoc");
 
     const run_cmd = exe.run();
     run_cmd.step.dependOn(b.getInstallStep());

@@ -2,22 +2,23 @@ const std = @import("std");
 const Allocator = std.mem.Allocator;
 
 pub const Problem = struct {
-    input: []const u8 = undefined, allocator: *Allocator,
-    buf: []u8, tokenizer: ?std.mem.TokenIterator = null,
+    allocator: *Allocator,
+    input: [:0]const u8 = undefined,
+    tokenizer: ?std.mem.TokenIterator = null,
     splitter: ?std.mem.SplitIterator = null,
 
     pub fn init(year: u16, day: u16, allocator: *Allocator) !Problem {
-        var problem = Problem { .allocator = allocator, .buf = try allocator.alloc(u8, 65536) };
+        var problem = Problem { .allocator = allocator };
         var buf: [32]u8 = undefined;
         const filename = try std.fmt.bufPrint(&buf, "input/{}/day{:0>2}.txt", .{year, day});
         const file = try std.fs.cwd().openFile(filename, .{});
         defer file.close();
-        problem.input = problem.buf[0..try file.read(problem.buf)];
+        problem.input = try file.readToEndAllocOptions(allocator, 65536, null, @alignOf(u8), 0);
         return problem;
     }
 
     pub fn deinit(self: *Problem) void {
-        self.allocator.free(self.buf);
+        self.allocator.free(self.input);
     }
 
     pub fn line(self: *Problem) ?[]const u8 {
