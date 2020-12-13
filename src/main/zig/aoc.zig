@@ -13,7 +13,7 @@ pub const Problem = struct {
         const filename = try std.fmt.bufPrint(&buf, "input/{}/day{:0>2}.txt", .{year, day});
         const file = try std.fs.cwd().openFile(filename, .{});
         defer file.close();
-        problem.input = try file.readToEndAllocOptions(allocator, 65536, null, @alignOf(u8), 0);
+        problem.input = try file.readToEndAllocOptions(allocator, 262144, null, @alignOf(u8), 0);
         return problem;
     }
 

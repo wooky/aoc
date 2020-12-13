@@ -1,7 +1,6 @@
 package ca.yakov.aoc.aoc2016
 
 import ca.yakov.aoc.Solution
-import ca.yakov.aoc.inputLines
 
 private class Room(room: String) {
     val name: String
@@ -20,7 +19,8 @@ private class Room(room: String) {
 fun run04(input: String): Solution {
     val realRooms =
         input
-            .inputLines()
+            .trim()
+            .lineSequence()
             .map { Room(it) }
             .filter { room ->
                 room
