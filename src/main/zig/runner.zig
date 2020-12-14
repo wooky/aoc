@@ -22,7 +22,7 @@ pub fn main() !void {
 
     var problem = aoc.Problem.init(year, day, std.heap.page_allocator) catch |err| switch (err) {
         error.FileNotFound => {
-            std.debug.warn("Invalid year/day provided\n", .{});
+            std.debug.print("Invalid year/day provided\n", .{});
             std.process.exit(1);
         },
         else => return err
@@ -30,20 +30,21 @@ pub fn main() !void {
     defer problem.deinit();
 
     const solution = try run(&problem, year, day);
-    std.debug.warn("{}\n", .{solution.p1});
-    if (solution.s2) |s2| {
-        const width = s2[0];
-        var idx: usize = 1;
-        while (idx < s2.len) : (idx += width) {
-            std.debug.warn("{}\n", .{s2[idx..idx+width]});
-        }
+    printPart(solution.p1, solution.s1);
+    printPart(solution.p2, solution.s2);
+}
+
+fn printPart(p: usize, s: ?[]const u8) void {
+    if (s) |ss| {
+        std.debug.print("{}\n", .{ss});
+        std.heap.page_allocator.free(ss);
     }
     else {
-        std.debug.warn("{}\n", .{solution.p2});
+        std.debug.print("{}\n", .{p});
     }
 }
 
 fn usage(args: [][]const u8) noreturn {
-    std.debug.warn("Usage: {} [year] [day]\n", .{args[0]});
+    std.debug.print("Usage: {} [year] [day]\n", .{args[0]});
     std.process.exit(1);
 }

@@ -5,12 +5,13 @@ import ca.yakov.aoc.Solution
 fun run16(input: String): Solution {
     val inputTrimmed = input.trim()
     return Solution(
+        0uL, 0uL,
         checkMe(inputTrimmed, 272),
         checkMe(inputTrimmed, 35651584)
     )
 }
 
-private fun checkMe(input: String, length: Int): ULong {
+private fun checkMe(input: String, length: Int): String {
     var a = input
     while (a.length < length) {
         val b = a.reversed().map { if (it == '0') '1' else '0' }.joinToString("")
@@ -20,5 +21,5 @@ private fun checkMe(input: String, length: Int): ULong {
     while (checksum.length % 2 == 0) {
         checksum = checksum.chunked(2) { if (it[0] == it[1]) 1 else 0 }.joinToString("")
     }
-    return checksum.toULong()
+    return checksum
 }

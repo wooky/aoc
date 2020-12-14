@@ -38,11 +38,11 @@ fun run10(input: String): Solution {
     }
 
     val expected = setOf(17, 61)
-    var expectedBotId = 0uL
+    var expectedBotId = ""
     while (queue.isNotEmpty()) {
         val bot = queue.removeLast()
         if (bot.chips == expected) {
-            expectedBotId = bot.id.toULong()
+            expectedBotId = bot.id
         }
 
         deposit(bot.low, bot.chips.minOrNull()!!, bots, queue, outputs)
@@ -51,8 +51,8 @@ fun run10(input: String): Solution {
     }
 
     return Solution(
-        expectedBotId,
-        (outputs["0"]!! * outputs["1"]!! * outputs["2"]!!).toULong()
+        p1 = 0uL, s1 = expectedBotId,
+        p2 = (outputs["0"]!! * outputs["1"]!! * outputs["2"]!!).toULong()
     )
 }
 

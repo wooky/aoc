@@ -24,24 +24,23 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         const width = res.bottomright.x - res.topleft.x + 1;
         const height = res.bottomright.y - res.topleft.y + 1;
 
-        var reg = try problem.allocator.alloc(u8, @intCast(usize, width * height + 1));
-        reg[0] = @intCast(u8, width);
+        var reg = try problem.allocator.alloc(u8, @intCast(usize, (width + 1) * height));
         
-        var idx: usize = 1;
+        var idx: usize = 0;
         var y = res.topleft.y;
-        while (y <= res.bottomright.y) : (y += 1) {
+        while (y <= res.bottomright.y) : ({y += 1; idx += 1;}) {
             var x = res.topleft.x;
-            while (x <= res.bottomright.x) : (x += 1) {
+            while (x <= res.bottomright.x) : ({x += 1; idx += 1;}) {
                 const chr = res.wall.get(.{ .x = x, .y = y }) orelse 0;
                 reg[idx] = if (chr == 0) '.' else '#';
-                idx += 1;
             }
+            reg[idx] = '\n';
         }
 
         break :blk reg;
     };
 
-    return aoc.Solution{ .p1 = panels_painted, .p2 = 0, .s2 = id };
+    return aoc.Solution{ .p1 = panels_painted, .p2 = undefined, .s2 = id };
 }
 
 fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {
