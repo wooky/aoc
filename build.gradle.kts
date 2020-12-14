@@ -7,6 +7,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 kotlin {
@@ -21,6 +22,10 @@ kotlin {
         }
     }
     sourceSets {
-        val linuxX64Main by getting
+        val linuxX64Main by getting {
+            dependencies {
+                implementation("com.soywiz.korlibs.krypto:krypto:2.0.2")
+            }
+        }
     }
 }
