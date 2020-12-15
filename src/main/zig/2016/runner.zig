@@ -14,6 +14,7 @@ pub fn run(problem: *aoc.Problem, day: u16) anyerror!aoc.Solution { // TODO remo
         16 => kotlin_bridge.run("2016", "16", problem),
         17 => kotlin_bridge.run("2016", "17", problem),
         18 => kotlin_bridge.run("2016", "18", problem),
+        19 => kotlin_bridge.run("2016", "19", problem),
         else => unreachable
     };
 }
