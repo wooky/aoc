@@ -1,12 +1,8 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
-const regex = @cImport(
-    @cInclude("regex.h")
-);
 
 const Validation = struct {
-    const regex_t = [48]u8; // translate-c can't convert regex.regex_t properly, so this abhorrent hack is used instead
-    const Validators = std.StringHashMap(regex_t);
+    const Validators = std.StringHashMap(aoc.Regex);
 
     validators: Validators,
 
@@ -24,25 +20,19 @@ const Validation = struct {
     fn deinit(self: *Validation) void {
         var iter = self.validators.iterator();
         while (iter.next()) |kv| {
-            regex.regfree(@ptrCast(*regex.regex_t, &kv.value));
+            kv.value.deinit();
         }
-
         self.validators.deinit();
     }
 
     fn addRegex(self: *Validation, field: []const u8, pattern: [:0]const u8) Validation {
-        var r: regex_t = undefined;
-        _ = regex.regcomp(@ptrCast(*regex.regex_t, &r), pattern, regex.REG_EXTENDED);
-        self.validators.putNoClobber(field, r) catch unreachable;
+        self.validators.putNoClobber(field, aoc.Regex.compilez(pattern)) catch unreachable;
         return self.*;
     }
 
     fn validate(self: *const Validation, field: []const u8, value: []const u8) ?bool {
         const validator = self.validators.get(field) orelse return null;
-        var buf: [15:0]u8 = undefined;
-        std.mem.copy(u8, &buf, value);
-        buf[value.len] = 0;
-        return regex.regexec(@ptrCast(*const regex.regex_t, &validator), &buf, 0, null, 0) == 0;
+        return validator.matches(value);
     }
 };
 
