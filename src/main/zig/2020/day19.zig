@@ -3,188 +3,115 @@ const std = @import("std");
 const ArenaAllocator = std.heap.ArenaAllocator;
 
 const RawRules = struct {
-    const RuleToken = union(enum) {
-        None: void,
-        Goto: []const u8,
-        RepeatFirst: void,
-    };
     const Rule = union(enum) {
-        Literal: PatternMap,
-        Unprocessed: struct {
-            first: [2]RuleToken,
-            second: ?[3]RuleToken,
-        },
+        Literal: []const u8,
+        Goto: [][][]const u8,
     };
-    const None = RuleToken { .None = {} };
 
     const RuleMap = std.StringHashMap(Rule);
-    const PatternMap = std.StringHashMap(void);
 
     arena: ArenaAllocator = undefined,
-    rule_map: RuleMap = undefined,
+    unprocessed_rule_map: RuleMap = undefined,
+    processed_rule_map: RuleMap = undefined,
 
     fn init(self: *RawRules, allocator: *std.mem.Allocator) void {
         self.arena = ArenaAllocator.init(allocator);
-        self.rule_map = RuleMap.init(&self.arena.allocator);
+        self.unprocessed_rule_map = RuleMap.init(&self.arena.allocator);
     }
 
     fn deinit(self: *RawRules) void {
-        self.rule_map.deinit();
         self.arena.deinit();
     }
 
     fn addRule(self: *RawRules, line: []const u8) !void {
-        const colon = std.mem.indexOf(u8, line, ":").?;
-        const raw_rule = line[colon + 2..];
+        var colon = std.mem.split(line, ": ");
+        const rule_idx = colon.next().?;
+        const raw_rule = colon.next().?;
         const rule = blk: {
             if (raw_rule[0] == '"') {
-                var map = PatternMap.init(&self.arena.allocator);
-                try map.put(raw_rule[1..2], {});
-                break :blk Rule { .Literal = map };
-            }
-            else if (std.mem.indexOf(u8, raw_rule, " |")) |pipe| {
-                break :blk Rule { .Unprocessed = .{
-                    .first = parseSingleRule(2, raw_rule[0..pipe]),
-                    .second = parseSingleRule(3, raw_rule[pipe + 3..]),
-                } };
+                break :blk Rule { .Literal = raw_rule[1..2] };
             }
             else {
-                break :blk Rule { .Unprocessed = .{
-                    .first = parseSingleRule(2, raw_rule),
-                    .second = null,
-                } };
+                var goto = std.ArrayList([][]const u8).init(&self.arena.allocator);
+                var pipe = std.mem.split(raw_rule, " | ");
+                while (pipe.next()) |chunk| {
+                    var indexes = std.ArrayList([]const u8).init(&self.arena.allocator);
+                    var tokens = std.mem.tokenize(chunk, " ");
+                    while (tokens.next()) |token| {
+                        try indexes.append(token);
+                    }
+                    try goto.append(indexes.toOwnedSlice());
+                }
+                break :blk Rule { .Goto = goto.toOwnedSlice() };
             }
         };
-        try self.rule_map.put(line[0..colon], rule);
-    }
-
-    fn parseSingleRule(comptime size: u8, chunk: []const u8) [size]RuleToken {
-        var rule_tokens: [size]RuleToken = undefined;
-        var idx: u8 = 0;
-        var tokens = std.mem.tokenize(chunk, " ");
-        while (tokens.next()) |token| : (idx += 1) {
-            rule_tokens[idx] = .{ .Goto = token };
-        }
-        while (idx < size) : (idx += 1) {
-            rule_tokens[idx] = None;
-        }
-        return rule_tokens;
+        try self.unprocessed_rule_map.put(rule_idx, rule);
     }
 
     fn formValidMessages(self: *RawRules) !aoc.Regex {
-        const rule0 = self.rule_map.get("0").?.Unprocessed.first;
-
-        var pattern = std.ArrayList(u8).init(&self.arena.allocator);
-        defer pattern.deinit();
-        try pattern.appendSlice("^(");
-
-        {
-            var iter = (try self.formMessage(rule0[0].Goto)).iterator();
-            while (iter.next()) |message| {
-                try pattern.appendSlice(message.key);
-                try pattern.append('|');
-            }
-            _ = pattern.pop();
-        }
-        try pattern.appendSlice(")(");
-        {
-            var iter = (try self.formMessage(rule0[1].Goto)).iterator();
-            while (iter.next()) |message| {
-                try pattern.appendSlice(message.key);
-                try pattern.append('|');
-            }
-            _ = pattern.pop();
-        }
-        try pattern.appendSlice(")$\x00");
-        
-        return aoc.Regex.compilez(@ptrCast([*c]const u8, pattern.items));
+        self.processed_rule_map = try self.unprocessed_rule_map.clone();
+        const pattern = try self.formMessage("0");
+        const patternz = try std.fmt.allocPrintZ(&self.arena.allocator, "^{}$", .{pattern});
+        defer self.arena.allocator.free(patternz);
+        return aoc.Regex.compilez(patternz);
     }
 
-    fn formMessage(self: *RawRules, rule_idx: []const u8) anyerror!PatternMap {
-        switch (self.rule_map.get(rule_idx).?) {
+    fn formMessage(self: *RawRules, rule_idx: []const u8) anyerror![]const u8 {
+        switch (self.processed_rule_map.get(rule_idx).?) {
             .Literal => |l| return l,
-            .Unprocessed => |rule| {
-                var map = PatternMap.init(&self.arena.allocator);
-                try appendMap(&map, try self.formMessageFromSingleRule(&rule.first, null));
-                if (rule.second) |s| {
-                    try appendMap(&map, try self.formMessageFromSingleRule(&s, &map));
+            .Goto => |goto| {
+                var pattern = try std.fmt.allocPrint(
+                    &self.arena.allocator,
+                    "({}",
+                    .{ try self.formMessageFromSingleRule(goto[0]) }
+                );
+                for (goto[1..]) |rule| {
+                    pattern = try std.fmt.allocPrint(
+                        &self.arena.allocator,
+                        "{}|{}",
+                        .{ pattern, try self.formMessageFromSingleRule(rule) }
+                    );
                 }
-                try self.rule_map.put(rule_idx, .{ .Literal = map });
-                return map;
+                pattern = try std.fmt.allocPrint(&self.arena.allocator, "{})", .{pattern});
+                try self.processed_rule_map.put(rule_idx, .{ .Literal = pattern });
+                return pattern;
             }
         }
     }
 
-    fn formMessageFromSingleRule(self: *RawRules, rules: []const RuleToken, first: ?*const PatternMap) anyerror!PatternMap {
-        var left_map = PatternMap.init(&self.arena.allocator);
-        try left_map.put("", {}); // Need at least one item to combine with something
+    fn formMessageFromSingleRule(self: *RawRules, rules: [][]const u8) anyerror![]const u8 {
+        var pattern: []const u8 = &[_]u8 {};
 
         for (rules) |rule| {
-            var right_map: PatternMap = undefined;
-            switch (rule) {
-                .None => break,
-                .Goto => |g| right_map = try self.formMessage(g),
-                .RepeatFirst => right_map = first.?.*,
-            }
-            var new_map = PatternMap.init(&self.arena.allocator);
-            var left_iterator = left_map.iterator();
-            std.debug.print("Go through {} * {} values\n", .{left_map.count(), right_map.count()});
-            while (left_iterator.next()) |left| {
-                var right_iterator = right_map.iterator();
-                while (right_iterator.next()) |right| {
-                    const pattern =
-                        if (rule == .RepeatFirst)
-                            try std.fmt.allocPrint(&self.arena.allocator, "{}({})+", .{left.key, right.key})
-                        else
-                            try std.fmt.allocPrint(&self.arena.allocator, "{}{}", .{left.key, right.key})
-                        ;
-                    try new_map.put(pattern, {});
-                }
-            }
-            left_map.deinit();
-            left_map = new_map;
+            pattern = try std.fmt.allocPrint(
+                &self.arena.allocator,
+                "{}{}",
+                .{ pattern, try self.formMessage(rule) }
+            );
         }
 
-        return left_map;
-    }
-
-    fn appendMap(dest: *PatternMap, src: PatternMap) !void {
-        var iter = src.iterator();
-        while (iter.next()) |kv| {
-            try dest.put(kv.key, {});
-        }
+        return pattern;
     }
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var raw_rules1 = RawRules {};
-    raw_rules1.init(problem.allocator);
-
-    var raw_rules2 = RawRules {};
-    raw_rules2.init(problem.allocator);
+    var raw_rules = RawRules {};
+    raw_rules.init(problem.allocator);
+    defer raw_rules.deinit();
 
     var rule_lines = std.mem.tokenize(problem.group().?, "\n");
     while (rule_lines.next()) |line| {
-        try raw_rules1.addRule(line);
-        try raw_rules2.addRule(line);
+        try raw_rules.addRule(line);
     }
-    try raw_rules2.rule_map.put("8", .{ .Unprocessed = .{
-        .first = [_]RawRules.RuleToken { .{ .Goto = "42" }, RawRules.None },
-        .second = [_]RawRules.RuleToken { .{ .Goto = "42" }, .{ .RepeatFirst = {} }, RawRules.None }
-    } });
-    try raw_rules2.rule_map.put("11", .{ .Unprocessed = .{
-        .first = [_]RawRules.RuleToken { .{ .Goto = "42" }, .{ .Goto = "31" } },
-        .second = [_]RawRules.RuleToken { .{ .Goto = "42" }, .{ .RepeatFirst = {} }, .{ .Goto = "31" } },
-    } });
 
     var res1: usize = 0;
-    var valid_messages1 = try raw_rules1.formValidMessages();
-    raw_rules1.deinit();
+    var valid_messages1 = try raw_rules.formValidMessages();
     defer valid_messages1.deinit();
 
     var res2: usize = 0;
-    var valid_messages2 = try raw_rules2.formValidMessages();
-    raw_rules2.deinit();
+    try raw_rules.addRule("8: 42 | 42 42 | 42 42 42 | 42 42 42 42 | 42 42 42 42 42");
+    try raw_rules.addRule("11: 42 31 | 42 42 31 31 | 42 42 42 31 31 31 | 42 42 42 42 31 31 31 31 | 42 42 42 42 42 31 31 31 31 31");
+    var valid_messages2 = try raw_rules.formValidMessages();
     defer valid_messages2.deinit();
 
     var message_lines = std.mem.tokenize(problem.group().?, "\n");
