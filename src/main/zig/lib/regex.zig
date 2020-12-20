@@ -8,7 +8,7 @@ const ZeroTerminatedBuffer = [128:0]u8;
 
 regex: regex_t = undefined,
 
-pub fn compilez(pattern: [:0]const u8) Self {
+pub fn compilez(pattern: [*c]const u8) Self {
     var self = Self {};
     _ = regexh.regcomp(@ptrCast(*regexh.regex_t, &self.regex), pattern, regexh.REG_EXTENDED);
     return self;
