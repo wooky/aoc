@@ -1,5 +1,6 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
+const LargeImage = u14400;
 
 const Coord = struct { x: i8 = 0, y: i8 = 0 };
 
@@ -32,11 +33,8 @@ const TileMap = struct {
             var idx: usize = 0;
             outer: while (idx < self.unprocessed_tiles.items.len) {
                 var unprocessed_tile = self.unprocessed_tiles.items[idx];
-                var transformations: u8 = 0;
-                while (transformations < 8) : (transformations += 1) {
-                    if (transformations % 4 == 0) {
-                        unprocessed_tile.flip();
-                    }
+                var iter = unprocessed_tile.iterator();
+                while (iter.next()) |_| {
                     if (unprocessed_tile.offsetMatchingWithTile(&tile)) |offset| {
                         const next = Coord {
                             .x = coord.x + offset.x,
@@ -52,9 +50,20 @@ const TileMap = struct {
                         _ = self.unprocessed_tiles.swapRemove(idx);
                         continue :outer;
                     }
-                    unprocessed_tile.rotate();
                 }
                 idx += 1;
+            }
+        }
+    }
+
+    fn toLargeImage(self: *const TileMap) LargeImage {
+        var image: LargeImage = 0;
+        var row: i8 = 0;
+        while (row < 12) : (row += 1) {
+            var col: i8 = 0;
+            while (col < 12) : (col += 1) {
+                const tile = self.tile_map.get(.{ .x = self.bottom_right.x - col, .y = self.bottom_right.y - row }).?;
+                
             }
         }
     }
@@ -78,29 +87,8 @@ const Tile = struct {
         return tile;
     }
 
-    fn rotate(self: *Tile) void {
-        var new_tile: u100 = 0;
-        var src_row: u7 = 0;
-        while (src_row < 10) : (src_row += 1) {
-            const dst_col = std.math.absCast(@intCast(i7, src_row) - 9);
-            var src_col: u7 = 0;
-            while (src_col < 10) : (src_col += 1) {
-                const dst_row = src_col;
-                new_tile |= ((self.tile >> (src_row*10 + src_col)) & 1) << (dst_row*10 + dst_col);
-            }
-        }
-        self.tile = new_tile;
-    }
-
-    fn flip(self: *Tile) void {
-        var new_tile: u100 = 0;
-        var row: u7 = 0;
-        while (row < 10) : (row += 1) {
-            const src = (self.tile >> (row * 10)) & 0x3FF;
-            const dest_shift = std.math.absCast((@intCast(i7, row) - 9)) * 10;
-            new_tile |= src << dest_shift;
-        }
-        self.tile = new_tile;
+    fn iterator(self: *Tile) ImageTransformationIterator(u100) {
+        return ImageTransformationIterator(u100).init(&self.tile);
     }
 
     fn offsetMatchingWithTile(self: *const Tile, other: *const Tile) ?Coord {
@@ -128,6 +116,59 @@ const Tile = struct {
         return (self.tile & mask) == ((other.tile << 9) & mask);
     }
 };
+
+fn ImageTransformationIterator(comptime T: type) type {
+    comptime const dim = std.math.sqrt(@bitSizeOf(T));
+    comptime const Shift = std.math.Log2Int(T);
+
+    return struct {
+        const Self = @This();
+
+        image: *T,
+        counter: u8 = 0,
+
+        fn init(image: *T) Self {
+            return Self { .image = image };
+        }
+
+        fn next(self: *Self) ?void {
+            if (self.counter == 8) {
+                return null;
+            }
+            if (self.counter % 4 == 0) {
+                self.flip();
+            }
+            self.rotate();
+            self.counter += 1;
+        }
+
+        fn rotate(self: *Self) void {
+            var new_image: T = 0;
+            var src_row: Shift = 0;
+            while (src_row < dim) : (src_row += 1) {
+                const dst_col = std.math.absCast((std.math.negateCast(src_row) catch unreachable) + dim - 1);
+                var src_col: Shift = 0;
+                while (src_col < dim) : (src_col += 1) {
+                    const dst_row = src_col;
+                    new_image |= ((self.image.* >> (src_row*dim + src_col)) & 1) << (dst_row*dim + dst_col);
+                }
+            }
+            self.image.* = new_image;
+        }
+
+        fn flip(self: *Self) void {
+            comptime const row_mask = (1 << dim) - 1;
+            var new_image: T = 0;
+            var row: Shift = 0;
+            while (row < dim) : (row += 1) {
+                const src = (self.image.* >> (row * dim)) & row_mask;
+                const dest_shift = std.math.absCast((std.math.negateCast(row) catch unreachable) + dim - 1) * dim;
+                new_image |= src << dest_shift;
+            }
+            self.image.* = new_image;
+        }
+    };
+}
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var tile_map = TileMap.init(problem.allocator);
