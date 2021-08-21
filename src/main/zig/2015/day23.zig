@@ -43,17 +43,17 @@ const Computer = struct {
     }
 
     fn hlf(self: *Computer, instruction: Instruction) std.fmt.ParseIntError!isize {
-        self.registers.getEntry(instruction[1]).?.value /= 2;
+        self.registers.getPtr(instruction[1]).?.* /= 2;
         return 1;
     }
 
     fn tpl(self: *Computer, instruction: Instruction) std.fmt.ParseIntError!isize {
-        self.registers.getEntry(instruction[1]).?.value *= 3;
+        self.registers.getPtr(instruction[1]).?.* *= 3;
         return 1;
     }
 
     fn inc(self: *Computer, instruction: Instruction) std.fmt.ParseIntError!isize {
-        self.registers.getEntry(instruction[1]).?.value += 1;
+        self.registers.getPtr(instruction[1]).?.* += 1;
         return 1;
     }
 

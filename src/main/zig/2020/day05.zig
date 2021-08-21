@@ -24,7 +24,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var iterator = unoccupied_seats.iterator();
     const target_id = blk: {
         while (iterator.next()) |kv| {
-            const k = kv.key;
+            const k = kv.key_ptr.*;
             if (!unoccupied_seats.contains(k - 1) and !unoccupied_seats.contains(k + 1)) {
                 break :blk k;
             }

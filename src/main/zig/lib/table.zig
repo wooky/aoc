@@ -19,9 +19,9 @@ pub fn StringTable(comptime V: type) type {
         }
 
         pub fn put(self: *Self, k1: []const u8, k2: [] const u8, v: V) !void {
-            var opt_submap = self.backing.getEntry(k1);
-            if (opt_submap) |kv| {
-                _ = try kv.value.put(k2, v);
+            var opt_submap = self.backing.getPtr(k1);
+            if (opt_submap) |submap| {
+                _ = try submap.put(k2, v);
             }
             else {
                 var submap = StringBackingSubmap.init(self.backing.allocator);
@@ -38,7 +38,7 @@ pub fn StringTable(comptime V: type) type {
             var backing = self.backing;
             var iter = backing.iterator();
             while (iter.next()) |kv| {
-                kv.value.deinit();
+                kv.value_ptr.deinit();
             }
             backing.deinit();
         }

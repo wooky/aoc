@@ -20,7 +20,7 @@ const Validation = struct {
     fn deinit(self: *Validation) void {
         var iter = self.validators.iterator();
         while (iter.next()) |kv| {
-            kv.value.deinit();
+            kv.value_ptr.deinit();
         }
         self.validators.deinit();
     }

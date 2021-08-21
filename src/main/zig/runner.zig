@@ -36,15 +36,15 @@ pub fn main() !void {
 
 fn printPart(p: usize, s: ?[]const u8) void {
     if (s) |ss| {
-        std.debug.print("{}\n", .{ss});
+        std.debug.print("{s}\n", .{ss});
         std.heap.page_allocator.free(ss);
     }
     else {
-        std.debug.print("{}\n", .{p});
+        std.debug.print("{d}\n", .{p});
     }
 }
 
 fn usage(args: [][]const u8) noreturn {
-    std.debug.print("Usage: {} [year] [day]\n", .{args[0]});
+    std.debug.print("Usage: {s} [year] [day]\n", .{args[0]});
     std.process.exit(1);
 }

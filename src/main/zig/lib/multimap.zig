@@ -16,7 +16,7 @@ pub fn StringMultimap(comptime V: type) type {
         pub fn deinit(self: *Self) void {
             var iterator = self.backing.iterator();
             while (iterator.next()) |kv| {
-                kv.value.deinit();
+                kv.value_ptr.deinit();
             }
             self.backing.deinit();
         }
@@ -27,9 +27,9 @@ pub fn StringMultimap(comptime V: type) type {
         }
 
         pub fn put(self: *Self, key: []const u8, value: V) !void {
-            var opt_sublist = self.backing.getEntry(key);
-            if (opt_sublist) |kv| {
-                try kv.value.append(value);
+            var opt_sublist = self.backing.getPtr(key);
+            if (opt_sublist) |v| {
+                try v.append(value);
             }
             else {
                 var sublist = BackingSubList.init(self.backing.allocator);

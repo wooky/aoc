@@ -24,8 +24,8 @@ const MemoryGame = struct {
     fn fetchTargetNumber(self: *MemoryGame, target: usize) !usize {
         while (self.turn <= target) : (self.turn += 1) {
             if (self.numbers_turns.getEntry(self.last_spoken)) |kv| {
-                self.last_spoken = self.turn - 1 - kv.*.value;
-                kv.*.value = self.turn - 1;
+                self.last_spoken = self.turn - 1 - kv.value_ptr.*;
+                kv.value_ptr.* = self.turn - 1;
             }
             else {
                 try self.numbers_turns.putNoClobber(self.last_spoken, self.turn - 1);

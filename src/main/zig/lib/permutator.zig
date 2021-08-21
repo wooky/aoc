@@ -19,7 +19,7 @@ pub fn Permutator(comptime T: type) type {
             var permutator = try init(allocator);
             var iterator = map.iterator();
             while (iterator.next()) |kv| {
-                try permutator.elements.append(kv.key);
+                try permutator.elements.append(kv.key_ptr.*);
             }
             return permutator;
         }

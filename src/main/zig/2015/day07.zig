@@ -125,7 +125,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer cache1.deinit();
     const part1 = outputs.get("a").?.evaluate(&cache1);
 
-    outputs.getEntry("b").?.value.op1.constant = part1;
+    outputs.getPtr("b").?.op1.constant = part1;
     var cache2 = WireCache.init(problem.allocator, outputs);
     defer cache2.deinit();
     const part2 = outputs.get("a").?.evaluate(&cache2);

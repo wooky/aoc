@@ -51,7 +51,7 @@ const RawRules = struct {
     fn formValidMessages(self: *RawRules) !aoc.Regex {
         self.processed_rule_map = try self.unprocessed_rule_map.clone();
         const pattern = try self.formMessage("0");
-        const patternz = try std.fmt.allocPrintZ(&self.arena.allocator, "^{}$", .{pattern});
+        const patternz = try std.fmt.allocPrintZ(&self.arena.allocator, "^{s}$", .{pattern});
         defer self.arena.allocator.free(patternz);
         return aoc.Regex.compilez(patternz);
     }
@@ -62,17 +62,17 @@ const RawRules = struct {
             .Goto => |goto| {
                 var pattern = try std.fmt.allocPrint(
                     &self.arena.allocator,
-                    "({}",
+                    "({s}",
                     .{ try self.formMessageFromSingleRule(goto[0]) }
                 );
                 for (goto[1..]) |rule| {
                     pattern = try std.fmt.allocPrint(
                         &self.arena.allocator,
-                        "{}|{}",
+                        "{s}|{s}",
                         .{ pattern, try self.formMessageFromSingleRule(rule) }
                     );
                 }
-                pattern = try std.fmt.allocPrint(&self.arena.allocator, "{})", .{pattern});
+                pattern = try std.fmt.allocPrint(&self.arena.allocator, "{s})", .{pattern});
                 try self.processed_rule_map.put(rule_idx, .{ .Literal = pattern });
                 return pattern;
             }
@@ -85,7 +85,7 @@ const RawRules = struct {
         for (rules) |rule| {
             pattern = try std.fmt.allocPrint(
                 &self.arena.allocator,
-                "{}{}",
+                "{s}{s}",
                 .{ pattern, try self.formMessage(rule) }
             );
         }

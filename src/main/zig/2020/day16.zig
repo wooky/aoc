@@ -99,7 +99,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         outer: while (processed != possible_fields.items.len) : (processed += 1) {
             for (possible_fields.items) |*pi, idx| {
                 if (pi.count() == 1) {
-                    const field = pi.iterator().next().?.key;
+                    const field = pi.iterator().next().?.key_ptr.*;
                     for (possible_fields.items) |*pi2| {
                         _ = pi2.remove(field);
                     }

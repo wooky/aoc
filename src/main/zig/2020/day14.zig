@@ -55,7 +55,7 @@ fn sumMemory(mem: *const Memory) usize {
     var res: usize = 0;
     var iter = mem.iterator();
     while (iter.next()) |kv| {
-        res += kv.value;
+        res += kv.value_ptr.*;
     }
     return res;
 }

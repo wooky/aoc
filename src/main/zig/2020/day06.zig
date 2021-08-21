@@ -17,14 +17,14 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             }
             else {
                 const e = try yeses.getOrPutValue(c, 0);
-                e.value += 1;
+                e.value_ptr.* += 1;
             }
         }
         
         var iter = yeses.iterator();
         while (iter.next()) |kv| {
             any_yeses += 1;
-            if (kv.value == people) {
+            if (kv.value_ptr.* == people) {
                 all_yeses += 1;
             }
         }

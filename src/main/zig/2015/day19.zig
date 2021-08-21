@@ -82,7 +82,7 @@ fn nextAtom(molecule: []const u8, idx: usize) ?usize {
 }
 
 fn replaceString(arena: *Arena, molecule: []const u8, idx: usize, end_idx: usize, replacement: []const u8) ![]u8 {
-    return std.fmt.allocPrint(&arena.allocator, "{}{}{}", .{
+    return std.fmt.allocPrint(&arena.allocator, "{s}{s}{s}", .{
         molecule[0..idx], replacement, molecule[end_idx..]
     });
 }

@@ -16,7 +16,7 @@ const HashIterator = struct {
     fn next(self: *HashIterator) !?HashOutput {
         self.counter += 1;
         var buf: [16]u8 = undefined;
-        const hash_input = try std.fmt.bufPrint(&buf, "{}{}", .{self.input, self.counter});
+        const hash_input = try std.fmt.bufPrint(&buf, "{s}{d}", .{self.input, self.counter});
         var hash_output: HashOutput = undefined;
         Md5.hash(hash_input, &hash_output, .{});
         return hash_output;

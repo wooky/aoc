@@ -94,7 +94,7 @@ fn boot(allocator: *Allocator, comptime CoordList: type, active_cubes_copy: anyt
 
         var iter = active_cubes.iterator();
         while (iter.next()) |kv| {
-            var cube = kv.key;
+            var cube = kv.key_ptr.*;
             var active_neighbors: u8 = 0;
             while (cube.nextNeighbor()) |neighbor| {
                 if (active_cubes.contains(neighbor)) {
@@ -111,7 +111,7 @@ fn boot(allocator: *Allocator, comptime CoordList: type, active_cubes_copy: anyt
 
         iter = inactive_cubes_to_process.iterator();
         while (iter.next()) |kv| {
-            var cube = kv.key;
+            var cube = kv.key_ptr.*;
             var active_neighbors: u8 = 0;
             while (cube.nextNeighbor()) |neighbor| {
                 if (active_cubes.contains(neighbor)) {

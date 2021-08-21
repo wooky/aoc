@@ -32,7 +32,7 @@ fn parse_object(obj: std.json.ObjectMap) Solution {
     var red = false;
     var iter = obj.iterator();
     while (iter.next()) |kv| {
-        solution.append(switch (kv.value) {
+        solution.append(switch (kv.value_ptr.*) {
             std.json.Value.Object => |o| parse_object(o),
             std.json.Value.Array => |a| parse_array(a),
             std.json.Value.Integer => |i| Solution { .all = i, .nonred = i },
