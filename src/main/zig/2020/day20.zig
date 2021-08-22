@@ -70,25 +70,40 @@ const TileMap = struct {
 };
 
 const Tile = struct {
+    const VECTOR_SIZE: usize = 10;
+
     id: u16,
-    tile: u100 = 0,
+    matrix: aoc.SquareMatrix,
 
     fn fromGroup(group: []const u8) !Tile {
-        var tile = Tile { .id = try std.fmt.parseInt(u16, group[5..9], 10) };
-        for (group) |c| {
-            const bit: u1 = switch (c) {
-                '#' => 1,
-                '.' => 0,
-                else => continue
-            };
-            tile.tile <<= 1;
-            tile.tile |= bit;
+        var tile = Tile {
+            .id = try std.fmt.parseInt(u16, group[5..9], 10),
+            .matrix = aoc.SquareMatrix.init(VECTOR_SIZE),
+        };
+        var row: usize = 0;
+        var col: usize = 0;
+        for (group[11..]) |c| {
+            switch (c) {
+                '#' => {
+                    tile.matrix.set(row, col, 1);
+                    col += 1;
+                },
+                '.' => {
+                    tile.matrix.set(row, col, 0);
+                    col += 1;
+                },
+                '\n' => {
+                    row += 1;
+                    col = 0;
+                },
+                else => unreachable
+            }
         }
         return tile;
     }
 
-    fn iterator(self: *Tile) ImageTransformationIterator(u100) {
-        return ImageTransformationIterator(u100).init(&self.tile);
+    fn iterator(self: *Tile) TileIterator {
+        return TileIterator { .matrix = &self.matrix };
     }
 
     fn offsetMatchingWithTile(self: *const Tile, other: *const Tile) ?Coord {
@@ -108,67 +123,31 @@ const Tile = struct {
     }
 
     fn topMatches(self: *const Tile, other: *const Tile) bool {
-        return (self.tile >> 90) == (other.tile & 0x3FF);
+        const other_bottom = other.matrix.submatrix(VECTOR_SIZE - 1, 0, 1, VECTOR_SIZE);
+        return self.matrix.submatrix(0, 0, 1, VECTOR_SIZE).equals(&other_bottom);
     }
 
     fn leftMatches(self: *const Tile, other: *const Tile) bool {
-        const mask: u100 = 0b1000000000100000000010000000001000000000100000000010000000001000000000100000000010000000001000000000;
-        return (self.tile & mask) == ((other.tile << 9) & mask);
+        const other_right = other.matrix.submatrix(0, VECTOR_SIZE - 1, VECTOR_SIZE, 1);
+        return self.matrix.submatrix(0, 0, VECTOR_SIZE, 1).equals(&other_right);
     }
 };
 
-fn ImageTransformationIterator(comptime T: type) type {
-    comptime const dim = std.math.sqrt(@bitSizeOf(T));
-    comptime const Shift = std.math.Log2Int(T);
+const TileIterator = struct {
+    matrix: *aoc.SquareMatrix,
+    counter: u8 = 0,
 
-    return struct {
-        const Self = @This();
-
-        image: *T,
-        counter: u8 = 0,
-
-        fn init(image: *T) Self {
-            return Self { .image = image };
+    fn next(self: *TileIterator) ?void {
+        if (self.counter == 8) {
+            return null;
         }
-
-        fn next(self: *Self) ?void {
-            if (self.counter == 8) {
-                return null;
-            }
-            if (self.counter % 4 == 0) {
-                self.flip();
-            }
-            self.rotate();
-            self.counter += 1;
+        if (self.counter % 4 == 0) {
+            self.matrix.flipHorizontally();
         }
-
-        fn rotate(self: *Self) void {
-            var new_image: T = 0;
-            var src_row: Shift = 0;
-            while (src_row < dim) : (src_row += 1) {
-                const dst_col = std.math.absCast((std.math.negateCast(src_row) catch unreachable) + dim - 1);
-                var src_col: Shift = 0;
-                while (src_col < dim) : (src_col += 1) {
-                    const dst_row = src_col;
-                    new_image |= ((self.image.* >> (src_row*dim + src_col)) & 1) << (dst_row*dim + dst_col);
-                }
-            }
-            self.image.* = new_image;
-        }
-
-        fn flip(self: *Self) void {
-            comptime const row_mask = (1 << dim) - 1;
-            var new_image: T = 0;
-            var row: Shift = 0;
-            while (row < dim) : (row += 1) {
-                const src = (self.image.* >> (row * dim)) & row_mask;
-                const dest_shift = std.math.absCast((std.math.negateCast(row) catch unreachable) + dim - 1) * dim;
-                new_image |= src << dest_shift;
-            }
-            self.image.* = new_image;
-        }
-    };
-}
+        self.matrix.rotate90DegreesClockwise();
+        self.counter += 1;
+    }
+};
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var tile_map = TileMap.init(problem.allocator);

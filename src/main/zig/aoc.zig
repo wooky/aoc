@@ -42,3 +42,4 @@ usingnamespace @import("lib/table.zig");
 usingnamespace @import("lib/multimap.zig");
 usingnamespace @import("lib/permutator.zig");
 usingnamespace @import("lib/regex.zig");
+usingnamespace @import("lib/matrix.zig");

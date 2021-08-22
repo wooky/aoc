@@ -20,6 +20,7 @@ pub fn build(b: *Builder) void {
     exe.addIncludeDir("build/bin/linuxX64/releaseShared");
     exe.addLibPath("build/bin/linuxX64/releaseShared");
     exe.linkSystemLibrary("aoc");
+    exe.linkSystemLibrary("gsl");
 
     const run_cmd = exe.run();
     run_cmd.step.dependOn(b.getInstallStep());
