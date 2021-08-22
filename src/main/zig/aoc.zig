@@ -38,7 +38,7 @@ pub const Problem = struct {
 
 pub const Solution = struct { p1: usize, s1: ?[]const u8 = null, p2: usize, s2: ?[]const u8 = null };
 
-pub const StringTable = @import("lib/table.zig").StringTable;
-pub const StringMultimap = @import("lib/multimap.zig").StringMultimap;
-pub const Permutator = @import("lib/permutator.zig").Permutator;
-pub const Regex = @import("lib/regex.zig");
+usingnamespace @import("lib/table.zig");
+usingnamespace @import("lib/multimap.zig");
+usingnamespace @import("lib/permutator.zig");
+usingnamespace @import("lib/regex.zig");
