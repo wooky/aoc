@@ -4,7 +4,7 @@ const Intcode = @import("intcode.zig");
 
 const Wall = std.AutoHashMap(aoc.Coord, u1);
 const WallResult = struct {
-    wall: Wall, topleft: aoc.Coord, bottomright: aoc.Coord
+    wall: Wall, range: aoc.CoordRange
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
@@ -20,22 +20,19 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const id = blk: {
         var res = try paintPanels(&intcode, 1);
         defer res.wall.deinit();
-        const dimensions = res.bottomright.subtract(res.topleft);
 
-        var reg = try problem.allocator.alloc(u8, @intCast(usize, (dimensions.col + 2) * (dimensions.row + 1)));
+        var reg = std.ArrayList(u8).init(problem.allocator);
         
-        var idx: usize = 0;
-        var row = res.topleft.row;
-        while (row <= res.bottomright.row) : ({row += 1; idx += 1;}) {
-            var col = res.topleft.col;
-            while (col <= res.bottomright.col) : ({col += 1; idx += 1;}) {
-                const chr = res.wall.get(aoc.Coord.fromRowCol(row, col)) orelse 0;
-                reg[idx] = if (chr == 0) '.' else '#';
+        var iter = res.range.iterator();
+        while (iter.next()) |coord| {
+            const chr = res.wall.get(coord) orelse 0;
+            try reg.append(if (chr == 0) '.' else '#');
+            if (coord.col == res.range.bottom_right.col) {
+                try reg.append('\n');
             }
-            reg[idx] = '\n';
         }
 
-        break :blk reg;
+        break :blk reg.toOwnedSlice();
     };
 
     return aoc.Solution{ .p1 = panels_painted, .p2 = undefined, .s2 = id };
@@ -48,19 +45,14 @@ fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {
     var delta = aoc.Coord.Predefined.UP;
     var wall = Wall.init(intcode.allocator);
     try wall.putNoClobber(pos, starting_tile);
-    var topleft = aoc.Coord.Predefined.ORIGIN;
-    var bottomright = aoc.Coord.Predefined.ORIGIN;
+    var range = aoc.CoordRange.init();
 
     while (true) {
         const input = wall.get(pos) orelse 0;
         try state.inputs.append(input);
         const color = (try intcode.run(&state)) orelse break;
         _ = try wall.put(pos, @intCast(u1, color));
-
-        topleft.row = std.math.min(topleft.row, pos.row);
-        topleft.col = std.math.min(topleft.col, pos.col);
-        bottomright.row = std.math.max(bottomright.row, pos.row);
-        bottomright.col = std.math.max(bottomright.col, pos.col);
+        range.amend(pos);
 
         switch ((try intcode.run(&state)).?) {
             0 => delta.mutRotate90DegreesCounterclockwise(),
@@ -70,5 +62,5 @@ fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {
         pos.mutAdd(delta);
     }
 
-    return WallResult{ .wall = wall, .topleft = topleft, .bottomright = bottomright };
+    return WallResult{ .wall = wall, .range = range };
 }

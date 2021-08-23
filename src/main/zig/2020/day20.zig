@@ -2,8 +2,7 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const TileMap = struct {
-    top_left: aoc.Coord = aoc.Coord.Predefined.ORIGIN,
-    bottom_right: aoc.Coord = aoc.Coord.Predefined.ORIGIN,
+    range: aoc.CoordRange = aoc.CoordRange.init(),
     unprocessed_tiles: std.ArrayList(Tile),
     queue: std.ArrayList(aoc.Coord),
     tile_map: std.AutoHashMap(aoc.Coord, Tile),
@@ -38,11 +37,7 @@ const TileMap = struct {
                 while (iterator.next()) {
                     if (unprocessed_tile.offsetMatchingWithTile(&tile)) |offset| {
                         const next = coord.add(offset);
-                        self.top_left.row = std.math.min(self.top_left.row, next.row);
-                        self.top_left.col = std.math.min(self.top_left.col, next.col);
-                        self.bottom_right.row = std.math.max(self.bottom_right.row, next.row);
-                        self.bottom_right.col = std.math.max(self.bottom_right.col, next.col);
-
+                        self.range.amend(next);
                         try self.tile_map.putNoClobber(next, unprocessed_tile);
                         try self.queue.append(next);
                         _ = self.unprocessed_tiles.swapRemove(idx);
@@ -152,23 +147,23 @@ const Image = struct {
     fn fromTileMap(tilemap: *const TileMap) Image {
         var matrix = aoc.SquareMatrix.init(ROW_BITS);
         var roughness: usize = 0;
-        var tilemap_coord = aoc.Coord.Predefined.ORIGIN;
-        while (tilemap_coord.row < TILES_SIZE) : (tilemap_coord.row += 1) {
-            tilemap_coord.col = 0;
-            while (tilemap_coord.col < TILES_SIZE) : (tilemap_coord.col += 1) {
-                var tile = tilemap.tile_map.get(tilemap.top_left.add(tilemap_coord)).?;
-                var row: usize = 0;
-                while (row < BORDERLESS_TILE_SIZE) : (row += 1) {
-                    var col: usize = 0;
-                    while (col < BORDERLESS_TILE_SIZE) : (col += 1) {
-                        if (tile.matrix.get(row + 1, col + 1) == 1) {
-                            roughness += 1;
-                            matrix.set(
-                                @intCast(usize, tilemap_coord.row) * BORDERLESS_TILE_SIZE + row,
-                                @intCast(usize, tilemap_coord.col) * BORDERLESS_TILE_SIZE + col,
-                                1);
-                        }
-                    }
+
+        var tilemap_iter = tilemap.range.iterator();
+        while (tilemap_iter.next()) |tilemap_coord| {
+            const image_superoffset = tilemap_coord.subtract(tilemap.range.top_left);
+            const tile = tilemap.tile_map.get(tilemap_coord).?;
+            var pixel_iter = aoc.CoordRangeIterator.init(
+                aoc.Coord.Predefined.ORIGIN,
+                aoc.Coord.fromRowCol(BORDERLESS_TILE_SIZE - 1, BORDERLESS_TILE_SIZE - 1)
+            );
+            while (pixel_iter.next()) |pixel_coord| {
+                if (tile.matrix.get(@intCast(usize, pixel_coord.row + 1), @intCast(usize, pixel_coord.col + 1)) == 1) {
+                    roughness += 1;
+                    matrix.set(
+                        @intCast(usize, image_superoffset.row * BORDERLESS_TILE_SIZE + pixel_coord.row),
+                        @intCast(usize, image_superoffset.col * BORDERLESS_TILE_SIZE + pixel_coord.col),
+                        1
+                    );
                 }
             }
         }
@@ -235,10 +230,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     try tile_map.process();
     const res1 =
-        @intCast(usize, tile_map.tile_map.get(tile_map.top_left).?.id) * 
-        tile_map.tile_map.get(aoc.Coord.fromRowCol(tile_map.top_left.row, tile_map.bottom_right.col)).?.id *
-        tile_map.tile_map.get(aoc.Coord.fromRowCol(tile_map.bottom_right.row, tile_map.top_left.col)).?.id *
-        tile_map.tile_map.get(tile_map.bottom_right).?.id;
+        @intCast(usize, tile_map.tile_map.get(tile_map.range.top_left).?.id) * 
+        tile_map.tile_map.get(aoc.Coord.fromRowCol(tile_map.range.top_left.row, tile_map.range.bottom_right.col)).?.id *
+        tile_map.tile_map.get(aoc.Coord.fromRowCol(tile_map.range.bottom_right.row, tile_map.range.top_left.col)).?.id *
+        tile_map.tile_map.get(tile_map.range.bottom_right).?.id;
 
     var image = Image.fromTileMap(&tile_map);
     defer image.deinit();

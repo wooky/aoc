@@ -66,3 +66,58 @@ pub const Coord = struct {
         return self.row == other.row and self.col == other.col;
     }
 };
+
+pub const CoordRange = struct {
+    top_left: Coord = undefined,
+    bottom_right: Coord = undefined,
+    never_touched: bool = true,
+
+    pub fn init() CoordRange {
+        return .{};
+    }
+
+    pub fn amend(self: *CoordRange, coord: Coord) void {
+        if (self.never_touched) {
+            self.top_left = coord;
+            self.bottom_right = coord;
+            self.never_touched = false;
+        }
+        else {
+            self.top_left.row = std.math.min(self.top_left.row, coord.row);
+            self.top_left.col = std.math.min(self.top_left.col, coord.col);
+            self.bottom_right.row = std.math.max(self.bottom_right.row, coord.row);
+            self.bottom_right.col = std.math.max(self.bottom_right.col, coord.col);
+        }
+    }
+
+    pub fn iterator(self: *const CoordRange) CoordRangeIterator {
+        return CoordRangeIterator.init(self.top_left, self.bottom_right);
+    }
+};
+
+pub const CoordRangeIterator = struct {
+    first: Coord,
+    last: Coord,
+    curr: Coord,
+
+    pub fn init(first: Coord, last: Coord) CoordRangeIterator {
+        return .{ .first = first, .last = last, .curr = first };
+    }
+
+    pub fn next(self: *CoordRangeIterator) ?Coord {
+        if (self.curr.row > self.last.row) {
+            return null;
+        }
+
+        var res = self.curr;
+        if (self.curr.col == self.last.col) {
+            self.curr.row += 1;
+            self.curr.col = self.first.col;
+        }
+        else {
+            self.curr.col += 1;
+        }
+
+        return res;
+    }
+};
