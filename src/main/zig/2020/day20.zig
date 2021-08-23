@@ -1,6 +1,5 @@
 const aoc = @import("../aoc.zig");
 const std = @import("std");
-const LargeImage = u14400;
 
 const Coord = struct { x: i8 = 0, y: i8 = 0 };
 
@@ -56,18 +55,6 @@ const TileMap = struct {
                     }
                 }
                 idx += 1;
-            }
-        }
-    }
-
-    fn toLargeImage(self: *const TileMap) LargeImage {
-        var image: LargeImage = 0;
-        var row: i8 = 0;
-        while (row < 12) : (row += 1) {
-            var col: i8 = 0;
-            while (col < 12) : (col += 1) {
-                const tile = self.tile_map.get(.{ .x = self.bottom_right.x - col, .y = self.bottom_right.y - row }).?;
-                
             }
         }
     }
