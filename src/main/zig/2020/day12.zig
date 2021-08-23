@@ -7,36 +7,13 @@ const Ship = struct {
         value: isize,
     };
 
-    const Coord = struct {
-        x: isize = 0,
-        y: isize = 0,
-
-        fn rotate(self: *Coord, deg: isize) void {
-            const cos: isize = switch (deg) {
-                0 => 1,
-                180, -180 => -1,
-                else => 0
-            };
-            const sin: isize = switch (deg) {
-                90, -270 => 1,
-                270, -90 => -1,
-                else => 0
-            };
-            const x = self.x;
-            const y = self.y;
-
-            self.x = x*cos - y*sin;
-            self.y = x*sin + y*cos;
-        }
-    };
-
-    ship_coord: Coord = Coord {},
-    waypoint_coord: Coord,
+    ship_coord: aoc.Coord = aoc.Coord.Predefined.ORIGIN,
+    waypoint_coord: aoc.Coord,
     target_ship: bool,
 
     fn init(waypoint_x: isize, waypoint_y: isize, target_ship: bool) Ship {
         return Ship {
-            .waypoint_coord = .{.x = waypoint_x, .y = waypoint_y},
+            .waypoint_coord = aoc.Coord.fromXY(waypoint_x, waypoint_y),
             .target_ship = target_ship,
         };
     }
@@ -44,22 +21,26 @@ const Ship = struct {
     fn go(self: *Ship, instruction: Instruction) void {
         const target_movement = if (self.target_ship) &self.ship_coord else &self.waypoint_coord;
         switch (instruction.action) {
-            'N' => target_movement.y -= instruction.value,
-            'S' => target_movement.y += instruction.value,
-            'E' => target_movement.x += instruction.value,
-            'W' => target_movement.x -= instruction.value,
-            'L' => self.waypoint_coord.rotate(-instruction.value),
-            'R' => self.waypoint_coord.rotate(instruction.value),
-            'F' => {
-                self.ship_coord.x += self.waypoint_coord.x * instruction.value;
-                self.ship_coord.y += self.waypoint_coord.y * instruction.value;
-            },
+            'N' => target_movement.row -= instruction.value,
+            'S' => target_movement.row += instruction.value,
+            'E' => target_movement.col += instruction.value,
+            'W' => target_movement.col -= instruction.value,
+            'L' => self.rotateWaypoint(instruction.value, aoc.Coord.mutRotate90DegreesCounterclockwise),
+            'R' => self.rotateWaypoint(instruction.value, aoc.Coord.mutRotate90DegreesClockwise),
+            'F' => self.ship_coord.mutAdd(self.waypoint_coord.multiply(instruction.value)),
             else => unreachable
         }
     }
 
+    fn rotateWaypoint(self: *Ship, degrees: isize, call: anytype) void {
+        var i: usize = 0;
+        while (i < @intCast(usize, degrees) / 90) : (i += 1) {
+            @call(.{}, call, .{&self.waypoint_coord});
+        }
+    }
+
     fn getShipDistance(self: *const Ship) usize {
-        return @intCast(usize, std.math.absCast(self.ship_coord.x) + std.math.absCast(self.ship_coord.y));
+        return self.ship_coord.distanceFromOrigin();
     }
 
     fn parseInstruction(line: []const u8) !Instruction {

@@ -2,10 +2,9 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 const Intcode = @import("intcode.zig");
 
-const Coord = struct { x: i16 = 0, y: i16 = 0 };
-const Wall = std.AutoHashMap(Coord, u1);
+const Wall = std.AutoHashMap(aoc.Coord, u1);
 const WallResult = struct {
-    wall: Wall, topleft: Coord, bottomright: Coord
+    wall: Wall, topleft: aoc.Coord, bottomright: aoc.Coord
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
@@ -21,17 +20,16 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const id = blk: {
         var res = try paintPanels(&intcode, 1);
         defer res.wall.deinit();
-        const width = res.bottomright.x - res.topleft.x + 1;
-        const height = res.bottomright.y - res.topleft.y + 1;
+        const dimensions = res.bottomright.subtract(res.topleft);
 
-        var reg = try problem.allocator.alloc(u8, @intCast(usize, (width + 1) * height));
+        var reg = try problem.allocator.alloc(u8, @intCast(usize, (dimensions.col + 2) * (dimensions.row + 1)));
         
         var idx: usize = 0;
-        var y = res.topleft.y;
-        while (y <= res.bottomright.y) : ({y += 1; idx += 1;}) {
-            var x = res.topleft.x;
-            while (x <= res.bottomright.x) : ({x += 1; idx += 1;}) {
-                const chr = res.wall.get(.{ .x = x, .y = y }) orelse 0;
+        var row = res.topleft.row;
+        while (row <= res.bottomright.row) : ({row += 1; idx += 1;}) {
+            var col = res.topleft.col;
+            while (col <= res.bottomright.col) : ({col += 1; idx += 1;}) {
+                const chr = res.wall.get(aoc.Coord.fromRowCol(row, col)) orelse 0;
                 reg[idx] = if (chr == 0) '.' else '#';
             }
             reg[idx] = '\n';
@@ -46,12 +44,12 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {
     var state = intcode.newState();
     defer state.deinit();
-    var pos = Coord {};
-    var delta = Coord { .x = 0, .y = -1 };
-    var wall = std.AutoHashMap(Coord, u1).init(intcode.allocator);
+    var pos = aoc.Coord.Predefined.ORIGIN;
+    var delta = aoc.Coord.Predefined.UP;
+    var wall = Wall.init(intcode.allocator);
     try wall.putNoClobber(pos, starting_tile);
-    var topleft = Coord {};
-    var bottomright = Coord {};
+    var topleft = aoc.Coord.Predefined.ORIGIN;
+    var bottomright = aoc.Coord.Predefined.ORIGIN;
 
     while (true) {
         const input = wall.get(pos) orelse 0;
@@ -59,28 +57,17 @@ fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {
         const color = (try intcode.run(&state)) orelse break;
         _ = try wall.put(pos, @intCast(u1, color));
 
-        topleft.x = std.math.min(topleft.x, pos.x);
-        topleft.y = std.math.min(topleft.y, pos.y);
-        bottomright.x = std.math.max(bottomright.x, pos.x);
-        bottomright.y = std.math.max(bottomright.y, pos.y);
+        topleft.row = std.math.min(topleft.row, pos.row);
+        topleft.col = std.math.min(topleft.col, pos.col);
+        bottomright.row = std.math.max(bottomright.row, pos.row);
+        bottomright.col = std.math.max(bottomright.col, pos.col);
 
-        const rot_factor: i16 = switch ((try intcode.run(&state)).?) {
-            0 => -1,
-            1 => 1,
+        switch ((try intcode.run(&state)).?) {
+            0 => delta.mutRotate90DegreesCounterclockwise(),
+            1 => delta.mutRotate90DegreesClockwise(),
             else => unreachable
-        };
-        const old_delta = delta;
-        delta = .{
-            .x = switch (old_delta.x) {
-                0 => old_delta.y * -rot_factor,
-                else => 0
-            },
-            .y = switch (old_delta.y) {
-                0 => old_delta.x * rot_factor,
-                else => 0
-            }
-        };
-        pos.x += delta.x; pos.y += delta.y;
+        }
+        pos.mutAdd(delta);
     }
 
     return WallResult{ .wall = wall, .topleft = topleft, .bottomright = bottomright };
