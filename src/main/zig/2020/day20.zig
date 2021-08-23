@@ -61,21 +61,20 @@ const Tile = struct {
             .id = try std.fmt.parseInt(u16, group[5..9], 10),
             .matrix = aoc.SquareMatrix.init(VECTOR_SIZE),
         };
-        var row: usize = 0;
-        var col: usize = 0;
+        var coord = aoc.Coord.Predefined.ORIGIN;
         for (group[11..]) |c| {
             switch (c) {
                 '#' => {
-                    tile.matrix.set(row, col, 1);
-                    col += 1;
+                    tile.matrix.set(coord, 1);
+                    coord.col += 1;
                 },
                 '.' => {
-                    tile.matrix.set(row, col, 0);
-                    col += 1;
+                    tile.matrix.set(coord, 0);
+                    coord.col += 1;
                 },
                 '\n' => {
-                    row += 1;
-                    col = 0;
+                    coord.row += 1;
+                    coord.col = 0;
                 },
                 else => unreachable
             }
@@ -108,13 +107,13 @@ const Tile = struct {
     }
 
     fn topMatches(self: *const Tile, other: *const Tile) bool {
-        const other_bottom = other.matrix.submatrix(VECTOR_SIZE - 1, 0, 1, VECTOR_SIZE);
-        return self.matrix.submatrix(0, 0, 1, VECTOR_SIZE).equals(&other_bottom);
+        const other_bottom = other.matrix.submatrix(aoc.Coord.fromRowCol(VECTOR_SIZE - 1, 0), aoc.Coord.fromRowCol(1, VECTOR_SIZE));
+        return self.matrix.submatrix(aoc.Coord.Predefined.ORIGIN, aoc.Coord.fromRowCol(1, VECTOR_SIZE)).equals(&other_bottom);
     }
 
     fn leftMatches(self: *const Tile, other: *const Tile) bool {
-        const other_right = other.matrix.submatrix(0, VECTOR_SIZE - 1, VECTOR_SIZE, 1);
-        return self.matrix.submatrix(0, 0, VECTOR_SIZE, 1).equals(&other_right);
+        const other_right = other.matrix.submatrix(aoc.Coord.fromRowCol(0, VECTOR_SIZE - 1), aoc.Coord.fromRowCol(VECTOR_SIZE, 1));
+        return self.matrix.submatrix(aoc.Coord.Predefined.ORIGIN, aoc.Coord.fromRowCol(VECTOR_SIZE, 1)).equals(&other_right);
     }
 };
 
@@ -157,13 +156,9 @@ const Image = struct {
                 aoc.Coord.fromRowCol(BORDERLESS_TILE_SIZE - 1, BORDERLESS_TILE_SIZE - 1)
             );
             while (pixel_iter.next()) |pixel_coord| {
-                if (tile.matrix.get(@intCast(usize, pixel_coord.row + 1), @intCast(usize, pixel_coord.col + 1)) == 1) {
+                if (tile.matrix.get(pixel_coord.add(aoc.Coord.fromRowCol(1, 1))) == 1) {
                     roughness += 1;
-                    matrix.set(
-                        @intCast(usize, image_superoffset.row * BORDERLESS_TILE_SIZE + pixel_coord.row),
-                        @intCast(usize, image_superoffset.col * BORDERLESS_TILE_SIZE + pixel_coord.col),
-                        1
-                    );
+                    matrix.set(pixel_coord.add(image_superoffset.multiply(BORDERLESS_TILE_SIZE)), 1);
                 }
             }
         }
@@ -182,17 +177,17 @@ const Image = struct {
         var iter = self.transformation_iterator();
         while (iter.next()) {
             var monsters: usize = 0;
-            var row: usize = 0;
-            while (row < ROW_BITS - MONSTER_LIMIT.row) : (row += 1) {
-                var col: usize = 0;
-                outer: while (col < ROW_BITS - MONSTER_LIMIT.col) : (col += 1) {
-                    for (MONSTER_COORDS) |monster_coord| {
-                        if (self.matrix.get(row + @intCast(usize, monster_coord.row), col + @intCast(usize, monster_coord.col)) != 1) {
-                            continue :outer;
-                        }
+            var range_iter = aoc.CoordRangeIterator.init(
+                aoc.Coord.Predefined.ORIGIN,
+                aoc.Coord.fromRowCol(ROW_BITS - MONSTER_LIMIT.row - 1, ROW_BITS - MONSTER_LIMIT.col - 1)
+            );
+            outer: while (range_iter.next()) |coord| {
+                for (MONSTER_COORDS) |monster_coord| {
+                    if (self.matrix.get(coord.add(monster_coord)) != 1) {
+                        continue :outer;
                     }
-                    monsters += 1;
                 }
+                monsters += 1;
             }
             if (monsters > 0) {
                 return self.roughness - (MONSTER_COORDS.len * monsters);

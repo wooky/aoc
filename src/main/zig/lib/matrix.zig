@@ -3,6 +3,7 @@ const c = @cImport({
     @cInclude("gsl/gsl_blas.h");
 });
 const std = @import("std");
+const aoc = @import("../aoc.zig");
 
 pub const SquareMatrix = struct {
     var flip_matrix: ?SquareMatrix = null;
@@ -27,16 +28,22 @@ pub const SquareMatrix = struct {
         return self.matrix.*.size1;
     }
 
-    pub fn get(self: *const SquareMatrix, row: usize, col: usize) f64 {
-        return c.gsl_matrix_get(self.matrix, row, col);
+    pub fn get(self: *const SquareMatrix, coord: aoc.Coord) f64 {
+        return c.gsl_matrix_get(self.matrix, @intCast(usize, coord.row), @intCast(usize, coord.col));
     }
 
-    pub fn set(self: *SquareMatrix, row: usize, col: usize, x: f64) void {
-        c.gsl_matrix_set(self.matrix, row, col, x);
+    pub fn set(self: *SquareMatrix, coord: aoc.Coord, x: f64) void {
+        c.gsl_matrix_set(self.matrix, @intCast(usize, coord.row), @intCast(usize, coord.col), x);
     }
 
-    pub fn submatrix(self: *const SquareMatrix, y: usize, x: usize, rows: usize, cols: usize) MatrixView {
-        return .{ .view = c.gsl_matrix_const_submatrix(self.matrix, y, x, rows, cols) };
+    pub fn submatrix(self: *const SquareMatrix, begin: aoc.Coord, dimensions: aoc.Coord) MatrixView {
+        return .{ .view = c.gsl_matrix_const_submatrix(
+            self.matrix,
+            @intCast(usize, begin.row),
+            @intCast(usize, begin.col),
+            @intCast(usize, dimensions.row),
+            @intCast(usize, dimensions.col)
+        ) };
     }
 
     pub fn rotate90DegreesClockwise(self: *SquareMatrix) void {
@@ -60,22 +67,12 @@ pub const SquareMatrix = struct {
         }
         if (flip_matrix == null) {
             flip_matrix = SquareMatrix.init(self.size());
-            var i: usize = 0;
+            var i: isize = 0;
             while (i < self.size()) : (i += 1) {
-                flip_matrix.?.set(i, self.size() - i - 1, 1);
+                flip_matrix.?.set(aoc.Coord.fromRowCol(i, @intCast(isize, self.size()) - i - 1), 1);
             }
         }
         return flip_matrix.?;
-    }
-
-    pub fn copyFrom(self: *SquareMatrix, src: *const SquareMatrix, src_y: usize, src_x: usize, dst_y: usize, dst_x: usize, rows: usize, cols: usize) void {
-        var row: usize = 0;
-        while (row < rows) : (row += 1) {
-            var col: usize = 0;
-            while (col < cols) : (col += 1) {
-                self.set(dst_y + row, dst_x + col, src.get(src_y + row, src_x + col));
-            }
-        }
     }
 
     pub fn printMatrix(self: *const SquareMatrix) void {
