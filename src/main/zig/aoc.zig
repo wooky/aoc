@@ -38,6 +38,7 @@ pub const Problem = struct {
 
 pub const Solution = struct { p1: usize, s1: ?[]const u8 = null, p2: usize, s2: ?[]const u8 = null };
 
+usingnamespace @import("lib/conway.zig");
 usingnamespace @import("lib/coord.zig");
 usingnamespace @import("lib/matrix.zig");
 usingnamespace @import("lib/multimap.zig");

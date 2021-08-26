@@ -62,8 +62,12 @@ pub const Coord = struct {
         return std.math.absCast(self.row) + std.math.absCast(self.col);
     }
 
-    pub fn equals(self: *const Coord, other: Coord) bool {
-        return self.row == other.row and self.col == other.col;
+    pub fn equals(self: *const Coord, other: ?Coord) bool {
+        return other != null and self.row == other.?.row and self.col == other.?.col;
+    }
+
+    pub fn neighbors(self: *const Coord) CoordNeighborIterator {
+        return CoordNeighborIterator.init(self.*);
     }
 };
 
@@ -74,6 +78,10 @@ pub const CoordRange = struct {
 
     pub fn init() CoordRange {
         return .{};
+    }
+
+    pub fn initWithBounds(top_left: Coord, bottom_right: Coord) CoordRange {
+        return .{ .top_left = top_left, .bottom_right = bottom_right };
     }
 
     pub fn amend(self: *CoordRange, coord: Coord) void {
@@ -88,6 +96,12 @@ pub const CoordRange = struct {
             self.bottom_right.row = std.math.max(self.bottom_right.row, coord.row);
             self.bottom_right.col = std.math.max(self.bottom_right.col, coord.col);
         }
+    }
+
+    pub fn coordInRange(self: *const CoordRange, coord: Coord) bool {
+        return
+            coord.row >= self.top_left.row and coord.row <= self.bottom_right.row and
+            coord.col >= self.top_left.col and coord.col <= self.bottom_right.col;
     }
 
     pub fn iterator(self: *const CoordRange) CoordRangeIterator {
@@ -119,5 +133,28 @@ pub const CoordRangeIterator = struct {
         }
 
         return res;
+    }
+};
+
+pub const CoordNeighborIterator = struct {
+    center: Coord,
+    range_iter: CoordRangeIterator,
+
+    pub fn init(center: Coord) CoordNeighborIterator {
+        return .{
+            .center = center,
+            .range_iter = CoordRangeIterator.init(
+                center.subtract(Coord.fromRowCol(1, 1)),
+                center.add(Coord.fromRowCol(1, 1))
+            )
+        };
+    }
+
+    pub fn next(self: *CoordNeighborIterator) ?Coord {
+        const curr = self.range_iter.next();
+        if (self.center.equals(curr)) {
+            return self.range_iter.next();
+        }
+        return curr;
     }
 };
