@@ -16,7 +16,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var lights = [_]Light{ .{} } ** 1_000_000;
 
     while (problem.line()) |line| {
-        var range = aoc.CoordRange.init();
+        var range = aoc.CoordRange2D.init();
         var state = TokenState.turn_toggle;
         var command: Command = undefined;
         var tokens = std.mem.tokenize(line, " ");
@@ -46,7 +46,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
         var iter = range.iterator();
         while (iter.next()) |coord| {
-            var light = &lights[@intCast(usize, coord.row * 1000 + coord.col)];
+            var light = &lights[@intCast(usize, coord.y * 1000 + coord.x)];
             switch (command) {
                 .turn_on => {light.p1 = 1; light.p2 += 1;},
                 .turn_off => {light.p1 = 0; if (light.p2 > 0) light.p2 -= 1;},
@@ -63,10 +63,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     return aoc.Solution{ .p1 = lights_on, .p2 = brightness };
 }
 
-fn parseCoord(token: []const u8) !aoc.Coord {
+fn parseCoord(token: []const u8) !aoc.Coord2D {
     var vals = std.mem.tokenize(token, ",");
-    return aoc.Coord.fromXY(
+    return aoc.Coord2D.init(.{
         try std.fmt.parseInt(u16, vals.next().?, 10),
         try std.fmt.parseInt(u16, vals.next().?, 10)
-    );
+    });
 }

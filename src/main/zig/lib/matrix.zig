@@ -69,7 +69,7 @@ pub const SquareMatrix = struct {
             flip_matrix = SquareMatrix.init(self.size());
             var i: isize = 0;
             while (i < self.size()) : (i += 1) {
-                flip_matrix.?.set(aoc.Coord.fromRowCol(i, @intCast(isize, self.size()) - i - 1), 1);
+                flip_matrix.?.set(aoc.Coord.init(.{i, @intCast(isize, self.size()) - i - 1}), 1);
             }
         }
         return flip_matrix.?;

@@ -5,8 +5,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var visited = std.AutoHashMap(aoc.Coord, void).init(problem.allocator);
     defer visited.deinit();
     var already_visited: ?aoc.Coord = null;
-    var curr_pos = aoc.Coord.Predefined.ORIGIN;
-    var delta = aoc.Coord.Predefined.UP;
+    var curr_pos = aoc.PredefinedCoord.ORIGIN;
+    var delta = aoc.PredefinedCoord.UP;
     var tokens = std.mem.tokenize(problem.input, ", \n");
     while (tokens.next()) |token| {
         var direction = token[0];

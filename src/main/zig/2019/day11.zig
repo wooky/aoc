@@ -27,7 +27,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         while (iter.next()) |coord| {
             const chr = res.wall.get(coord) orelse 0;
             try reg.append(if (chr == 0) '.' else '#');
-            if (coord.col == res.range.bottom_right.col) {
+            if (coord.col == res.range.last.col) {
                 try reg.append('\n');
             }
         }
@@ -41,8 +41,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {
     var state = intcode.newState();
     defer state.deinit();
-    var pos = aoc.Coord.Predefined.ORIGIN;
-    var delta = aoc.Coord.Predefined.UP;
+    var pos = aoc.PredefinedCoord.ORIGIN;
+    var delta = aoc.PredefinedCoord.UP;
     var wall = Wall.init(intcode.allocator);
     try wall.putNoClobber(pos, starting_tile);
     var range = aoc.CoordRange.init();

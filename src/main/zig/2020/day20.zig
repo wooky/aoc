@@ -26,8 +26,8 @@ const TileMap = struct {
     }
 
     fn process(self: *TileMap) !void {
-        try self.tile_map.put(aoc.Coord.Predefined.ORIGIN, self.unprocessed_tiles.pop());
-        try self.queue.append(aoc.Coord.Predefined.ORIGIN);
+        try self.tile_map.put(aoc.PredefinedCoord.ORIGIN, self.unprocessed_tiles.pop());
+        try self.queue.append(aoc.PredefinedCoord.ORIGIN);
         while (self.queue.popOrNull()) |coord| {
             const tile = self.tile_map.get(coord).?;
             var idx: usize = 0;
@@ -61,7 +61,7 @@ const Tile = struct {
             .id = try std.fmt.parseInt(u16, group[5..9], 10),
             .matrix = aoc.SquareMatrix.init(VECTOR_SIZE),
         };
-        var coord = aoc.Coord.Predefined.ORIGIN;
+        var coord = aoc.PredefinedCoord.ORIGIN;
         for (group[11..]) |c| {
             switch (c) {
                 '#' => {
@@ -92,28 +92,28 @@ const Tile = struct {
 
     fn offsetMatchingWithTile(self: *const Tile, other: *const Tile) ?aoc.Coord {
         if (self.topMatches(other)) {
-            return aoc.Coord.Predefined.DOWN;
+            return aoc.PredefinedCoord.DOWN;
         }
         if (other.topMatches(self)) {
-            return aoc.Coord.Predefined.UP;
+            return aoc.PredefinedCoord.UP;
         }
         if (self.leftMatches(other)) {
-            return aoc.Coord.Predefined.RIGHT;
+            return aoc.PredefinedCoord.RIGHT;
         }
         if (other.leftMatches(self)) {
-            return aoc.Coord.Predefined.LEFT;
+            return aoc.PredefinedCoord.LEFT;
         }
         return null;
     }
 
     fn topMatches(self: *const Tile, other: *const Tile) bool {
-        const other_bottom = other.matrix.submatrix(aoc.Coord.fromRowCol(VECTOR_SIZE - 1, 0), aoc.Coord.fromRowCol(1, VECTOR_SIZE));
-        return self.matrix.submatrix(aoc.Coord.Predefined.ORIGIN, aoc.Coord.fromRowCol(1, VECTOR_SIZE)).equals(&other_bottom);
+        const other_bottom = other.matrix.submatrix(aoc.Coord.init(.{VECTOR_SIZE - 1, 0}), aoc.Coord.init(.{1, VECTOR_SIZE}));
+        return self.matrix.submatrix(aoc.PredefinedCoord.ORIGIN, aoc.Coord.init(.{1, VECTOR_SIZE})).equals(&other_bottom);
     }
 
     fn leftMatches(self: *const Tile, other: *const Tile) bool {
-        const other_right = other.matrix.submatrix(aoc.Coord.fromRowCol(0, VECTOR_SIZE - 1), aoc.Coord.fromRowCol(VECTOR_SIZE, 1));
-        return self.matrix.submatrix(aoc.Coord.Predefined.ORIGIN, aoc.Coord.fromRowCol(VECTOR_SIZE, 1)).equals(&other_right);
+        const other_right = other.matrix.submatrix(aoc.Coord.init(.{0, VECTOR_SIZE - 1}), aoc.Coord.init(.{VECTOR_SIZE, 1}));
+        return self.matrix.submatrix(aoc.PredefinedCoord.ORIGIN, aoc.Coord.init(.{VECTOR_SIZE, 1})).equals(&other_right);
     }
 };
 
@@ -122,23 +122,23 @@ const Image = struct {
     const BORDERLESS_TILE_SIZE: usize = Tile.VECTOR_SIZE - 2;
     const ROW_BITS = TILES_SIZE * BORDERLESS_TILE_SIZE;
     const MONSTER_COORDS = [_]aoc.Coord {
-        aoc.Coord.fromRowCol(0, 18),
-        aoc.Coord.fromRowCol(1, 0),
-        aoc.Coord.fromRowCol(1, 5),
-        aoc.Coord.fromRowCol(1, 6),
-        aoc.Coord.fromRowCol(1, 11),
-        aoc.Coord.fromRowCol(1, 12),
-        aoc.Coord.fromRowCol(1, 17),
-        aoc.Coord.fromRowCol(1, 18),
-        aoc.Coord.fromRowCol(1, 19),
-        aoc.Coord.fromRowCol(2, 1),
-        aoc.Coord.fromRowCol(2, 4),
-        aoc.Coord.fromRowCol(2, 7),
-        aoc.Coord.fromRowCol(2, 10),
-        aoc.Coord.fromRowCol(2, 13),
-        aoc.Coord.fromRowCol(2, 16),
+        aoc.Coord.init(.{0, 18}),
+        aoc.Coord.init(.{1, 0}),
+        aoc.Coord.init(.{1, 5}),
+        aoc.Coord.init(.{1, 6}),
+        aoc.Coord.init(.{1, 11}),
+        aoc.Coord.init(.{1, 12}),
+        aoc.Coord.init(.{1, 17}),
+        aoc.Coord.init(.{1, 18}),
+        aoc.Coord.init(.{1, 19}),
+        aoc.Coord.init(.{2, 1}),
+        aoc.Coord.init(.{2, 4}),
+        aoc.Coord.init(.{2, 7}),
+        aoc.Coord.init(.{2, 10}),
+        aoc.Coord.init(.{2, 13}),
+        aoc.Coord.init(.{2, 16}),
     };
-    const MONSTER_LIMIT = aoc.Coord.fromRowCol(3, 20);
+    const MONSTER_LIMIT = aoc.Coord.init(.{3, 20});
 
     matrix: aoc.SquareMatrix,
     roughness: usize,
@@ -149,14 +149,14 @@ const Image = struct {
 
         var tilemap_iter = tilemap.range.iterator();
         while (tilemap_iter.next()) |tilemap_coord| {
-            const image_superoffset = tilemap_coord.subtract(tilemap.range.top_left);
+            const image_superoffset = tilemap_coord.subtract(tilemap.range.first);
             const tile = tilemap.tile_map.get(tilemap_coord).?;
             var pixel_iter = aoc.CoordRangeIterator.init(
-                aoc.Coord.Predefined.ORIGIN,
-                aoc.Coord.fromRowCol(BORDERLESS_TILE_SIZE - 1, BORDERLESS_TILE_SIZE - 1)
+                aoc.PredefinedCoord.ORIGIN,
+                aoc.Coord.init(.{BORDERLESS_TILE_SIZE - 1, BORDERLESS_TILE_SIZE - 1})
             );
             while (pixel_iter.next()) |pixel_coord| {
-                if (tile.matrix.get(pixel_coord.add(aoc.Coord.fromRowCol(1, 1))) == 1) {
+                if (tile.matrix.get(pixel_coord.add(aoc.Coord.init(.{1, 1}))) == 1) {
                     roughness += 1;
                     matrix.set(pixel_coord.add(image_superoffset.multiply(BORDERLESS_TILE_SIZE)), 1);
                 }
@@ -178,8 +178,8 @@ const Image = struct {
         while (iter.next()) {
             var monsters: usize = 0;
             var range_iter = aoc.CoordRangeIterator.init(
-                aoc.Coord.Predefined.ORIGIN,
-                aoc.Coord.fromRowCol(ROW_BITS - MONSTER_LIMIT.row - 1, ROW_BITS - MONSTER_LIMIT.col - 1)
+                aoc.PredefinedCoord.ORIGIN,
+                aoc.Coord.init(.{ROW_BITS - MONSTER_LIMIT.row - 1, ROW_BITS - MONSTER_LIMIT.col - 1})
             );
             outer: while (range_iter.next()) |coord| {
                 for (MONSTER_COORDS) |monster_coord| {
@@ -225,10 +225,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     try tile_map.process();
     const res1 =
-        @intCast(usize, tile_map.tile_map.get(tile_map.range.top_left).?.id) * 
-        tile_map.tile_map.get(aoc.Coord.fromRowCol(tile_map.range.top_left.row, tile_map.range.bottom_right.col)).?.id *
-        tile_map.tile_map.get(aoc.Coord.fromRowCol(tile_map.range.bottom_right.row, tile_map.range.top_left.col)).?.id *
-        tile_map.tile_map.get(tile_map.range.bottom_right).?.id;
+        @intCast(usize, tile_map.tile_map.get(tile_map.range.first).?.id) * 
+        tile_map.tile_map.get(aoc.Coord.init(.{tile_map.range.first.row, tile_map.range.last.col})).?.id *
+        tile_map.tile_map.get(aoc.Coord.init(.{tile_map.range.last.row, tile_map.range.first.col})).?.id *
+        tile_map.tile_map.get(tile_map.range.last).?.id;
 
     var image = Image.fromTileMap(&tile_map);
     defer image.deinit();

@@ -7,13 +7,13 @@ const Ship = struct {
         value: isize,
     };
 
-    ship_coord: aoc.Coord = aoc.Coord.Predefined.ORIGIN,
-    waypoint_coord: aoc.Coord,
+    ship_coord: aoc.Coord2D = aoc.Coord2D.init(.{0, 0}),
+    waypoint_coord: aoc.Coord2D,
     target_ship: bool,
 
     fn init(waypoint_x: isize, waypoint_y: isize, target_ship: bool) Ship {
         return Ship {
-            .waypoint_coord = aoc.Coord.fromXY(waypoint_x, waypoint_y),
+            .waypoint_coord = aoc.Coord2D.init(.{waypoint_x, waypoint_y}),
             .target_ship = target_ship,
         };
     }
@@ -21,12 +21,12 @@ const Ship = struct {
     fn go(self: *Ship, instruction: Instruction) void {
         const target_movement = if (self.target_ship) &self.ship_coord else &self.waypoint_coord;
         switch (instruction.action) {
-            'N' => target_movement.row -= instruction.value,
-            'S' => target_movement.row += instruction.value,
-            'E' => target_movement.col += instruction.value,
-            'W' => target_movement.col -= instruction.value,
-            'L' => self.rotateWaypoint(instruction.value, aoc.Coord.mutRotate90DegreesCounterclockwise),
-            'R' => self.rotateWaypoint(instruction.value, aoc.Coord.mutRotate90DegreesClockwise),
+            'N' => target_movement.y -= instruction.value,
+            'S' => target_movement.y += instruction.value,
+            'E' => target_movement.x += instruction.value,
+            'W' => target_movement.x -= instruction.value,
+            'L' => self.rotateWaypoint(instruction.value, aoc.Coord2D.mutRotate90DegreesCounterclockwise),
+            'R' => self.rotateWaypoint(instruction.value, aoc.Coord2D.mutRotate90DegreesClockwise),
             'F' => self.ship_coord.mutAdd(self.waypoint_coord.multiply(instruction.value)),
             else => unreachable
         }

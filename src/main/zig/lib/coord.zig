@@ -1,160 +1,233 @@
 const std = @import("std");
 
-pub const Coord = struct {
-    pub const Predefined = struct {
-        pub const ORIGIN = Coord.fromRowCol(0, 0);
-        pub const UP = Coord.fromRowCol(-1, 0);
-        pub const RIGHT = Coord.fromRowCol(0, 1);
-        pub const DOWN = Coord.fromRowCol(1, 0);
-        pub const LEFT = Coord.fromRowCol(0, -1);
-    };
+pub fn GenericCoord(comptime Self: type) type {
+    return struct {
+        pub fn init(coord: anytype) Self {
+            var self: Self = undefined;
+            inline for (@typeInfo(Self).Struct.fields) |field, i| {
+                @field(self, field.name) = coord[i];
+            }
+            return self;
+        }
 
+        pub fn add(self: *const Self, other: Self) Self {
+            var result = self.*;
+            result.mutAdd(other);
+            return result;
+        }
+
+        pub fn subtract(self: *const Self, other: Self) Self {
+            var result = self.*;
+            inline for (@typeInfo(Self).Struct.fields) |field| {
+                @field(result, field.name) -= @field(other, field.name);
+            }
+            return result;
+        }
+
+        pub fn multiply(self: *const Self, factor: isize) Self {
+            var result = self.*;
+            result.mutMultiply(factor);
+            return result;
+        }
+
+        pub fn mutAdd(self: *Self, other: Self) void {
+            inline for (@typeInfo(Self).Struct.fields) |field| {
+                @field(self, field.name) += @field(other, field.name);
+            }
+        }
+
+        pub fn mutMultiply(self: *Self, factor: isize) void {
+            inline for (@typeInfo(Self).Struct.fields) |field| {
+                @field(self, field.name) *= factor;
+            }
+        }
+
+        pub fn mutRotate90DegreesClockwise(self: *Self) void {
+            if (@typeInfo(Self).Struct.fields.len != 2) {
+                @compileError("Cannot rotate coord which doesn't have 2 points");
+            }
+            const old_coord = self.*;
+            @field(self, @typeInfo(Self).Struct.fields[0].name) = @field(old_coord, @typeInfo(Self).Struct.fields[1].name);
+            @field(self, @typeInfo(Self).Struct.fields[1].name) = -@field(old_coord, @typeInfo(Self).Struct.fields[0].name);
+        }
+
+        pub fn mutRotate90DegreesCounterclockwise(self: *Self) void {
+            if (@typeInfo(Self).Struct.fields.len != 2) {
+                @compileError("Cannot rotate coord which doesn't have 2 points");
+            }
+            const old_coord = self.*;
+            @field(self, @typeInfo(Self).Struct.fields[0].name) = -@field(old_coord, @typeInfo(Self).Struct.fields[1].name);
+            @field(self, @typeInfo(Self).Struct.fields[1].name) = @field(old_coord, @typeInfo(Self).Struct.fields[0].name);
+        }
+
+        pub fn distanceFromOrigin(self: *const Self) usize {
+            var dist: usize = 0;
+            inline for (@typeInfo(Self).Struct.fields) |field| {
+                dist += std.math.absCast(@field(self, field.name));
+            }
+            return dist;
+        }
+
+        pub fn equals(self: *const Self, other: ?Self) bool {
+            if (other == null) {
+                return false;
+            }
+            inline for (@typeInfo(Self).Struct.fields) |field| {
+                if (@field(self, field.name) != @field(other.?, field.name)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        pub fn neighbors(self: *const Self) GenericCoordNeighborIterator(Self) {
+            return GenericCoordNeighborIterator(Self).init(self.*);
+        }
+    };
+}
+pub const Coord = struct {
     row: isize,
     col: isize,
 
-    pub fn fromRowCol(row: isize, col: isize) Coord {
-        return .{ .row = row, .col = col };
-    }
+    pub usingnamespace GenericCoord(Coord);
+};
+pub const Coord2D = struct {
+    x: isize,
+    y: isize,
 
-    pub fn fromXY(x: isize, y: isize) Coord {
-        return .{ .row = y, .col = x };
-    }
-
-    pub fn add(self: *const Coord, other: Coord) Coord {
-        var result = self.*;
-        result.mutAdd(other);
-        return result;
-    }
-
-    pub fn mutAdd(self: *Coord, other: Coord) void {
-        self.row += other.row;
-        self.col += other.col;
-    }
-
-    pub fn multiply(self: *const Coord, factor: isize) Coord {
-        var result = self.*;
-        result.mutMultiply(factor);
-        return result;
-    }
-
-    pub fn subtract(self: *const Coord, other: Coord) Coord {
-        return .{ .row = self.row - other.row, .col = self.col - other.col };
-    }
-
-    pub fn mutMultiply(self: *Coord, factor: isize) void {
-        self.row *= factor;
-        self.col *= factor;
-    }
-
-    pub fn mutRotate90DegreesClockwise(self: *Coord) void {
-        const old_coord = self.*;
-        self.row = old_coord.col;
-        self.col = -old_coord.row;
-    }
-
-    pub fn mutRotate90DegreesCounterclockwise(self: *Coord) void {
-        const old_coord = self.*;
-        self.row = -old_coord.col;
-        self.col = old_coord.row;
-    }
-
-    pub fn distanceFromOrigin(self: *const Coord) usize {
-        return std.math.absCast(self.row) + std.math.absCast(self.col);
-    }
-
-    pub fn equals(self: *const Coord, other: ?Coord) bool {
-        return other != null and self.row == other.?.row and self.col == other.?.col;
-    }
-
-    pub fn neighbors(self: *const Coord) CoordNeighborIterator {
-        return CoordNeighborIterator.init(self.*);
-    }
+    pub usingnamespace GenericCoord(Coord2D);
 };
 
-pub const CoordRange = struct {
-    top_left: Coord = undefined,
-    bottom_right: Coord = undefined,
-    never_touched: bool = true,
-
-    pub fn init() CoordRange {
-        return .{};
-    }
-
-    pub fn initWithBounds(top_left: Coord, bottom_right: Coord) CoordRange {
-        return .{ .top_left = top_left, .bottom_right = bottom_right };
-    }
-
-    pub fn amend(self: *CoordRange, coord: Coord) void {
-        if (self.never_touched) {
-            self.top_left = coord;
-            self.bottom_right = coord;
-            self.never_touched = false;
-        }
-        else {
-            self.top_left.row = std.math.min(self.top_left.row, coord.row);
-            self.top_left.col = std.math.min(self.top_left.col, coord.col);
-            self.bottom_right.row = std.math.max(self.bottom_right.row, coord.row);
-            self.bottom_right.col = std.math.max(self.bottom_right.col, coord.col);
-        }
-    }
-
-    pub fn coordInRange(self: *const CoordRange, coord: Coord) bool {
-        return
-            coord.row >= self.top_left.row and coord.row <= self.bottom_right.row and
-            coord.col >= self.top_left.col and coord.col <= self.bottom_right.col;
-    }
-
-    pub fn iterator(self: *const CoordRange) CoordRangeIterator {
-        return CoordRangeIterator.init(self.top_left, self.bottom_right);
-    }
+pub const PredefinedCoord = struct {
+    pub const ORIGIN = Coord.init(.{0, 0});
+    pub const UP = Coord.init(.{-1, 0});
+    pub const RIGHT = Coord.init(.{0, 1});
+    pub const DOWN = Coord.init(.{1, 0});
+    pub const LEFT = Coord.init(.{0, -1});
 };
 
-pub const CoordRangeIterator = struct {
-    first: Coord,
-    last: Coord,
-    curr: Coord,
+pub fn GenericCoordRange(comptime C: type) type {
+    return struct {
+        const Self = @This();
 
-    pub fn init(first: Coord, last: Coord) CoordRangeIterator {
-        return .{ .first = first, .last = last, .curr = first };
-    }
+        first: C = undefined,
+        last: C = undefined,
+        never_touched: bool = true,
 
-    pub fn next(self: *CoordRangeIterator) ?Coord {
-        if (self.curr.row > self.last.row) {
-            return null;
+        pub fn init() Self {
+            return .{};
         }
 
-        var res = self.curr;
-        if (self.curr.col == self.last.col) {
-            self.curr.row += 1;
-            self.curr.col = self.first.col;
-        }
-        else {
-            self.curr.col += 1;
+        pub fn initWithBounds(first: C, last: C) Self {
+            return .{ .first = first, .last = last };
         }
 
-        return res;
-    }
-};
-
-pub const CoordNeighborIterator = struct {
-    center: Coord,
-    range_iter: CoordRangeIterator,
-
-    pub fn init(center: Coord) CoordNeighborIterator {
-        return .{
-            .center = center,
-            .range_iter = CoordRangeIterator.init(
-                center.subtract(Coord.fromRowCol(1, 1)),
-                center.add(Coord.fromRowCol(1, 1))
-            )
-        };
-    }
-
-    pub fn next(self: *CoordNeighborIterator) ?Coord {
-        const curr = self.range_iter.next();
-        if (self.center.equals(curr)) {
-            return self.range_iter.next();
+        pub fn amend(self: *Self, coord: C) void {
+            if (self.never_touched) {
+                self.first = coord;
+                self.last = coord;
+                self.never_touched = false;
+            }
+            else {
+                inline for (@typeInfo(C).Struct.fields) |field| {
+                    @field(self.first, field.name) = std.math.min(@field(self.first, field.name), @field(coord, field.name));
+                    @field(self.last, field.name) = std.math.max(@field(self.last, field.name), @field(coord, field.name));
+                }
+            }
         }
-        return curr;
-    }
-};
+
+        pub fn coordInRange(self: *const Self, coord: C) bool {
+            inline for (@typeInfo(C).Struct.fields) |field| {
+                if (@field(coord, field.name) < @field(self.first, field.name)) {
+                    return false;
+                }
+                if (@field(coord, field.name) > @field(self.last, field.name)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        pub fn iterator(self: *const Self) GenericCoordRangeIterator(C) {
+            return GenericCoordRangeIterator(C).init(self.first, self.last);
+        }
+    };
+}
+pub const CoordRange = GenericCoordRange(Coord);
+pub const CoordRange2D = GenericCoordRange(Coord2D);
+
+pub fn GenericCoordRangeIterator(comptime C: type) type {
+    return struct {
+        const Self = @This();
+
+        first: C,
+        last: C,
+        curr: C,
+        completed: bool = false,
+
+        pub fn init(first: C, last: C) Self {
+            return .{ .first = first, .last = last, .curr = first };
+        }
+
+        pub fn next(self: *Self) ?C {
+            if (self.completed) {
+                return null;
+            }
+
+            comptime const last_field = @typeInfo(C).Struct.fields.len - 1;
+            var res = self.curr;
+            inline for (@typeInfo(C).Struct.fields) |field, i| {
+                if (@field(self.curr, field.name) == @field(self.last, field.name)) {
+                    if (i == last_field) {
+                        self.completed = true;
+                    }
+                    else {
+                        @field(self.curr, @typeInfo(C).Struct.fields[i + 1].name) += 1;
+                        @field(self.curr, field.name) = @field(self.last, field.name);
+                    }
+                }
+                else {
+                    @field(self.curr, field.name) += 1;
+                    break;
+                }
+            }
+
+            return res;
+        }
+    };
+}
+pub const CoordRangeIterator = GenericCoordRangeIterator(Coord);
+pub const CoordRangeIterator2D = GenericCoordRangeIterator(Coord2D);
+
+pub fn GenericCoordNeighborIterator(comptime C: type) type {
+    return struct {
+        const Self = @This();
+
+        center: C,
+        range_iter: GenericCoordRangeIterator(C),
+
+        pub fn init(center: C) Self {
+            var offset: C = undefined;
+            inline for (@typeInfo(C).Struct.fields) |field| {
+                @field(offset, field.name) = 1;
+            }
+            return .{
+                .center = center,
+                .range_iter = GenericCoordRangeIterator(C).init(
+                    center.subtract(offset),
+                    center.add(offset)
+                )
+            };
+        }
+
+        pub fn next(self: *Self) ?Coord {
+            const curr = self.range_iter.next();
+            if (self.center.equals(curr)) {
+                return self.range_iter.next();
+            }
+            return curr;
+        }
+    };
+}
+pub const CoordNeighborIterator = GenericCoordNeighborIterator(Coord);
+pub const CoordNeighborIterator2D = GenericCoordNeighborIterator(Coord2D);
