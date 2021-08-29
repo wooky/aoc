@@ -98,13 +98,11 @@ pub fn ConwayIterator(comptime C: type) type {
         }
 
         fn iterateActive(self: *Self, coord: C) !bool {
-            // std.debug.print("\n{any} ===> ", .{coord});
             self.coord = coord;
             self.active = true;
             self.active_neighbors = 0;
             var neighbors = coord.neighbors();
             while (neighbors.next()) |neighbor| {
-                // std.debug.print("{any} ", .{neighbor});
                 if (self.prev_active_spots.contains(neighbor)) {
                     self.active_neighbors += 1;
                 }

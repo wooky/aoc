@@ -225,7 +225,7 @@ pub fn GenericCoordNeighborIterator(comptime C: type) type {
             };
         }
 
-        pub fn next(self: *Self) ?Coord {
+        pub fn next(self: *Self) ?C {
             const curr = self.range_iter.next();
             if (self.center.equals(curr)) {
                 return self.range_iter.next();
