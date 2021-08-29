@@ -174,21 +174,26 @@ pub fn GenericCoordRangeIterator(comptime C: type) type {
                 return null;
             }
 
-            comptime const last_field = @typeInfo(C).Struct.fields.len - 1;
+            comptime var field_idx = @typeInfo(C).Struct.fields.len;
             var res = self.curr;
-            inline for (@typeInfo(C).Struct.fields) |field, i| {
-                if (@field(self.curr, field.name) == @field(self.last, field.name)) {
-                    if (i == last_field) {
-                        self.completed = true;
+            var go = true; // required because breaking out of inline loop crashes compiler
+            inline while (field_idx > 0) : (field_idx -= 1) {
+                comptime const field_name = @typeInfo(C).Struct.fields[field_idx - 1].name;
+                if (go) {
+                    if (@field(self.curr, field_name) == @field(self.last, field_name)) {
+                        if (field_idx == 1) {
+                            self.completed = true;
+                        }
+                        else {
+                            // Next field shall be incremented in the next iteration
+                            @field(self.curr, field_name) = @field(self.first, field_name);
+                        }
                     }
                     else {
-                        @field(self.curr, @typeInfo(C).Struct.fields[i + 1].name) += 1;
-                        @field(self.curr, field.name) = @field(self.last, field.name);
+                        @field(self.curr, field_name) += 1;
+                        // break; // can't break here, crashes compiler, so next line is used as a hack
+                        go = false;
                     }
-                }
-                else {
-                    @field(self.curr, field.name) += 1;
-                    break;
                 }
             }
 
