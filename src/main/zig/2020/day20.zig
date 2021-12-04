@@ -234,5 +234,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer image.deinit();
     const res2 = image.findMonsters();
 
-    return aoc.Solution { .p1 = res1, .p2 = res2 };
+    return problem.solution(res1, res2);
 }

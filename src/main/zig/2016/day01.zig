@@ -28,8 +28,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution {
-        .p1 = curr_pos.distanceFromOrigin(),
-        .p2 = already_visited.?.distanceFromOrigin()
-    };
+    return problem.solution(
+        curr_pos.distanceFromOrigin(),
+        already_visited.?.distanceFromOrigin()
+    );
 }

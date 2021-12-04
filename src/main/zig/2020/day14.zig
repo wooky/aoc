@@ -37,7 +37,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution { .p1 = sumMemory(&mem1), .p2 = sumMemory(&mem2) };
+    return problem.solution(sumMemory(&mem1), sumMemory(&mem2));
 }
 
 fn putFloatingAddresses(address: usize, value: usize, mem: *Memory, address_masks: []const usize) anyerror!void {

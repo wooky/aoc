@@ -25,10 +25,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution {
-        .p1 = try boot(&conway_3d),
-        .p2 = try boot(&conway_4d),
-    };
+    return problem.solution(
+        try boot(&conway_3d),
+        try boot(&conway_4d),
+    );
 }
 
 fn boot(conway: anytype) !usize {

@@ -17,5 +17,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution{ .p1 = blocks, .p2 = 0 };
+    return problem.solution(blocks, 0);
 }

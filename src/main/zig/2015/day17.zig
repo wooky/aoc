@@ -18,7 +18,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     var params = Params { .containers = &containers };
     calcCombos(&params, 0, 0, 1);
-    return aoc.Solution{ .p1 = params.combos, .p2 = params.smallest_container_combo };
+    return problem.solution(params.combos, params.smallest_container_combo);
 }
 
 fn calcCombos(params: *Params, idx: usize, total_volume: u8, container_qty: u8) void {

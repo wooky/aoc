@@ -35,7 +35,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         break :blk reg.toOwnedSlice();
     };
 
-    return aoc.Solution{ .p1 = panels_painted, .p2 = undefined, .s2 = id };
+    return problem.solution(panels_painted, id);
 }
 
 fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {

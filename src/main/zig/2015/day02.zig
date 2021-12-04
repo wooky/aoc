@@ -21,5 +21,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         wrapping_paper += 2 * (area1 + area2 + area3) + slack;
         ribbon += present_wrap + bow;
     }
-    return aoc.Solution{ .p1 = wrapping_paper, .p2 = ribbon };
+    return problem.solution(wrapping_paper, ribbon);
 }

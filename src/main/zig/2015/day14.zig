@@ -53,5 +53,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution{ .p1 = furthest, .p2 = most_points };
+    return problem.solution(furthest, most_points);
 }

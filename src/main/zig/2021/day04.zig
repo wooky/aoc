@@ -97,10 +97,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         unreachable;
     };
 
-    return aoc.Solution {
-        .p1 = s1.?,
-        .p2 = s2,
-    };
+    return problem.solution(s1.?, s2);
 }
 
 fn getWinningBoards(allocator: *Allocator, board_iter_const: std.AutoHashMap(*Board, void).KeyIterator, last_called: u8) ![]*Board {

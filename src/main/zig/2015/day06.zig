@@ -60,7 +60,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         lights_on += light.p1;
         brightness += light.p2;
     }
-    return aoc.Solution{ .p1 = lights_on, .p2 = brightness };
+    return problem.solution(lights_on, brightness);
 }
 
 fn parseCoord(token: []const u8) !aoc.Coord2D {

@@ -45,8 +45,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try memory_game.append(try std.fmt.parseInt(usize, number, 10));
     }
 
-    return aoc.Solution {
-        .p1 = try memory_game.fetchTargetNumber(2020),
-        .p2 = try memory_game.fetchTargetNumber(30000000)
-    };
+    return problem.solution(
+        try memory_game.fetchTargetNumber(2020),
+        try memory_game.fetchTargetNumber(30000000)
+    );
 }

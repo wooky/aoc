@@ -27,8 +27,8 @@ const Keypad = struct {
         self.buf[self.buf_size - 1] = self.keys[self.idx];
     }
 
-    fn done(self: *const Keypad, allocator: *std.mem.Allocator) ![]const u8 {
-        return try allocator.dupe(u8, self.buf[0..self.buf_size]);
+    fn done(self: *const Keypad) []const u8 {
+        return self.buf[0..self.buf_size];
     }
 
     fn up(self: *Keypad) void {
@@ -74,8 +74,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         keypad2.punch();
     }
 
-    return aoc.Solution {
-        .p1 = 0, .s1 = try keypad1.done(problem.allocator),
-        .p2 = 0, .s2 = try keypad2.done(problem.allocator),
-    };
+    return problem.solution(keypad1.done(), keypad2.done());
 }

@@ -24,7 +24,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         std.json.Value.Array => |arr| parse_array(arr),
         else => unreachable,
     };
-    return aoc.Solution{ .p1 = @intCast(usize, solution.all), .p2 = @intCast(usize, solution.nonred) };
+    return problem.solution(solution.all, solution.nonred);
 }
 
 fn parse_object(obj: std.json.ObjectMap) Solution {

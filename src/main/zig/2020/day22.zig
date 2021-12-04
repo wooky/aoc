@@ -171,5 +171,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer recursive_combat.deinit();
     const res2 = (try recursive_combat.play()).score();
 
-    return aoc.Solution { .p1 = res1, .p2 = res2 };
+    return problem.solution(res1, res2);
 }

@@ -42,5 +42,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution { .p1 = fourty, .p2 = curr.size };
+    return problem.solution(fourty, curr.size);
 }

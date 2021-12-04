@@ -92,8 +92,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try instructions.append(instruction);
     }
 
-    return aoc.Solution {
-        .p1 = try computer.execute(instructions.items, 0),
-        .p2 = try computer.execute(instructions.items, 1)
-    };
+    return problem.solution(
+        try computer.execute(instructions.items, 0),
+        try computer.execute(instructions.items, 1)
+    );
 }

@@ -103,5 +103,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     }
     const solution2 = conway.active_spots.count();
 
-    return aoc.Solution { .p1 = solution1, .p2 = solution2 };
+    return problem.solution(solution1, solution2);
 }

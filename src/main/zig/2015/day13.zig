@@ -30,7 +30,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     try permutator.elements.append(me);
     const included = get_max_happiness(&permutator, happiness);
     
-    return aoc.Solution { .p1 = excluded, .p2 = included };
+    return problem.solution(excluded, included);
 }
 
 fn get_max_happiness(permutator: *HappinessPermutator, happiness: HappinessTable) u16 {

@@ -24,8 +24,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution {
-        .p1 = @as(u32, hor) * depth_naive,
-        .p2 = @as(u32, hor) * @intCast(u32, depth_aimed),
-    };
+    return problem.solution(
+        @as(u32, hor) * depth_naive,
+        @as(u32, hor) * @intCast(u32, depth_aimed),
+    );
 }

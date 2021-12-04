@@ -30,5 +30,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution { .p1 = any_yeses, .p2 = all_yeses };
+    return problem.solution(any_yeses, all_yeses);
 }

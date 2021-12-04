@@ -62,5 +62,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return aoc.Solution { .p1 = present, .p2 = valid };
+    return problem.solution(present, valid);
 }

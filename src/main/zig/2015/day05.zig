@@ -87,5 +87,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         nice2 += part2.eval();
     }
 
-    return aoc.Solution{ .p1 = nice1, .p2 = nice2 };
+    return problem.solution(nice1, nice2);
 }

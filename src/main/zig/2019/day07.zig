@@ -11,10 +11,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         amplifier.* = try Intcode.init(problem.allocator, problem.input);
     }
 
-    return aoc.Solution {
-        .p1 = try getHighestOutput(&intcode, &[_]i8{0,1,2,3,4}),
-        .p2 = try getHighestOutput(&intcode, &[_]i8{5,6,7,8,9}),
-    };
+    return problem.solution(
+        try getHighestOutput(&intcode, &[_]i8{0,1,2,3,4}),
+        try getHighestOutput(&intcode, &[_]i8{5,6,7,8,9}),
+    );
 }
 
 fn getHighestOutput(intcode: *const Intcode, inputs: []const i8) !usize {

@@ -53,5 +53,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             real = sue;
         }
     }
-    return aoc.Solution{ .p1 = try std.fmt.parseInt(usize, fake, 10), .p2 = try std.fmt.parseInt(usize, real, 10) };
+    return problem.solution(fake, real);
 }

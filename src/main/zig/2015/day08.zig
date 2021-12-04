@@ -34,5 +34,5 @@ pub fn run(problem: *aoc.Problem) aoc.Solution {
         }
         extra += 2;
     }
-    return .{ .p1 = unprintable, .p2 = extra };
+    return problem.solution(unprintable, extra);
 }

@@ -130,5 +130,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer cache2.deinit();
     const part2 = outputs.get("a").?.evaluate(&cache2);
 
-    return aoc.Solution{ .p1 = part1, .p2 = part2 };
+    return problem.solution(part1, part2);
 }

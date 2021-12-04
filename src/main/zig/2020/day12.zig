@@ -60,5 +60,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         ship2.go(instruction);
     }
 
-    return aoc.Solution { .p1 = ship1.getShipDistance(), .p2 = ship2.getShipDistance() };
+    return problem.solution(ship1.getShipDistance(), ship2.getShipDistance());
 }

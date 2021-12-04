@@ -32,7 +32,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         unreachable;
     };
 
-    return aoc.Solution { .p1 = highest_seatid, .p2 = target_id };
+    return problem.solution(highest_seatid, target_id);
 }
 
 fn decode(str: []const u8, upper_half_char: u8) u16 {

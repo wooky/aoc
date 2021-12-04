@@ -44,5 +44,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         break :blk timestamp;
     };
 
-    return aoc.Solution { .p1 = res1, .p2 = res2 };
+    return problem.solution(res1, res2);
 }

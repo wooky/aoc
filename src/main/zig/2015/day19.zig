@@ -70,7 +70,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         break :blk replacements;
     };
 
-    return aoc.Solution{ .p1 = uniquePossibilities, .p2 = fastestFabrication };
+    return problem.solution(uniquePossibilities, fastestFabrication);
 }
 
 fn nextAtom(molecule: []const u8, idx: usize) ?usize {

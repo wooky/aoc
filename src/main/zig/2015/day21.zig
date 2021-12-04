@@ -66,5 +66,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             }
         }
     }
-    return aoc.Solution { .p1 = cheapest_win, .p2 = expensive_lose };
+    return problem.solution(cheapest_win, expensive_lose);
 }

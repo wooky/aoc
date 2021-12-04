@@ -18,7 +18,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                      isValidTriangle(line1[2], line2[2], line3[2]);
     }
 
-    return aoc.Solution { .p1 = valid_hor, .p2 = valid_ver };
+    return problem.solution(valid_hor, valid_ver);
 }
 
 fn lineToSides(line: []const u8) ![3]u16 {

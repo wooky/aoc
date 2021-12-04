@@ -91,7 +91,7 @@ const SeatIterator = struct {
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const res1 = try getOccupiedSeats(problem.allocator, problem.input, 4, false);
     const res2 = try getOccupiedSeats(problem.allocator, problem.input, 5, true);
-    return aoc.Solution { .p1 = res1, .p2 = res2 };
+    return problem.solution(res1, res2);
 }
 
 fn getOccupiedSeats(allocator: *Allocator, seats: []const u8, tolerance: u8, follow_blanks: bool) !usize {

@@ -64,8 +64,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try map_bad.makeDefective();
     }
 
-    return aoc.Solution {
-        .p1 = map_good.conway.active_spots.count(),
-        .p2 = map_bad.conway.active_spots.count(),
-    };
+    return problem.solution(
+        map_good.conway.active_spots.count(),
+        map_bad.conway.active_spots.count(),
+    );
 }

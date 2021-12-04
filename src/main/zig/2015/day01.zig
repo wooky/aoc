@@ -14,5 +14,5 @@ pub fn run(problem: *aoc.Problem) aoc.Solution {
             basement_idx = idx + 1;
         }
     }
-    return .{ .p1 = @intCast(usize, floor), .p2 = basement_idx };
+    return problem.solution(floor, basement_idx);
 }

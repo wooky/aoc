@@ -27,5 +27,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     }
     const res1 = last;
 
-    return aoc.Solution { .p1 = res1, .p2 = 0 };
+    return problem.solution(res1, 0);
 }

@@ -34,9 +34,26 @@ pub const Problem = struct {
         }
         return self.splitter.?.next();
     }
+
+    pub fn solution(self: *Problem, s1: anytype, s2: anytype) Solution {
+        comptime const fmt1 = if (std.meta.trait.isZigString(@TypeOf(s1))) "{s}" else "{}";
+        comptime const fmt2 = if (std.meta.trait.isZigString(@TypeOf(s2))) "{s}" else "{}";
+        return .{
+            .s1 = std.fmt.allocPrint(self.allocator, fmt1, .{s1}) catch unreachable,
+            .s2 = std.fmt.allocPrint(self.allocator, fmt2, .{s2}) catch unreachable,
+        };
+    }
 };
 
-pub const Solution = struct { p1: usize, s1: ?[]const u8 = null, p2: usize, s2: ?[]const u8 = null };
+pub const Solution = struct {
+    s1: []const u8,
+    s2: []const u8,
+
+    pub fn deinit(self: *Solution, allocator: *Allocator) void {
+        allocator.free(self.s1);
+        allocator.free(self.s2);
+    }
+};
 
 usingnamespace @import("lib/conway.zig");
 usingnamespace @import("lib/coord.zig");

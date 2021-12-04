@@ -40,5 +40,5 @@ pub fn run(problem: *aoc.Problem) aoc.Solution {
         (if (santa_turn) santa_pair else robot_pair).advance(&visited_pair, &count_pair, c);
         santa_turn = !santa_turn;
     }
-    return .{ .p1 = count_solo, .p2 = count_pair };
+    return problem.solution(count_solo, count_pair);
 }

@@ -41,8 +41,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         window3.consume(depths.items);
     }
 
-    return aoc.Solution {
-        .p1 = window1.increases,
-        .p2 = window3.increases,
-    };
+    return problem.solution(window1.increases, window3.increases);
 }

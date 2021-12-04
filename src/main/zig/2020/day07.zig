@@ -39,7 +39,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     const shiny_gold_contents = countBags(containing, "shiny gold");
 
-    return aoc.Solution { .p1 = contains_shiny_gold, .p2 = shiny_gold_contents };
+    return problem.solution(contains_shiny_gold, shiny_gold_contents);
 }
 
 fn extractBag(statement: []const u8) ?BagsHeld {

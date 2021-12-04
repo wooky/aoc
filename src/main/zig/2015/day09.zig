@@ -32,5 +32,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         min_dist = std.math.min(min_dist, dist);
         max_dist = std.math.max(max_dist, dist);
     }
-    return aoc.Solution { .p1 = min_dist, .p2 = max_dist};
+    return problem.solution(min_dist, max_dist);
 }

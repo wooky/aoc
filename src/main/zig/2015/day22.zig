@@ -170,7 +170,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         break :blk getMinManaUsed(&player, &boss, std.math.maxInt(Mana), 1);
     };
     
-    return aoc.Solution{ .p1 = res1, .p2 = res2 };
+    return problem.solution(res1, res2);
 }
 
 fn getMinManaUsed(player: *Player, boss: *Boss, max_mana: Mana, player_damage_per_turn: HitPoints) Mana {

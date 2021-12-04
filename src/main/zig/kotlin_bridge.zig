@@ -13,23 +13,21 @@ pub fn run(comptime year: []const u8, comptime day: []const u8, problem: *aoc.Pr
     const kotlin_aoc = symbols.*.kotlin.root.ca.yakov.aoc;
     const path = @field(@field(kotlin_aoc, year_field), day_field);
     const kotlin_solution = path.?(problem.input);
-    var solution = aoc.Solution { .p1 = undefined, .p2 = undefined };
+    var solution = aoc.Solution { .s1 = undefined, .s2 = undefined };
     try populateSolution(problem.allocator, &solution, kotlin_solution, kotlin_aoc, "1");
     try populateSolution(problem.allocator, &solution, kotlin_solution, kotlin_aoc, "2");
     symbols.*.DisposeStablePointer.?(kotlin_solution.pinned);
     return solution;
 }
 
+// TODO purge the get_p functions
 fn populateSolution(allocator: *std.mem.Allocator, solution: *aoc.Solution, kotlin_solution: anytype, kotlin_aoc: anytype, comptime field: []const u8) !void {
     comptime const get_s = "get_s" ++ field;
-    if (@field(kotlin_aoc.Solution, get_s).?(kotlin_solution)) |s| {
-        comptime const s_field = "s" ++ field;
-        var str = try allocator.dupe(u8, s[0..std.mem.len(s)]);
-        @field(solution, s_field) = str;
-    }
-    else {
-        comptime const get_p = "get_p" ++ field;
-        comptime const p_field = "p" ++ field;
-        @field(solution, p_field) = @field(kotlin_aoc.Solution, get_p).?(kotlin_solution);
-    }
+    const s =
+        if (@field(kotlin_aoc.Solution, get_s).?(kotlin_solution)) |s|
+            try allocator.dupe(u8, s[0..std.mem.len(s)])
+        else
+            try std.fmt.allocPrint(allocator, "{}", .{@field(kotlin_aoc.Solution, "get_p" ++ field).?(kotlin_solution)})
+        ;
+    @field(solution, "s" ++ field) = s;
 }

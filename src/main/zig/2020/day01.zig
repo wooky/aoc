@@ -10,10 +10,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try numbers.append(try std.fmt.parseInt(u16, line, 10));
     }
 
-    return aoc.Solution {
-        .p1 = mult(numbers.items, 0, 1, 1).?,
-        .p2 = mult(numbers.items, 0, 1, 2).?
-    };
+    return problem.solution(
+        mult(numbers.items, 0, 1, 1).?,
+        mult(numbers.items, 0, 1, 2).?
+    );
 }
 
 fn mult(numbers: []const u16, sum: u16, prod: usize, cnt: u8) ?usize {

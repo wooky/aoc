@@ -30,19 +30,9 @@ pub fn main() !void {
     };
     defer problem.deinit();
 
-    const solution = try run(&problem, year, day);
-    printPart(solution.p1, solution.s1);
-    printPart(solution.p2, solution.s2);
-}
-
-fn printPart(p: usize, s: ?[]const u8) void {
-    if (s) |ss| {
-        std.debug.print("{s}\n", .{ss});
-        std.heap.page_allocator.free(ss);
-    }
-    else {
-        std.debug.print("{d}\n", .{p});
-    }
+    var solution = try run(&problem, year, day);
+    defer solution.deinit(std.heap.page_allocator);
+    std.debug.print("{s}\n{s}\n", .{solution.s1, solution.s2});
 }
 
 fn usage(args: [][]const u8) noreturn {

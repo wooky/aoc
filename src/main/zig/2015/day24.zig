@@ -140,5 +140,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const qe1 = try qe.calcMinQe(3);
     const qe2 = try qe.calcMinQe(4);
 
-    return aoc.Solution { .p1 = qe1, .p2 = qe2 };
+    return problem.solution(qe1, qe2);
 }

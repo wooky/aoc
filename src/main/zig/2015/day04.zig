@@ -44,5 +44,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         unreachable;
     };
 
-    return aoc.Solution{ .p1 = five, .p2 = six };
+    return problem.solution(five, six);
 }
