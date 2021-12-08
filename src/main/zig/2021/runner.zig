@@ -8,6 +8,7 @@ pub fn run(problem: *aoc.Problem, day: u16) !aoc.Solution {
         4 => @import("day04.zig").run(problem),
         5 => @import("day05.zig").run(problem),
         6 => @import("day06.zig").run(problem),
+        7 => @import("day07.zig").run(problem),
         else => unreachable,
     };
 }
