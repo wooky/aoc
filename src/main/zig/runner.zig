@@ -1,6 +1,8 @@
 const aoc = @import("aoc.zig");
 const std = @import("std");
 
+pub const io_mode = .evented;
+
 pub fn run(problem: *aoc.Problem, year: u16, day: u16) !aoc.Solution {
     return try switch (year) {
         2015 => @import("2015/runner.zig").run(problem, day),
