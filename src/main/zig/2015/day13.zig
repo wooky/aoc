@@ -17,7 +17,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try happiness.put(p1, p2_dot[0..p2_dot.len-1], factor * amount);
     }
 
-    var permutator = try HappinessPermutator.fromHashMapKeys(problem.allocator, HappinessTable, happiness);
+    var permutator = try HappinessPermutator.fromHashMapKeys(problem.allocator, happiness);
     defer permutator.deinit();
     const excluded = get_max_happiness(&permutator, happiness);
 

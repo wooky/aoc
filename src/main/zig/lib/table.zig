@@ -34,11 +34,15 @@ pub fn StringTable(comptime V: type) type {
             return self.backing.iterator();
         }
 
+        pub fn count(self: Self) usize {
+            return self.backing.count();
+        }
+
         pub fn deinit(self: Self) void {
             var backing = self.backing;
-            var iter = backing.iterator();
-            while (iter.next()) |kv| {
-                kv.value_ptr.deinit();
+            var iter = backing.valueIterator();
+            while (iter.next()) |v| {
+                v.deinit();
             }
             backing.deinit();
         }

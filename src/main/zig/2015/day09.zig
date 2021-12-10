@@ -22,7 +22,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     var min_dist: u16 = std.math.maxInt(u16);
     var max_dist: u16 = std.math.minInt(u16);
-    var permutator = try aoc.Permutator([]const u8).fromHashMapKeys(problem.allocator, PathMap, paths);
+    var permutator = try aoc.Permutator([]const u8).fromHashMapKeys(problem.allocator, paths);
     defer permutator.deinit();
     while (permutator.next()) |locations| {
         var dist: u16 = 0;

@@ -1,3 +1,4 @@
+const c = @cImport(@cInclude("gsl/gsl_permutation.h"));
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
@@ -6,74 +7,66 @@ pub fn Permutator(comptime T: type) type {
         const Self = @This();
         const Elements = std.ArrayList(T);
 
-        elements: Elements, started: bool = undefined, completed: bool = undefined,
-        c: [32]usize = undefined, i: usize = undefined,
+        elements: Elements,
+        permutation: *c.gsl_permutation,
+        last_permutation_result: c_int = undefined,
 
-        pub fn init(allocator: *Allocator) !Self {
-            var permutator = Self { .elements = Elements.init(allocator) };
-            permutator.reset();
-            return permutator;
+        pub fn initUnprepared(allocator: *Allocator) !Self {
+            return Self {
+                .elements = Elements.init(allocator),
+                .permutation = c.gsl_permutation_alloc(0),
+            };
         }
 
-        pub fn fromHashMapKeys(allocator: *Allocator, comptime M: type, map: M) !Self {
-            var permutator = try init(allocator);
+        pub fn fromHashMapKeys(allocator: *Allocator, map: anytype) !Self {
+            var permutator = try initUnprepared(allocator);
             var iterator = map.iterator();
             while (iterator.next()) |kv| {
                 try permutator.elements.append(kv.key_ptr.*);
             }
+            permutator.reset();
             return permutator;
         }
 
         pub fn reset(self: *Self) void {
-            self.started = false;
-            self.completed = false;
-            self.c = [_]usize{0} ** 32;
-            self.i = 0;
+            if (c.gsl_permutation_size(self.permutation) != self.elements.items.len) {
+                c.gsl_permutation_free(self.permutation);
+                self.permutation = c.gsl_permutation_alloc(self.elements.items.len);
+            }
+            c.gsl_permutation_init(self.permutation);
+            self.last_permutation_result = c.GSL_SUCCESS;
         }
 
-        // Heap's Algorithm
-        // TODO make it async when https://github.com/ziglang/zig/issues/6917 gets resolved
-        pub fn next(self: *Self) ?[]const T {
-            if (self.completed) {
+        pub fn next(self: *Self) ?PermutationAccessor(T) {
+            if (self.last_permutation_result != c.GSL_SUCCESS) {
                 return null;
             }
 
-            if (!self.started) {
-                self.started = true;
-                return self.elements.items;
-            }
-
-            while (self.i < self.elements.items.len) {
-                if (self.c[self.i] < self.i) {
-                    if (self.i % 2 == 0) {
-                        self.swap(0, self.i);
-                    }
-                    else {
-                        self.swap(self.c[self.i], self.i);
-                    }
-                    self.c[self.i] += 1;
-                    self.i = 0;
-                    return self.elements.items;
-                    
-                }
-                else {
-                    self.c[self.i] = 0;
-                    self.i += 1;
-                }
-            }
-
-            self.completed = true;
-            return null;
-        }
-
-        fn swap(self: *Self, a: usize, b: usize) void {
-            var tmp = self.elements.items[a];
-            self.elements.items[a] = self.elements.items[b];
-            self.elements.items[b] = tmp;
+            const accessor = PermutationAccessor(T) { .elements = self.elements.items, .permutation = self.permutation };
+            self.last_permutation_result = c.gsl_permutation_next(self.permutation);
+            return accessor;
         }
 
         pub fn deinit(self: *Self) void {
             self.elements.deinit();
+            c.gsl_permutation_free(self.permutation);
+        }
+    };
+}
+
+pub fn PermutationAccessor(comptime T: type) type {
+    return struct {
+        const Self = @This();
+
+        elements: []T,
+        permutation: c.gsl_permutation,
+
+        pub fn size(self: Self) usize {
+            return self.elements.len;
+        }
+
+        pub fn get(self: Self, idx: usize) T {
+            return self.elements[c.gsl_permutation_get(self.permutation, idx)];
         }
     };
 }
