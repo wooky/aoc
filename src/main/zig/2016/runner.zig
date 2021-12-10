@@ -12,6 +12,7 @@ pub fn run(problem: *aoc.Problem, day: u16) anyerror!aoc.Solution { // TODO remo
         7 => kotlin_bridge.run("2016", "07", problem),
         9 => kotlin_bridge.run("2016", "09", problem),
         10 => kotlin_bridge.run("2016", "10", problem),
+        11 => @import("day11.zig").run(problem),
         12 => kotlin_bridge.run("2016", "12", problem),
         13 => kotlin_bridge.run("2016", "13", problem),
         14 => kotlin_bridge.run("2016", "14", problem),
