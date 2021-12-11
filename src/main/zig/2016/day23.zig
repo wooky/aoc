@@ -9,7 +9,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try computer.feed(line);
     }
 
-    const s1 = try computer.runAndFetchRegisterA();
-    const s2 = try computer.reset().setRegister("c", 1).runAndFetchRegisterA();
+    const s1 = try computer.setRegister("a", 7).runAndFetchRegisterA();
+    const s2 = try computer.reset().setRegister("a", 12).runAndFetchRegisterA();
     return problem.solution(s1, s2);
 }
