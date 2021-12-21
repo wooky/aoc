@@ -178,7 +178,7 @@ pub fn GenericCoordRangeIterator(comptime C: type) type {
             var res = self.curr;
             var go = true; // required because breaking out of inline loop crashes compiler
             inline while (field_idx > 0) : (field_idx -= 1) {
-                comptime const field_name = @typeInfo(C).Struct.fields[field_idx - 1].name;
+                const field_name = @typeInfo(C).Struct.fields[field_idx - 1].name;
                 if (go) {
                     if (@field(self.curr, field_name) == @field(self.last, field_name)) {
                         if (field_idx == 1) {

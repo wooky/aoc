@@ -7,7 +7,7 @@ const HappinessPermutator = aoc.Permutator([]const u8);
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var happiness = HappinessTable.init(problem.allocator);
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         const p1 = tokens.next().?;
         _ = tokens.next().?;
         const factor: i8 = if (std.mem.eql(u8, tokens.next().?, "gain")) 1 else -1;

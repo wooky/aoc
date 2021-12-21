@@ -54,7 +54,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer commands.deinit();
     while (problem.line()) |line| {
         const command = blk: {
-            var tokens = std.mem.tokenize(line, " ");
+            var tokens = std.mem.tokenize(u8, line, " ");
             const instr1 = tokens.next().?;
             const instr2 = tokens.next().?;
             if (std.mem.eql(u8, instr1, "swap")) {

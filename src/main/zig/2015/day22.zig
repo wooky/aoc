@@ -152,7 +152,7 @@ const spells = [_]Spell {
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var tokens = std.mem.tokenize(problem.input, ": \n");
+    var tokens = std.mem.tokenize(u8, problem.input, ": \n");
     _ = tokens.next().?; _ = tokens.next().?;
     const boss_hp = try std.fmt.parseInt(HitPoints, tokens.next().?, 10);
     _ = tokens.next().?;

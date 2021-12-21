@@ -14,9 +14,9 @@ const RawRules = struct {
     unprocessed_rule_map: RuleMap = undefined,
     processed_rule_map: RuleMap = undefined,
 
-    fn init(self: *RawRules, allocator: *std.mem.Allocator) void {
+    fn init(self: *RawRules, allocator: std.mem.Allocator) void {
         self.arena = ArenaAllocator.init(allocator);
-        self.unprocessed_rule_map = RuleMap.init(&self.arena.allocator);
+        self.unprocessed_rule_map = RuleMap.init(self.arena.allocator());
     }
 
     fn deinit(self: *RawRules) void {
@@ -24,7 +24,7 @@ const RawRules = struct {
     }
 
     fn addRule(self: *RawRules, line: []const u8) !void {
-        var colon = std.mem.split(line, ": ");
+        var colon = std.mem.split(u8, line, ": ");
         const rule_idx = colon.next().?;
         const raw_rule = colon.next().?;
         const rule = blk: {
@@ -32,11 +32,11 @@ const RawRules = struct {
                 break :blk Rule { .Literal = raw_rule[1..2] };
             }
             else {
-                var goto = std.ArrayList([][]const u8).init(&self.arena.allocator);
-                var pipe = std.mem.split(raw_rule, " | ");
+                var goto = std.ArrayList([][]const u8).init(self.arena.allocator());
+                var pipe = std.mem.split(u8, raw_rule, " | ");
                 while (pipe.next()) |chunk| {
-                    var indexes = std.ArrayList([]const u8).init(&self.arena.allocator);
-                    var tokens = std.mem.tokenize(chunk, " ");
+                    var indexes = std.ArrayList([]const u8).init(self.arena.allocator());
+                    var tokens = std.mem.tokenize(u8, chunk, " ");
                     while (tokens.next()) |token| {
                         try indexes.append(token);
                     }
@@ -51,8 +51,8 @@ const RawRules = struct {
     fn formValidMessages(self: *RawRules) !aoc.Regex {
         self.processed_rule_map = try self.unprocessed_rule_map.clone();
         const pattern = try self.formMessage("0");
-        const patternz = try std.fmt.allocPrintZ(&self.arena.allocator, "^{s}$", .{pattern});
-        defer self.arena.allocator.free(patternz);
+        const patternz = try std.fmt.allocPrintZ(self.arena.allocator(), "^{s}$", .{pattern});
+        defer self.arena.allocator().free(patternz);
         return aoc.Regex.compilez(patternz);
     }
 
@@ -61,18 +61,18 @@ const RawRules = struct {
             .Literal => |l| return l,
             .Goto => |goto| {
                 var pattern = try std.fmt.allocPrint(
-                    &self.arena.allocator,
+                    self.arena.allocator(),
                     "({s}",
                     .{ try self.formMessageFromSingleRule(goto[0]) }
                 );
                 for (goto[1..]) |rule| {
                     pattern = try std.fmt.allocPrint(
-                        &self.arena.allocator,
+                        self.arena.allocator(),
                         "{s}|{s}",
                         .{ pattern, try self.formMessageFromSingleRule(rule) }
                     );
                 }
-                pattern = try std.fmt.allocPrint(&self.arena.allocator, "{s})", .{pattern});
+                pattern = try std.fmt.allocPrint(self.arena.allocator(), "{s})", .{pattern});
                 try self.processed_rule_map.put(rule_idx, .{ .Literal = pattern });
                 return pattern;
             }
@@ -84,7 +84,7 @@ const RawRules = struct {
 
         for (rules) |rule| {
             pattern = try std.fmt.allocPrint(
-                &self.arena.allocator,
+                self.arena.allocator(),
                 "{s}{s}",
                 .{ pattern, try self.formMessage(rule) }
             );
@@ -99,7 +99,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     raw_rules.init(problem.allocator);
     defer raw_rules.deinit();
 
-    var rule_lines = std.mem.tokenize(problem.group().?, "\n");
+    var rule_lines = std.mem.tokenize(u8, problem.group().?, "\n");
     while (rule_lines.next()) |line| {
         try raw_rules.addRule(line);
     }
@@ -114,7 +114,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var valid_messages2 = try raw_rules.formValidMessages();
     defer valid_messages2.deinit();
 
-    var message_lines = std.mem.tokenize(problem.group().?, "\n");
+    var message_lines = std.mem.tokenize(u8, problem.group().?, "\n");
     while (message_lines.next()) |line| {
         if (valid_messages1.matches(line)) {
             res1 += 1;

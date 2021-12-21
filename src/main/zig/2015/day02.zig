@@ -5,7 +5,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var wrapping_paper: u64 = 0;
     var ribbon: u64 = 0;
     while (problem.line()) |line| {
-        var dimensions = std.mem.tokenize(line, "x");
+        var dimensions = std.mem.tokenize(u8, line, "x");
         const dim1 = try std.fmt.parseInt(u32, dimensions.next().?, 10);
         const dim2 = try std.fmt.parseInt(u32, dimensions.next().?, 10);
         const dim3 = try std.fmt.parseInt(u32, dimensions.next().?, 10);

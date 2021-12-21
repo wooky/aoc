@@ -20,7 +20,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var params = Params {};
     var ingredients_idx: usize = 0;
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         _ = tokens.next().?;
         params.ingredients[ingredients_idx] = Ingredient {
             .capacity = try int_from_tokens(&tokens, 1),
@@ -57,7 +57,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     return problem.solution(best, best_500);
 }
 
-fn int_from_tokens(tokens: *std.mem.TokenIterator, offset: usize) !i32 {
+fn int_from_tokens(tokens: *std.mem.TokenIterator(u8), offset: usize) !i32 {
     _ = tokens.next().?;
     const token = tokens.next().?;
     return try std.fmt.parseInt(i32, token[0..token.len-offset], 10);

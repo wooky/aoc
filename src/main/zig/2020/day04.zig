@@ -6,7 +6,7 @@ const Validation = struct {
 
     validators: Validators,
 
-    fn init(allocator: *std.mem.Allocator) !Validation {
+    fn init(allocator: std.mem.Allocator) !Validation {
         var validation = Validation { .validators = Validators.init(allocator) };
         return validation.addRegex("byr", "^(19[2-9][0-9]|200[0-2])$")
                          .addRegex("iyr", "^20(1[0-9]|20)$")
@@ -46,7 +46,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     while (problem.group()) |group| {
         var fields_present: u8 = 0;
         var all_valid = true;
-        var tokens = std.mem.tokenize(group, ": \n");
+        var tokens = std.mem.tokenize(u8, group, ": \n");
         while (tokens.next()) |field| {
             const value = tokens.next().?;
             if (validation.validate(field, value)) |validation_result| {

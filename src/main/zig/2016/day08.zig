@@ -11,7 +11,7 @@ const Screen = std.bit_set.StaticBitSet(SCREEN_WIDTH * SCREEN_HEIGHT);
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var screen = Screen.initEmpty();
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, " xy=");
+        var tokens = std.mem.tokenize(u8, line, " xy=");
         if (std.mem.eql(u8, tokens.next().?, "rect")) {
             rect(&screen, try std.fmt.parseInt(u8, tokens.next().?, 10), try std.fmt.parseInt(u8, tokens.next().?, 10));
         }

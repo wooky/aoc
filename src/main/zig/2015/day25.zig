@@ -2,7 +2,7 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var tokens = std.mem.tokenize(problem.input, " .,\n");
+    var tokens = std.mem.tokenize(u8, problem.input, " .,\n");
     var idx: u8 = 0;
     while (idx < 15) : (idx += 1) {
         _ = tokens.next().?;

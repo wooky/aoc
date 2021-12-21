@@ -2,7 +2,7 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var tokens = std.mem.tokenize(problem.input, "targe: xy=.,");
+    var tokens = std.mem.tokenize(u8, problem.input, "targe: xy=.,");
     const x_min = try std.fmt.parseInt(isize, tokens.next().?, 10);
     const x_max = try std.fmt.parseInt(isize, tokens.next().?, 10);
     const y_low = try std.fmt.parseInt(isize, tokens.next().?, 10);

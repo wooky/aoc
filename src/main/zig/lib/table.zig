@@ -9,7 +9,7 @@ pub fn StringTable(comptime V: type) type {
 
         backing: StringBackingMap,
 
-        pub fn init(allocator: *Allocator) Self {
+        pub fn init(allocator: Allocator) Self {
             return Self { .backing = StringBackingMap.init(allocator) };
         }
 

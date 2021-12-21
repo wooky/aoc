@@ -39,7 +39,7 @@ const Instructions = std.ArrayList(Instruction);
 registers: [4]isize,
 instructions: Instructions,
 
-pub fn init(allocator: *std.mem.Allocator) Assembunny {
+pub fn init(allocator: std.mem.Allocator) Assembunny {
     var computer: Assembunny = undefined;
     _ = computer.reset();
     computer.instructions = Instructions.init(allocator);
@@ -56,7 +56,7 @@ pub fn reset(self: *Assembunny) *Assembunny {
 }
 
 pub fn feed(self: *Assembunny, line: []const u8) !void {
-    var tokens = std.mem.tokenize(line, " ");
+    var tokens = std.mem.tokenize(u8, line, " ");
         const opcode = tokens.next().?;
         const x = tokens.next().?;
         const y = tokens.next();

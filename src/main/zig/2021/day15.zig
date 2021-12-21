@@ -48,12 +48,12 @@ fn aStar(risks: *const Risks, end_coord: aoc.Coord) !usize {
 
         coord: aoc.Coord, g_score: usize,
 
-        fn compare(a: Self, b: Self) std.math.Order {
+        fn compare(_: void, a: Self, b: Self) std.math.Order {
             return std.math.order(a.g_score, b.g_score);
         }
     };
 
-    var open_set = std.PriorityQueue(Node).init(risks.allocator, Node.compare);
+    var open_set = std.PriorityQueue(Node, void, Node.compare).init(risks.allocator, {});
     defer open_set.deinit();
     try open_set.add(.{ .coord = aoc.Coord.init(.{0, 0}), .g_score = 0 });
 

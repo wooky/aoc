@@ -24,7 +24,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 }
 
 // lmao multhreading is marginally faster
-fn doCodes(allocator: *std.mem.Allocator, lines: [][]const u8, most_common: []u8, least_common: []u8, idx: u8) void {
+fn doCodes(allocator: std.mem.Allocator, lines: [][]const u8, most_common: []u8, least_common: []u8, idx: u8) void {
     var frequency = std.AutoHashMap(u8, u8).init(allocator);
     defer frequency.deinit();
     for (lines) |line| {

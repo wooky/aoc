@@ -10,7 +10,7 @@ const Computer = struct {
     registers: Registers,
     instructions: Instructions,
 
-    fn init(allocator: *std.mem.Allocator) !Computer {
+    fn init(allocator: std.mem.Allocator) !Computer {
         var computer = Computer { .registers = Registers.init(allocator), .instructions = Instructions.init(allocator) };
 
         try computer.instructions.putNoClobber("hlf", hlf);
@@ -57,19 +57,19 @@ const Computer = struct {
         return 1;
     }
 
-    fn jmp(self: *Computer, instruction: Instruction) std.fmt.ParseIntError!isize {
-        return self.jump(instruction[1]);
+    fn jmp(_: *Computer, instruction: Instruction) std.fmt.ParseIntError!isize {
+        return jump(instruction[1]);
     }
 
     fn jie(self: *Computer, instruction: Instruction) std.fmt.ParseIntError!isize {
-        return if (self.registers.get(instruction[1]).? % 2 == 0) self.jump(instruction[2]) else 1;
+        return if (self.registers.get(instruction[1]).? % 2 == 0) jump(instruction[2]) else 1;
     }
 
     fn jio(self: *Computer, instruction: Instruction) std.fmt.ParseIntError!isize {
-        return if (self.registers.get(instruction[1]).? == 1) self.jump(instruction[2]) else 1;
+        return if (self.registers.get(instruction[1]).? == 1) jump(instruction[2]) else 1;
     }
 
-    fn jump(self: *Computer, offset: []const u8) std.fmt.ParseIntError!isize {
+    fn jump(offset: []const u8) std.fmt.ParseIntError!isize {
         const dir: isize = if (offset[0] == '+') 1 else -1;
         return dir * try std.fmt.parseInt(isize, offset[1..], 10);
     }
@@ -84,7 +84,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     while (problem.line()) |line| {
         var instruction: Instruction = undefined;
         var idx: usize = 0;
-        var tokens = std.mem.tokenize(line, " ,");
+        var tokens = std.mem.tokenize(u8, line, " ,");
         while (tokens.next()) |token| {
             instruction[idx] = token;
             idx += 1;

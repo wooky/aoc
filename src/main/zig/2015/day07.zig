@@ -44,7 +44,7 @@ const WireCache = struct {
 
     const WireCacheBacking = std.StringHashMap(u16);
 
-    fn init(allocator: *std.mem.Allocator, outputs: OutputMap) WireCache {
+    fn init(allocator: std.mem.Allocator, outputs: OutputMap) WireCache {
         return WireCache { .backing = WireCacheBacking.init(allocator), .outputs = outputs };
     }
 
@@ -75,7 +75,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var operation = Operation {};
         var output: []const u8 = undefined;
         var state = TokenState.operand1_not;
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         while (tokens.next()) |token| {
             switch (state) {
                 .operand1_not => {

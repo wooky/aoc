@@ -9,7 +9,7 @@ const ShuntingYard = struct {
     operator_stack: OperatorStack,
     output_stack: OutputStack,
 
-    fn init(allocator: *Allocator) ShuntingYard {
+    fn init(allocator: Allocator) ShuntingYard {
         return ShuntingYard { 
             .operator_stack = OperatorStack.init(allocator),
             .output_stack = OutputStack.init(allocator),

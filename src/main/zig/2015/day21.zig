@@ -31,7 +31,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         .{ .cost = 80, .def = 3 },
     };
 
-    var tokens = std.mem.tokenize(problem.input, ": \n");
+    var tokens = std.mem.tokenize(u8, problem.input, ": \n");
     _ = tokens.next().?; _ = tokens.next().?;
     const boss_hp = try std.fmt.parseInt(u8, tokens.next().?, 10);
     _ = tokens.next().?;

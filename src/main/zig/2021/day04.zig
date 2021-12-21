@@ -7,7 +7,7 @@ const Board = struct {
     numbers: std.AutoHashMap(u8, aoc.Coord),
     markings: std.AutoHashMap(aoc.Coord, void),
 
-    fn init(allocator: *Allocator) Board {
+    fn init(allocator: Allocator) Board {
         return .{
             .numbers = std.AutoHashMap(u8, aoc.Coord).init(allocator),
             .markings = std.AutoHashMap(aoc.Coord, void).init(allocator),
@@ -15,7 +15,7 @@ const Board = struct {
     }
 
     fn loadLine(self: *Board, line: []const u8, row: u8) !void {
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         var col: u8 = 0;
         while (tokens.next()) |token| {
             try self.numbers.put(try std.fmt.parseInt(u8, token, 10), .{ .row = row, .col = col });
@@ -65,10 +65,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer arena.deinit();
     const numbers = problem.line().?;
 
-    var boards = std.AutoHashMap(*Board, void).init(&arena.allocator);
+    var boards = std.AutoHashMap(*Board, void).init(arena.allocator());
     while (problem.line()) |line| {
-        var kv = try boards.getOrPutValue(try arena.allocator.create(Board), {});
-        kv.key_ptr.*.* = Board.init(&arena.allocator);
+        var kv = try boards.getOrPutValue(try arena.allocator().create(Board), {});
+        kv.key_ptr.*.* = Board.init(arena.allocator());
         try kv.key_ptr.*.loadLine(line, 0);
 
         var line_num: u8 = 1;
@@ -79,10 +79,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     var s1: ?usize = null;
     var s2 = blk: {
-        var tokens = std.mem.tokenize(numbers, ",");
+        var tokens = std.mem.tokenize(u8, numbers, ",");
         while (tokens.next()) |token| {
             const last_called = try std.fmt.parseInt(u8, token, 10);
-            const winning_boards = try getWinningBoards(&arena.allocator, boards.keyIterator(), last_called);
+            const winning_boards = try getWinningBoards(arena.allocator(), boards.keyIterator(), last_called);
             for (winning_boards) |wb| {
                 _ = boards.remove(wb);
             }
@@ -100,7 +100,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     return problem.solution(s1.?, s2);
 }
 
-fn getWinningBoards(allocator: *Allocator, board_iter_const: std.AutoHashMap(*Board, void).KeyIterator, last_called: u8) ![]*Board {
+fn getWinningBoards(allocator: Allocator, board_iter_const: std.AutoHashMap(*Board, void).KeyIterator, last_called: u8) ![]*Board {
     var winning_boards = std.ArrayList(*Board).init(allocator);
     var board_iter = board_iter_const;
     while (board_iter.next()) |board| {

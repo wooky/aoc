@@ -8,7 +8,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     while (problem.line()) |line| {
         var unprocessed_digits = [_]u7 {0} ** 6;
         var definite_digits = [_]u7 {0} ** 10;
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
 
         var unprocessed_digits_idx: u8 = 0;
         while (tokens.next()) |token| {

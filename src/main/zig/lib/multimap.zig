@@ -9,7 +9,7 @@ pub fn StringMultimap(comptime V: type) type {
 
         backing: BackingMap,
 
-        pub fn init(allocator: *Allocator) Self {
+        pub fn init(allocator: Allocator) Self {
             return Self { .backing = BackingMap.init(allocator) };
         }
 

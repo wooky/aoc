@@ -5,7 +5,7 @@ const NEW_SPAWN_TIMER = 8;
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var fish = [_]usize { 0 } ** (NEW_SPAWN_TIMER + 1);
-    var tokens = std.mem.tokenize(problem.input, ",");
+    var tokens = std.mem.tokenize(u8, problem.input, ",");
     while (tokens.next()) |token| {
         const timer = try std.fmt.parseInt(u8, token, 10);
         fish[timer] += 1;

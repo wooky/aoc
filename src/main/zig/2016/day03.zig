@@ -22,7 +22,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 }
 
 fn lineToSides(line: []const u8) ![3]u16 {
-    var tokens = std.mem.tokenize(line, " ");
+    var tokens = std.mem.tokenize(u8, line, " ");
     return [_]u16 {
         try std.fmt.parseInt(u16, tokens.next().?, 10),
         try std.fmt.parseInt(u16, tokens.next().?, 10),

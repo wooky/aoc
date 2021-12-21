@@ -19,10 +19,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const fields = blk: {
         var fields = std.ArrayList(Field).init(problem.allocator);
         const rules = problem.group().?;
-        var lines = std.mem.tokenize(rules, "\n");
+        var lines = std.mem.tokenize(u8, rules, "\n");
         while (lines.next()) |line| {
             const rule = line[0..std.mem.indexOf(u8, line, ":").?];
-            var range_tokens = std.mem.tokenize(line[rule.len..], ":- or");
+            var range_tokens = std.mem.tokenize(u8, line[rule.len..], ":- or");
             try fields.append(Field {
                 .name = rule,
                 .from1 = try std.fmt.parseInt(u16, range_tokens.next().?, 10),
@@ -63,7 +63,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const res1 = blk: {
         var error_rate: usize = 0;
         const nearby_tix = problem.group().?;
-        var lines = std.mem.tokenize(nearby_tix, "\n");
+        var lines = std.mem.tokenize(u8, nearby_tix, "\n");
         _ = lines.next().?;
         while (lines.next()) |line| {
             const ticket = try parseTicket(problem.allocator, line);
@@ -117,9 +117,9 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     return problem.solution(res1, res2);
 }
 
-fn parseTicket(allocator: *std.mem.Allocator, line: []const u8) !Ticket {
+fn parseTicket(allocator: std.mem.Allocator, line: []const u8) !Ticket {
     var ticket = Ticket.init(allocator);
-    var tokens = std.mem.tokenize(line, ",");
+    var tokens = std.mem.tokenize(u8, line, ",");
     while (tokens.next()) |token| {
         try ticket.append(try std.fmt.parseInt(u16, token, 10));
     }

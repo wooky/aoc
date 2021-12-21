@@ -50,7 +50,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     return problem.solution(res1, res2);
 }
 
-fn executeInstructions(instructions: []const Instruction, allocator: *std.mem.Allocator) !ExecutionResult {
+fn executeInstructions(instructions: []const Instruction, allocator: std.mem.Allocator) !ExecutionResult {
     var visited = std.AutoHashMap(Address, void).init(allocator);
     defer visited.deinit();
     var pc: Address = 0;

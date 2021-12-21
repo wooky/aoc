@@ -6,7 +6,7 @@ const CODE_TYPE_SHIFT = u4;
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var arena = std.heap.ArenaAllocator.init(problem.allocator);
     defer arena.deinit();
-    var codes = std.ArrayList(CODE_TYPE).init(&arena.allocator);
+    var codes = std.ArrayList(CODE_TYPE).init(arena.allocator());
     while (problem.line()) |line| {
         try codes.append(try std.fmt.parseInt(CODE_TYPE, line, 2));
     }
@@ -22,8 +22,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     };
     
     const s2 = blk: {
-        const o2Rating = try calcRating(&arena.allocator, codes.items, false);
-        const co2Rating = try calcRating(&arena.allocator, codes.items, true);
+        const o2Rating = try calcRating(arena.allocator(), codes.items, false);
+        const co2Rating = try calcRating(arena.allocator(), codes.items, true);
         break :blk o2Rating * co2Rating;
     };
 
@@ -39,7 +39,7 @@ fn commonBit(codes: []const CODE_TYPE, pos: CODE_TYPE_SHIFT) u1 {
     return if (diff < 0) 0 else 1;
 }
 
-fn calcRating(allocator: *std.mem.Allocator, codes: []const CODE_TYPE, least_common: bool) !usize {
+fn calcRating(allocator: std.mem.Allocator, codes: []const CODE_TYPE, least_common: bool) !usize {
     var filteredCodes = codes;
     var i: CODE_TYPE_SHIFT = std.meta.bitCount(CODE_TYPE) - 1;
     while (true) : (i -= 1) {

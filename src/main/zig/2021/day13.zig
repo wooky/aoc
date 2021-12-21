@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var dots = blk: {
         var dots = std.AutoHashMap(aoc.Coord2D, void).init(problem.allocator);
         const group = problem.group().?;
-        var tokens = std.mem.tokenize(group, "\n,");
+        var tokens = std.mem.tokenize(u8, group, "\n,");
         while (tokens.next()) |x_str| {
             const y_str = tokens.next().?;
             try dots.put(aoc.Coord2D.init(.{
@@ -22,7 +22,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var folds = blk: {
         var folds = std.ArrayList(Fold).init(problem.allocator);
         const group = problem.group().?;
-        var tokens = std.mem.tokenize(group, "fold ang=\n");
+        var tokens = std.mem.tokenize(u8, group, "fold ang=\n");
         while (tokens.next()) |dir| {
             const line = try std.fmt.parseInt(u16, tokens.next().?, 10);
             try folds.append(switch (dir[0]) {

@@ -5,7 +5,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var res1: usize = 0;
     var res2: usize = 0;
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, "- :");
+        var tokens = std.mem.tokenize(u8, line, "- :");
         const first = try std.fmt.parseInt(u8, tokens.next().?, 10);
         const last = try std.fmt.parseInt(u8, tokens.next().?, 10);
         const needle = tokens.next().?;

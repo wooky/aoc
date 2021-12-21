@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var already_visited: ?aoc.Coord = null;
     var curr_pos = aoc.PredefinedCoord.ORIGIN;
     var delta = aoc.PredefinedCoord.UP;
-    var tokens = std.mem.tokenize(problem.input, ", \n");
+    var tokens = std.mem.tokenize(u8, problem.input, ", \n");
     while (tokens.next()) |token| {
         var direction = token[0];
         var distance = try std.fmt.parseInt(i16, token[1..], 10);

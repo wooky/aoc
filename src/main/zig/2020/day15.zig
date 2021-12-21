@@ -8,7 +8,7 @@ const MemoryGame = struct {
     turn: usize = 1,
     last_spoken: usize = undefined,
 
-    fn init(allocator: *std.mem.Allocator) MemoryGame {
+    fn init(allocator: std.mem.Allocator) MemoryGame {
         return MemoryGame { .numbers_turns = NumbersTurns.init(allocator) };
     }
 
@@ -40,7 +40,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var memory_game = MemoryGame.init(problem.allocator);
     defer memory_game.deinit();
 
-    var tokens = std.mem.tokenize(problem.input, ",\n");
+    var tokens = std.mem.tokenize(u8, problem.input, ",\n");
     while (tokens.next()) |number| {
         try memory_game.append(try std.fmt.parseInt(usize, number, 10));
     }

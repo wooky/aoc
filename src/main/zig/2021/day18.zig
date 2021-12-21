@@ -9,7 +9,7 @@ const SnailfishNumber = struct {
 
     elements: Elements,
 
-    fn initFromLine(allocator: *std.mem.Allocator, line: []const u8) !SnailfishNumber {
+    fn initFromLine(allocator: std.mem.Allocator, line: []const u8) !SnailfishNumber {
         var snailfish_number = SnailfishNumber {
             .elements = Elements.init(allocator),
         };

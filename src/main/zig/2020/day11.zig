@@ -7,7 +7,7 @@ const OCCUPIED: u8 = '#';
 const FLOOR: u8 = '.';
 
 const SeatIterator = struct {
-    allocator: *Allocator,
+    allocator: Allocator,
     seats: []u8,
     follow_blanks: bool,
     width: usize,
@@ -15,7 +15,7 @@ const SeatIterator = struct {
     row: isize = 0,
     col: isize = -1,
     
-    fn init(allocator: *Allocator, seats: []const u8, follow_blanks: bool) !SeatIterator {
+    fn init(allocator: Allocator, seats: []const u8, follow_blanks: bool) !SeatIterator {
         const width = std.mem.indexOf(u8, seats, &[_]u8 {'\n'}).?;
         const height = seats.len / (width + 1);
         return SeatIterator {
@@ -94,7 +94,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     return problem.solution(res1, res2);
 }
 
-fn getOccupiedSeats(allocator: *Allocator, seats: []const u8, tolerance: u8, follow_blanks: bool) !usize {
+fn getOccupiedSeats(allocator: Allocator, seats: []const u8, tolerance: u8, follow_blanks: bool) !usize {
     var prev_arrangement = try SeatIterator.init(allocator, seats, follow_blanks);
     while (true) {
         var next_arrangement = try SeatIterator.init(allocator, seats, follow_blanks);

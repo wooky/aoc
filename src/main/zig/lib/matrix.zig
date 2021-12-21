@@ -48,14 +48,14 @@ pub const SquareMatrix = struct {
 
     pub fn rotate90DegreesClockwise(self: *SquareMatrix) void {
         var result = SquareMatrix.init(self.size());
-        _ = c.gsl_blas_dgemm(.CblasTrans, .CblasNoTrans, 1, self.matrix, self.getFlipMatrix().matrix, 0, result.matrix);
+        _ = c.gsl_blas_dgemm(c.CblasTrans, c.CblasNoTrans, 1, self.matrix, self.getFlipMatrix().matrix, 0, result.matrix);
         self.freeMatrix();
         self.matrix = result.matrix;
     }
 
     pub fn flipHorizontally(self: *SquareMatrix) void {
         var result = SquareMatrix.init(self.size());
-        _ = c.gsl_blas_dgemm(.CblasNoTrans, .CblasNoTrans, 1, self.matrix, self.getFlipMatrix().matrix, 0, result.matrix);
+        _ = c.gsl_blas_dgemm(c.CblasNoTrans, c.CblasNoTrans, 1, self.matrix, self.getFlipMatrix().matrix, 0, result.matrix);
         self.freeMatrix();
         self.matrix = result.matrix;
     }

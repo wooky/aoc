@@ -11,7 +11,7 @@ pub const State = struct {
     inputs_idx: usize = 0,
     relative_base_offset: TapeElement = 0,
 
-    fn init(allocator: *Allocator) State {
+    fn init(allocator: Allocator) State {
         return State { .memory = Memory.init(allocator), .inputs = Inputs.init(allocator) };
     }
 
@@ -27,12 +27,12 @@ pub const TapeIndex = usize;
 const Opcode = usize;
 const Tape = std.ArrayList(TapeElement);
 
-allocator: *Allocator,
+allocator: Allocator,
 tape: Tape,
 
-pub fn init(allocator: *std.mem.Allocator, code: []const u8) !Self {
+pub fn init(allocator: std.mem.Allocator, code: []const u8) !Self {
     var intcode = Self { .allocator = allocator, .tape = Tape.init(allocator) };
-    var tokens = std.mem.tokenize(code, ",\n");
+    var tokens = std.mem.tokenize(u8, code, ",\n");
     while (tokens.next()) |token| {
         try intcode.tape.append(try std.fmt.parseInt(TapeElement, token, 10));
     }

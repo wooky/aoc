@@ -10,7 +10,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var ranges = std.ArrayList(IpRange).init(problem.allocator);
     defer ranges.deinit();
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, "-");
+        var tokens = std.mem.tokenize(u8, line, "-");
         try ranges.append(.{
             .from = try std.fmt.parseInt(u32, tokens.next().?, 10),
             .to = try std.fmt.parseInt(u32, tokens.next().?, 10),

@@ -46,7 +46,7 @@ fn getNeighbors(coord: aoc.Coord) [4]aoc.Coord {
     };
 }
 
-fn calcBasinSize(allocator: *std.mem.Allocator, heights: *const HeightMap, low_point: aoc.Coord) !usize {
+fn calcBasinSize(allocator: std.mem.Allocator, heights: *const HeightMap, low_point: aoc.Coord) !usize {
     var basin_points = std.AutoHashMap(aoc.Coord, void).init(allocator);
     defer basin_points.deinit();
     var unprocessed_points = std.ArrayList(aoc.Coord).init(allocator);

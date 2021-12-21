@@ -39,7 +39,7 @@ const Part2 = struct {
     saw_repeat: bool = false,
     pairs: LetterPairs,
 
-    fn init(allocator: *std.mem.Allocator) Part2 {
+    fn init(allocator: std.mem.Allocator) Part2 {
         return Part2 { .pairs = LetterPairs.init(allocator) };
     }
 

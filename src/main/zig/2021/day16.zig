@@ -2,7 +2,7 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Packet = struct {
-    const Operation = enum {
+    const Operation = enum (u3) {
         Sum = 0,
         Product = 1,
         Minimum = 2,

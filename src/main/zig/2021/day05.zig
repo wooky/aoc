@@ -5,7 +5,7 @@ const Intersector = struct {
     coords_encountered: std.AutoHashMap(aoc.Coord2D, void),
     coords_crossed: std.AutoHashMap(aoc.Coord2D, void),
 
-    fn init(allocator: *std.mem.Allocator) Intersector {
+    fn init(allocator: std.mem.Allocator) Intersector {
         return .{
             .coords_encountered = std.AutoHashMap(aoc.Coord2D, void).init(allocator),
             .coords_crossed = std.AutoHashMap(aoc.Coord2D, void).init(allocator),
@@ -43,7 +43,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer diag_intersector.deinit();
 
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, " ,->");
+        var tokens = std.mem.tokenize(u8, line, " ,->");
         const from = aoc.Coord2D.init(.{
             try std.fmt.parseInt(isize, tokens.next().?, 10),
             try std.fmt.parseInt(isize, tokens.next().?, 10),

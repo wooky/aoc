@@ -25,7 +25,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var reindeer_buf: [16]Reindeer = undefined;
     var reindeer_size: u8 = 0;
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         _ = tokens.next().?; _ = tokens.next().?; _ = tokens.next().?;
         const speed = try std.fmt.parseInt(u16, tokens.next().?, 10);
         _ = tokens.next().?; _ = tokens.next().?;

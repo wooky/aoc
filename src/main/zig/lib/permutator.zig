@@ -9,13 +9,13 @@ pub fn Permutator(comptime T: type) type {
         elements: Elements, started: bool = undefined, completed: bool = undefined,
         c: [32]usize = undefined, i: usize = undefined,
 
-        pub fn init(allocator: *Allocator) !Self {
+        pub fn init(allocator: Allocator) !Self {
             var permutator = Self { .elements = Elements.init(allocator) };
             permutator.reset();
             return permutator;
         }
 
-        pub fn fromHashMapKeys(allocator: *Allocator, comptime M: type, map: M) !Self {
+        pub fn fromHashMapKeys(allocator: Allocator, comptime M: type, map: M) !Self {
             var permutator = try init(allocator);
             var iterator = map.iterator();
             while (iterator.next()) |kv| {

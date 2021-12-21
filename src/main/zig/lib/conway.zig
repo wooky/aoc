@@ -7,10 +7,10 @@ pub fn Conway(comptime C: type) type {
     return struct {
         const Self = @This();
 
-        allocator: *Allocator,
+        allocator: Allocator,
         active_spots: ActiveSpots(C),
 
-        pub fn init(allocator: *Allocator) Self {
+        pub fn init(allocator: Allocator) Self {
             return .{
                 .allocator = allocator,
                 .active_spots = ActiveSpots(C).init(allocator),
@@ -49,7 +49,7 @@ pub fn ConwayIterator(comptime C: type) type {
         active: bool = undefined,
         active_neighbors: u8 = undefined,
 
-        fn init(allocator: *Allocator, prev_active_spots: ActiveSpots(C), next_active_spots: *ActiveSpots(C)) Self {
+        fn init(allocator: Allocator, prev_active_spots: ActiveSpots(C), next_active_spots: *ActiveSpots(C)) Self {
             return .{
                 .prev_active_spots = prev_active_spots,
                 .next_active_spots = next_active_spots,

@@ -2,9 +2,9 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Buffer = struct {
-    allocator: *std.mem.Allocator, buf: []u8, size: usize = 0, next: *Buffer = undefined,
+    allocator: std.mem.Allocator, buf: []u8, size: usize = 0, next: *Buffer = undefined,
 
-    fn init(allocator: *std.mem.Allocator) !Buffer {
+    fn init(allocator: std.mem.Allocator) !Buffer {
         return Buffer { .allocator = allocator, .buf = try allocator.alloc(u8, 8388608) };
     }
 

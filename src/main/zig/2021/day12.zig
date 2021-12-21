@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var paths = Paths.init(problem.allocator);
     defer paths.deinit();
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, "-");
+        var tokens = std.mem.tokenize(u8, line, "-");
         const cave1 = tokens.next().?;
         const cave2 = tokens.next().?;
         try paths.put(cave1, cave2);

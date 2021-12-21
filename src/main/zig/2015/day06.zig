@@ -19,7 +19,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var range = aoc.CoordRange2D.init();
         var state = TokenState.turn_toggle;
         var command: Command = undefined;
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         while (tokens.next()) |token| {
             switch (state) {
                 .turn_toggle => {
@@ -64,7 +64,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 }
 
 fn parseCoord(token: []const u8) !aoc.Coord2D {
-    var vals = std.mem.tokenize(token, ",");
+    var vals = std.mem.tokenize(u8, token, ",");
     return aoc.Coord2D.init(.{
         try std.fmt.parseInt(u16, vals.next().?, 10),
         try std.fmt.parseInt(u16, vals.next().?, 10)

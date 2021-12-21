@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer intcode.deinit();
 
     var amplifiers: [5]Intcode = undefined;
-    for (amplifiers) |*amplifier, idx| {
+    for (amplifiers) |*amplifier| {
         amplifier.* = try Intcode.init(problem.allocator, problem.input);
     }
 

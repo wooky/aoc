@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var mem2 = Memory.init(problem.allocator); defer mem2.deinit();
     var mask: []const u8 = undefined;
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, "= ");
+        var tokens = std.mem.tokenize(u8, line, "= ");
         const lhs = tokens.next().?;
         const rhs = tokens.next().?;
 

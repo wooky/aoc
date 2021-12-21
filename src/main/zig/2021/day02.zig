@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var aim: i16 = 0;
     var depth_aimed: i32 = 0;
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         const command = tokens.next().?;
         const units = try std.fmt.parseInt(u8, tokens.next().?, 10);
         if (std.mem.eql(u8, command, "forward")) {

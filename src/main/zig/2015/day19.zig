@@ -20,7 +20,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             medicine = line;
             break;
         }
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         const key = tokens.next().?;
         _ = tokens.next().?;
         const value = tokens.next().?;
@@ -82,11 +82,11 @@ fn nextAtom(molecule: []const u8, idx: usize) ?usize {
 }
 
 fn replaceString(arena: *Arena, molecule: []const u8, idx: usize, end_idx: usize, replacement: []const u8) ![]u8 {
-    return std.fmt.allocPrint(&arena.allocator, "{s}{s}{s}", .{
+    return std.fmt.allocPrint(arena.allocator(), "{s}{s}{s}", .{
         molecule[0..idx], replacement, molecule[end_idx..]
     });
 }
 
-fn compareLengths(context: void, a: []const u8, b: []const u8) bool {
+fn compareLengths(_: void, a: []const u8, b: []const u8) bool {
     return a.len > b.len;
 }

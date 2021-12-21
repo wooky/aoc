@@ -33,7 +33,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     while (problem.line()) |line| {
         var is_fake = true;
         var is_real = true;
-        var tokens = std.mem.tokenize(line, " :,");
+        var tokens = std.mem.tokenize(u8, line, " :,");
         _ = tokens.next().?;
         const sue = tokens.next().?;
         while (tokens.next()) |key| {

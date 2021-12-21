@@ -8,7 +8,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var pair_insertions = std.StringHashMap(u8).init(problem.allocator);
     defer pair_insertions.deinit();
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, " ->");
+        var tokens = std.mem.tokenize(u8, line, " ->");
         try pair_insertions.put(tokens.next().?, tokens.next().?[0]);
     }
 

@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var pos_left: u16 = std.math.maxInt(u16);
     var pos_right: u16 = 0;
 
-    var tokens = std.mem.tokenize(problem.input, ",");
+    var tokens = std.mem.tokenize(u8, problem.input, ",");
     while (tokens.next()) |token| {
         const pos = try std.fmt.parseInt(u16, token, 10);
         var res = try positions.getOrPut(pos);

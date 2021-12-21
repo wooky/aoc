@@ -18,7 +18,7 @@ const Combinator = struct {
     last_bitmask: usize = undefined,
     max_bitmask: usize = undefined,
 
-    pub fn init(allocator: *Allocator, elements: Elements) Combinator {
+    pub fn init(allocator: Allocator, elements: Elements) Combinator {
         return Combinator {
             .elements = elements,
             .unprocessed_buf = ResultBuf.init(allocator),
@@ -64,11 +64,11 @@ const Combinator = struct {
 const QuantumEntanglement = struct {
     const Weights = std.ArrayList(usize);
 
-    allocator: *Allocator,
+    allocator: Allocator,
     weights: Weights,
     total_weight: usize = 0,
 
-    fn init(allocator: *Allocator) QuantumEntanglement {
+    fn init(allocator: Allocator) QuantumEntanglement {
         return QuantumEntanglement { .allocator = allocator, .weights = Weights.init(allocator) };
     }
 
@@ -131,7 +131,6 @@ const QuantumEntanglement = struct {
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var qe = QuantumEntanglement.init(problem.allocator);
     defer qe.deinit();
-    var total_weight: usize = 0;
     while (problem.line()) |line| {
         const weight = try std.fmt.parseInt(usize, line, 10);
         try qe.addWeight(weight);

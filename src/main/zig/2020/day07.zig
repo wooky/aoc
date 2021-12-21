@@ -10,7 +10,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer containing.deinit();
 
     while (problem.line()) |line| {
-        var statements = std.mem.split(line, " bag");
+        var statements = std.mem.split(u8, line, " bag");
         const contains = statements.next().?;
         while (statements.next()) |statement| {
             if (extractBag(statement)) |bag| {

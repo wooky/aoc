@@ -7,7 +7,7 @@ const TileMap = struct {
     queue: std.ArrayList(aoc.Coord),
     tile_map: std.AutoHashMap(aoc.Coord, Tile),
 
-    fn init(allocator: *std.mem.Allocator) TileMap {
+    fn init(allocator: std.mem.Allocator) TileMap {
         return TileMap {
             .unprocessed_tiles = std.ArrayList(Tile).init(allocator),
             .queue = std.ArrayList(aoc.Coord).init(allocator),

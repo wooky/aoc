@@ -9,7 +9,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer paths.deinit();
 
     while (problem.line()) |line| {
-        var tokens = std.mem.tokenize(line, " ");
+        var tokens = std.mem.tokenize(u8, line, " ");
         const loc1 = tokens.next().?;
         _ = tokens.next().?;
         const loc2 = tokens.next().?;

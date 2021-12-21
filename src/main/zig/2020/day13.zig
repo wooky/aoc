@@ -10,7 +10,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const next_timestamp = try std.fmt.parseInt(u32, problem.line().?, 10);
     const ids = problem.line().?;
     var offset: u8 = 0;
-    var tokens = std.mem.tokenize(ids, ",");
+    var tokens = std.mem.tokenize(u8, ids, ",");
     while (tokens.next()) |token| : (offset += 1) {
         if (token[0] == 'x') {
             continue;

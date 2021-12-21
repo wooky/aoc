@@ -7,7 +7,7 @@ const LightMap = struct {
 
     conway: Conway,
 
-    fn init(allocator: *std.mem.Allocator) LightMap {
+    fn init(allocator: std.mem.Allocator) LightMap {
         return .{ .conway = Conway.init(allocator) };
     }
 

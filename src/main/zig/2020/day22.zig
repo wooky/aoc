@@ -10,9 +10,9 @@ const Player = struct {
     player2: bool,
     last_card: u8 = undefined,
 
-    fn fromGroup(allocator: *Allocator, group: []const u8) !Player {
+    fn fromGroup(allocator: Allocator, group: []const u8) !Player {
         var deck = Deck.init(allocator);
-        var tokenizer = std.mem.tokenize(group, "\n");
+        var tokenizer = std.mem.tokenize(u8, group, "\n");
         const player_row = tokenizer.next().?;
         const player2 = player_row[player_row.len - 2] == '2';
         while (tokenizer.next()) |card| {
@@ -102,7 +102,7 @@ const RecursiveCombat = struct {
     combat: Combat,
     cards_seen: CardsSeen,
 
-    fn init(allocator: *Allocator, player1: *const Player, player2: *const Player) !RecursiveCombat {
+    fn init(allocator: Allocator, player1: *const Player, player2: *const Player) !RecursiveCombat {
         return RecursiveCombat {
             .arena = ArenaAllocator.init(allocator),
             .combat = try Combat.init(player1, player2),
@@ -130,8 +130,8 @@ const RecursiveCombat = struct {
                 }
             }
             try self.cards_seen.append(.{
-                .deck1 = try self.arena.allocator.dupe(u8, self.combat.player1.deck.items),
-                .deck2 = try self.arena.allocator.dupe(u8, self.combat.player2.deck.items),
+                .deck1 = try self.arena.allocator().dupe(u8, self.combat.player1.deck.items),
+                .deck2 = try self.arena.allocator().dupe(u8, self.combat.player2.deck.items),
             });
 
             self.combat.player1.popFirst();

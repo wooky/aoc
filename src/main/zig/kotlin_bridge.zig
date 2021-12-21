@@ -6,8 +6,8 @@ const kotlin = @cImport(
 );
 
 pub fn run(comptime year: []const u8, comptime day: []const u8, problem: *aoc.Problem) !aoc.Solution {
-    comptime const year_field = "aoc" ++ year;
-    comptime const day_field = "run" ++ day;
+    const year_field = "aoc" ++ year;
+    const day_field = "run" ++ day;
 
     const symbols = kotlin.libaoc_symbols();
     const kotlin_aoc = symbols.*.kotlin.root.ca.yakov.aoc;
@@ -21,8 +21,8 @@ pub fn run(comptime year: []const u8, comptime day: []const u8, problem: *aoc.Pr
 }
 
 // TODO purge the get_p functions
-fn populateSolution(allocator: *std.mem.Allocator, solution: *aoc.Solution, kotlin_solution: anytype, kotlin_aoc: anytype, comptime field: []const u8) !void {
-    comptime const get_s = "get_s" ++ field;
+fn populateSolution(allocator: std.mem.Allocator, solution: *aoc.Solution, kotlin_solution: anytype, kotlin_aoc: anytype, comptime field: []const u8) !void {
+    const get_s = "get_s" ++ field;
     const s =
         if (@field(kotlin_aoc.Solution, get_s).?(kotlin_solution)) |s|
             try allocator.dupe(u8, s[0..std.mem.len(s)])
