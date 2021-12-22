@@ -101,7 +101,7 @@ pub fn ConwayIterator(comptime C: type) type {
             self.coord = coord;
             self.active = true;
             self.active_neighbors = 0;
-            var neighbors = coord.neighbors();
+            var neighbors = coord.neighbors(false);
             while (neighbors.next()) |neighbor| {
                 if (self.prev_active_spots.contains(neighbor)) {
                     self.active_neighbors += 1;
@@ -117,7 +117,7 @@ pub fn ConwayIterator(comptime C: type) type {
             self.coord = coord;
             self.active = false;
             self.active_neighbors = 0;
-            var neighbors = coord.neighbors();
+            var neighbors = coord.neighbors(false);
             while (neighbors.next()) |neighbor| {
                 if (self.prev_active_spots.contains(neighbor)) {
                     self.active_neighbors += 1;

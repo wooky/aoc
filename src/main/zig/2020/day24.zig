@@ -21,7 +21,7 @@ const HexCoord = struct {
         self.underlying.mutAdd(other);
     }
 
-    pub fn neighbors(self: *const HexCoord) NeighborIterator {
+    pub fn neighbors(self: *const HexCoord, _: bool) NeighborIterator {
         return NeighborIterator.init(self.*);
     }
 

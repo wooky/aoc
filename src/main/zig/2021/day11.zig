@@ -55,7 +55,7 @@ fn tickOctopus(kv_opt: ?Octopuses.Entry, step: usize, octopuses: *const Octopuse
             if (power.* == 9) {
                 kv.value_ptr.* = Octopus{ .Flashing = step };
                 flashes.* += 1;
-                var neighbors = kv.key_ptr.neighbors();
+                var neighbors = kv.key_ptr.neighbors(false);
                 while (neighbors.next()) |neighbor| {
                     tickOctopus(octopuses.getEntry(neighbor), step, octopuses, flashes);
                 }

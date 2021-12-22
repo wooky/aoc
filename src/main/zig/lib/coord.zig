@@ -80,8 +80,8 @@ pub fn GenericCoord(comptime Self: type) type {
             return true;
         }
 
-        pub fn neighbors(self: *const Self) GenericCoordNeighborIterator(Self) {
-            return GenericCoordNeighborIterator(Self).init(self.*);
+        pub fn neighbors(self: *const Self, include_self: bool) GenericCoordNeighborIterator(Self) {
+            return GenericCoordNeighborIterator(Self).init(self.*, include_self);
         }
     };
 }
@@ -208,16 +208,16 @@ pub fn GenericCoordNeighborIterator(comptime C: type) type {
     return struct {
         const Self = @This();
 
-        center: C,
+        center: ?C,
         range_iter: GenericCoordRangeIterator(C),
 
-        pub fn init(center: C) Self {
+        pub fn init(center: C, include_self: bool) Self {
             var offset: C = undefined;
             inline for (@typeInfo(C).Struct.fields) |field| {
                 @field(offset, field.name) = 1;
             }
             return .{
-                .center = center,
+                .center = if (include_self) null else center,
                 .range_iter = GenericCoordRangeIterator(C).init(
                     center.subtract(offset),
                     center.add(offset)
@@ -227,7 +227,7 @@ pub fn GenericCoordNeighborIterator(comptime C: type) type {
 
         pub fn next(self: *Self) ?C {
             const curr = self.range_iter.next();
-            if (self.center.equals(curr)) {
+            if (self.center != null and self.center.?.equals(curr)) {
                 return self.range_iter.next();
             }
             return curr;
