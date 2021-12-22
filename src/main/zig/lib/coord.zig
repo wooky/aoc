@@ -98,6 +98,14 @@ pub const Coord2D = struct {
     pub usingnamespace GenericCoord(Coord2D);
 };
 
+pub const Coord3D = struct {
+    x: isize,
+    y: isize,
+    z: isize,
+
+    pub usingnamespace GenericCoord(Coord3D);
+};
+
 pub const PredefinedCoord = struct {
     pub const ORIGIN = Coord.init(.{0, 0});
     pub const UP = Coord.init(.{-1, 0});
@@ -203,6 +211,7 @@ pub fn GenericCoordRangeIterator(comptime C: type) type {
 }
 pub const CoordRangeIterator = GenericCoordRangeIterator(Coord);
 pub const CoordRangeIterator2D = GenericCoordRangeIterator(Coord2D);
+pub const CoordRangeIterator3D = GenericCoordRangeIterator(Coord3D);
 
 pub fn GenericCoordNeighborIterator(comptime C: type) type {
     return struct {

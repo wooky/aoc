@@ -1,17 +1,12 @@
 const aoc = @import("../aoc.zig");
 
-const Coord3D = struct {
-    x: i8, y: i8, z: i8,
-    usingnamespace aoc.GenericCoord(Coord3D);
-};
-
 const Coord4D = struct {
     x: i8, y: i8, z: i8, w: i8,
     usingnamespace aoc.GenericCoord(Coord4D);
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var conway_3d = aoc.Conway(Coord3D).init(problem.allocator);
+    var conway_3d = aoc.Conway(aoc.Coord3D).init(problem.allocator);
     defer conway_3d.deinit();
     var conway_4d = aoc.Conway(Coord4D).init(problem.allocator);
     defer conway_4d.deinit();
@@ -19,7 +14,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     while (problem.line()) |line| : (y += 1) {
         for (line) |state, x| {
             if (state == '#') {
-                try conway_3d.active_spots.put(Coord3D.init(.{@intCast(i8, x), y, 0}), {});
+                try conway_3d.active_spots.put(aoc.Coord3D.init(.{@intCast(i8, x), y, 0}), {});
                 try conway_4d.active_spots.put(Coord4D.init(.{@intCast(i8, x), y, 0, 0}), {});
             }
         }
