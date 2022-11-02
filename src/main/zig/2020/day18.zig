@@ -42,7 +42,7 @@ const ShuntingYard = struct {
             }
             else {
                 while (self.operator_stack.popOrNull()) |op| {
-                    if (op == '('or (precedence and token == '+' and op == '*')) {
+                    if (op == '(' or (precedence and token == '+' and op == '*')) {
                         try self.operator_stack.append(op);
                         break;
                     }

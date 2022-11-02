@@ -13,12 +13,13 @@ pub fn build(b: *Builder) void {
     const mode = b.standardReleaseOptions();
 
     const exe = b.addExecutable("aoc", "src/main/zig/runner.zig");
+    exe.use_stage1 = true; // TODO(#8) remove once stage2 stops crashing
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();
     exe.linkLibC();
-    exe.addIncludeDir("build/bin/linuxX64/releaseShared");
-    exe.addLibPath("build/bin/linuxX64/releaseShared");
+    exe.addIncludePath("build/bin/linuxX64/releaseShared");
+    exe.addLibraryPath("build/bin/linuxX64/releaseShared");
     exe.linkSystemLibrary("aoc");
     exe.linkSystemLibrary("gsl");
 

@@ -37,7 +37,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 }
 
                 if (definite_digits[9] != 0) {
-                    if (@popCount(u7, dig) == 5) {
+                    if (@popCount(dig) == 5) {
                         if (dig & definite_digits[9] != dig) {
                             definite_digits[2] = dig;
                         }

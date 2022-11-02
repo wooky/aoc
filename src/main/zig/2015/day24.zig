@@ -39,7 +39,7 @@ const Combinator = struct {
         while (self.last_bitmask <= self.max_bitmask) {
             const bitmask = self.last_bitmask;
             self.last_bitmask += 1;
-            if (@popCount(usize, bitmask) == self.r) {
+            if (@popCount(bitmask) == self.r) {
                 self.unprocessed_buf.items.len = 0;
                 var result = CombinationResult {};
                 var idx: usize = 0;

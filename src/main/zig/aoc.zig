@@ -36,8 +36,8 @@ pub const Problem = struct {
     }
 
     pub fn solution(self: *Problem, s1: anytype, s2: anytype) Solution {
-        const fmt1 = comptime if (std.meta.trait.isZigString(@TypeOf(s1))) "{s}" else "{}";
-        const fmt2 = comptime if (std.meta.trait.isZigString(@TypeOf(s2))) "{s}" else "{}";
+        const fmt1 = comptime if (std.meta.trait.isZigString(@TypeOf(s1))) "{s}" else "{any}";
+        const fmt2 = comptime if (std.meta.trait.isZigString(@TypeOf(s2))) "{s}" else "{any}";
         return .{
             .s1 = std.fmt.allocPrint(self.allocator, fmt1, .{s1}) catch unreachable,
             .s2 = std.fmt.allocPrint(self.allocator, fmt2, .{s2}) catch unreachable,

@@ -93,7 +93,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 break :blk winning_boards[0].sumUnmarked() * last_called;
             }
         }
-        std.debug.print("s1 = {}, boards remain = {}\n", .{s1, boards.count()});
+        std.debug.print("s1 = {any}, boards remain = {}\n", .{s1, boards.count()});
         unreachable;
     };
 
