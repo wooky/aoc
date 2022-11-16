@@ -7,6 +7,7 @@ pub fn run(problem: *aoc.Problem, year: u16, day: u16) !aoc.Solution {
     return try switch (year) {
         2015 => @import("2015/runner.zig").run(problem, day),
         2016 => @import("2016/runner.zig").run(problem, day),
+        2017 => @import("2017/runner.zig").run(problem, day),
         2019 => @import("2019/runner.zig").run(problem, day),
         2020 => @import("2020/runner.zig").run(problem, day),
         2021 => @import("2021/runner.zig").run(problem, day),

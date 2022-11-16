@@ -16,11 +16,14 @@ pub fn build(b: *Builder) void {
     exe.use_stage1 = true; // TODO(#8) remove once stage2 stops crashing
     exe.setTarget(target);
     exe.setBuildMode(mode);
+    exe.addPackagePath("aoc_nim", "build/aoc_nim.zig");
     exe.install();
     exe.linkLibC();
     exe.addIncludePath("build/bin/linuxX64/releaseShared");
     exe.addLibraryPath("build/bin/linuxX64/releaseShared");
+    exe.addLibraryPath("build/bindings.nim");
     exe.linkSystemLibrary("aoc");
+    exe.linkSystemLibrary("aoc_nim");
     exe.linkSystemLibrary("gsl");
 
     const run_cmd = exe.run();
