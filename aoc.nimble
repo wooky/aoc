@@ -16,6 +16,6 @@ requires "pixie >= 5.0.0"
 task bindings, "Generate bindings":
 
   proc compile(libName: string, flags = "") =
-    exec "nim c -f " & flags & " -d:release --app:lib --gc:orc --threads:on --out:" & libName & " --outdir:build/bindings.nim src/main/nim/aoc.nim"
+    exec "nim c -f " & flags & " --app:lib --gc:orc --threads:on --out:" & libName & " --outdir:build/bindings.nim src/main/nim/aoc.nim"
 
   compile "libaoc_nim.so"
