@@ -1,5 +1,4 @@
 const aoc = @import("../aoc.zig");
-const kotlin_bridge = @import("../kotlin_bridge.zig");
 const nim = @import("../nim_bridge.zig");
 
 pub fn run(problem: *aoc.Problem, day: u16) anyerror!aoc.Solution { // TODO remove anyerror from here
