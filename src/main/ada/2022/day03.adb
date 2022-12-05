@@ -1,5 +1,4 @@
 with Ada.Containers.Ordered_Sets;
-with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Day03 is

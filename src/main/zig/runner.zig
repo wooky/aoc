@@ -11,6 +11,7 @@ pub fn run(problem: *aoc.Problem, year: u16, day: u16) !aoc.Solution {
         2019 => @import("2019/runner.zig").run(problem, day),
         2020 => @import("2020/runner.zig").run(problem, day),
         2021 => @import("2021/runner.zig").run(problem, day),
+        2022 => @import("2022/runner.zig").run(problem, day),
         else => unreachable,
     };
 }

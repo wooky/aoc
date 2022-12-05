@@ -20,7 +20,9 @@ pub fn build(b: *Builder) void {
     exe.install();
     exe.linkLibC();
     exe.addLibraryPath("build/bindings.nim");
+    exe.addLibraryPath("build/ada/lib");
     exe.linkSystemLibrary("aoc_nim");
+    exe.linkSystemLibrary("aoc_ada");
     exe.linkSystemLibrary("gsl");
 
     const run_cmd = exe.run();
