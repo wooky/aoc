@@ -1,7 +1,8 @@
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
+with AOC; use AOC;
 
-procedure Day04 is
+function Day04 return Solution is
   package ID_Range_Package is
     type ID_Range is tagged record
       From: Natural;
@@ -58,6 +59,5 @@ begin
     Close (F);
   end;
 
-  Put_Line (Fully_Contained_Ranges'Image);
-  Put_Line (Overlapping_Ranges'Image);
+  return New_Solution (Fully_Contained_Ranges'Image, Overlapping_Ranges'Image);
 end Day04;

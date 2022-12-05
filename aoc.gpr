@@ -4,7 +4,7 @@ library project AOC is
   for Object_Dir use "build/ada/obj";
   for Library_Dir use "build/ada/lib";
   for Library_Kind use "dynamic";
-  for Library_Interface use ("run");
+  for Library_Interface use ("aoc", "run");
   for Library_Standalone use "encapsulated";
 
   package Compiler is

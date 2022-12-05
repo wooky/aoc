@@ -1,7 +1,8 @@
 with Ada.Containers.Ordered_Sets;
 with Ada.Text_IO; use Ada.Text_IO;
+with AOC; use AOC;
 
-procedure Day03 is
+function Day03 return Solution is
   package Contents_Container is new
     Ada.Containers.Ordered_Sets (Element_Type => Character);
   subtype Contents is Contents_Container.Set;
@@ -58,6 +59,5 @@ begin
     Close (F);
   end;
 
-  Put_Line (Total_Compartment_Priority'Image);
-  Put_Line (Total_Group_Priority'Image);
+  return New_Solution (Total_Compartment_Priority'Image, Total_Group_Priority'Image);
 end Day03;

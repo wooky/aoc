@@ -1,8 +1,9 @@
 with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Vectors;
 with Ada.Text_IO; use Ada.Text_IO;
+with AOC; use AOC;
 
-procedure Day01 is
+function Day01 return Solution is
   package Elves_Calories_Vector is new
     Ada.Containers.Vectors
       (Index_Type => Natural,
@@ -32,7 +33,7 @@ begin
   end;
 
   Elves_Calories_Vector_Sorting.Sort (Elves_Calories);
-  Put_Line (Elves_Calories.Last_Element'Image);
+
   declare
     Top_3_Calories : Natural := (
       Elves_Calories.Last_Element +
@@ -40,6 +41,9 @@ begin
       Elves_Calories (Elves_Calories.Last_Index - 2)
     );
   begin
-    Put_Line (Top_3_Calories'Image);
+    return New_Solution (
+      Elves_Calories.Last_Element'Image,
+      Top_3_Calories'Image
+    );
   end;
 end Day01;

@@ -3,8 +3,9 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.Regpat; use GNAT.Regpat;
+with AOC; use AOC;
 
-procedure Day05 is
+function Day05 return Solution is
   type FSM is (Populate, Skip, Operate);
 
   package Container_Stack_Vector_Package is new
@@ -93,6 +94,8 @@ begin
     Close (F);
   end;
 
-  Put_Line (Stacks_Top (Container_Stacks));
-  Put_Line (Stacks_Top (Container_Stacks_9001));
+  return New_Solution (
+    Stacks_Top (Container_Stacks),
+    Stacks_Top (Container_Stacks_9001)
+  );
 end Day05;

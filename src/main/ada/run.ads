@@ -1,6 +1,7 @@
+with AOC; use AOC;
 with Interfaces.C; use Interfaces.C;
 
-procedure Run (Year, Day : Positive)
+function Run (Year, Day : Positive) return Solution
   with
     Export => True,
     Convention => C,

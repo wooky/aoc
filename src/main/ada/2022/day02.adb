@@ -1,6 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
+with AOC; use AOC;
 
-procedure Day02 is
+function Day02 return Solution is
   subtype Elf_Move_Marker is Character range 'A' .. 'C';
   subtype My_Move_Marker is Character range 'X' .. 'Z';
 
@@ -81,6 +82,5 @@ begin
     Close (F);
   end;
 
-  Put_Line (Wrong_Total_Score'Image);
-  Put_Line (Right_Total_Score'Image);
+  return New_Solution (Wrong_Total_Score'Image, Right_Total_Score'Image);
 end Day02;
