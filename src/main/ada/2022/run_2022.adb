@@ -8,6 +8,7 @@ with Day05;
 with Day06;
 with Day07;
 with Day08;
+with Day09;
 
 function Run_2022 (Day : Positive) return Solution is
 begin
@@ -20,6 +21,7 @@ begin
     when 6 => return Day06;
     when 7 => return Day07;
     when 8 => return Day08;
+    when 9 => return Day09;
     when others => raise Name_Error with "Invalid day " & Day'Image;
   end case;
 end Run_2022;
