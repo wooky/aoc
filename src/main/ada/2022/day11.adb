@@ -3,10 +3,9 @@ with Ada.Containers.Generic_Array_Sort;
 with Ada.Containers.Vectors;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day11 return Solution is
+function Day11 (F : Aoc_File) return Solution is
   package Item_List_Vector is new Ada.Containers.Vectors (
     Index_Type => Natural,
     Element_Type => Long_Long_Integer
@@ -75,9 +74,7 @@ function Day11 return Solution is
   Monkeys : Monkey_Vector;
 begin
   declare
-    F : File_Type;
   begin
-    Open (F, In_File, "input/2022/day11.txt");
     while not End_Of_File (F) loop
       declare
         Line_Monkey : String := Get_Line (F);
@@ -127,7 +124,6 @@ begin
         Monkeys.Append (M);
       end;
     end loop;
-    Close (F);
   end;
 
   return New_Solution (

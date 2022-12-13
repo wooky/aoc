@@ -1,8 +1,7 @@
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day04 return Solution is
+function Day04 (F : Aoc_File) return Solution is
   package ID_Range_Package is
     type ID_Range is tagged record
       From: Natural;
@@ -38,9 +37,7 @@ function Day04 return Solution is
   Overlapping_Ranges : Natural := 0;
 begin
   declare
-    F : File_Type;
   begin
-    Open (F, In_File, "input/2022/day04.txt");
     while not End_Of_File (F) loop
       declare
         Line : String := Get_Line (F);
@@ -56,7 +53,6 @@ begin
         end if;
       end;
     end loop;
-    Close (F);
   end;
 
   return New_Solution (Fully_Contained_Ranges'Image, Overlapping_Ranges'Image);

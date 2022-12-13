@@ -1,7 +1,6 @@
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day02 return Solution is
+function Day02 (F : Aoc_File) return Solution is
   subtype Elf_Move_Marker is Character range 'A' .. 'C';
   subtype My_Move_Marker is Character range 'X' .. 'Z';
 
@@ -44,15 +43,13 @@ function Day02 return Solution is
   Right_Total_Score : Natural := 0;
 begin
   declare
-    F : File_Type;
   begin
-    Open (F, In_File, "input/2022/day02.txt");
     while not End_Of_File (F) loop
       declare
         Line : String := Get_Line (F);
-        Elf_Move : Move := Elf_Moves (Elf_Move_Marker (Line (1)));
-        My_Wrong_Move : Move := My_Wrong_Moves (My_Move_Marker (Line (3)));
-        My_Strategy : Strategy := My_Strategies (My_Move_Marker (Line (3)));
+        Elf_Move : Move := Elf_Moves (Elf_Move_Marker (Line (Line'First)));
+        My_Wrong_Move : Move := My_Wrong_Moves (My_Move_Marker (Line (Line'Last)));
+        My_Strategy : Strategy := My_Strategies (My_Move_Marker (Line (Line'Last)));
 
         Wrong_Win_Score : Natural := Score_Draw;
         My_Right_Move : Move;
@@ -79,7 +76,6 @@ begin
         Right_Total_Score := Right_Total_Score + Right_Win_Score + Elf_To_My_Move_Stats (My_Right_Move).Score;
       end;
     end loop;
-    Close (F);
   end;
 
   return New_Solution (Wrong_Total_Score'Image, Right_Total_Score'Image);

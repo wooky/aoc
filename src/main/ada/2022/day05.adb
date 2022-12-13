@@ -1,11 +1,10 @@
 with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.Regpat; use GNAT.Regpat;
 with AOC; use AOC;
 
-function Day05 return Solution is
+function Day05 (F : Aoc_File) return Solution is
   type FSM is (Populate, Skip, Operate);
 
   package Container_Stack_Vector_Package is new
@@ -34,12 +33,10 @@ function Day05 return Solution is
   Container_Stacks_9001 : Container_Stacks_Vector;
 begin
   declare
-    F : File_Type;
     FSM_State : FSM := Populate;
     Operation_Regex : Pattern_Matcher := Compile ("move (\d+) from (\d+) to (\d+)");
     Operation_Matches : Match_Array (1 .. 3);
   begin
-    Open (F, In_File, "input/2022/day05.txt");
     while not End_Of_File (F) loop
       declare
         Line : String := Get_Line (F);
@@ -91,7 +88,6 @@ begin
         end case;
       end;
     end loop;
-    Close (F);
   end;
 
   return New_Solution (

@@ -1,7 +1,6 @@
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day10 return Solution is
+function Day10 (F : Aoc_File) return Solution is
   type Unformatted_CRT_Display is array(1 .. 40 * 6) of Character;
 
   type CPU_Parameters is record
@@ -34,9 +33,7 @@ function Day10 return Solution is
   CPU : CPU_Parameters;
 begin
   declare
-    F : File_Type;
   begin
-    Open (F, In_File, "input/2022/day10.txt");
     while not End_Of_File (F) loop
       declare
         Line : String := Get_Line (F);
@@ -58,7 +55,6 @@ begin
         end if;
       end;
     end loop;
-    Close (F);
   end;
   Wait_Cycles (CPU);
 

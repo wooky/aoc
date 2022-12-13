@@ -1,8 +1,7 @@
 with Ada.Containers.Ordered_Sets;
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day09 return Solution is
+function Day09 (F : Aoc_File) return Solution is
   type Coordinate is record
     X, Y : Integer := 0;
   end record;
@@ -65,9 +64,7 @@ function Day09 return Solution is
   Rope10 : Rope (10);
 begin
   declare
-    F : File_Type;
   begin
-    Open (F, In_File, "input/2022/day09.txt");
     while not End_Of_File (F) loop
       declare
         Line : String := Get_Line (F);
@@ -80,7 +77,6 @@ begin
         end loop;
       end;
     end loop;
-    Close (F);
   end;
   return New_Solution (S1 => Rope2.Tail_Visits.Length'Image, S2 => Rope10.Tail_Visits.Length'Image);
 end Day09;

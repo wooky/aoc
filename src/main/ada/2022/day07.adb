@@ -5,10 +5,9 @@ with Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Hash;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day07 return Solution is
+function Day07 (F : Aoc_File) return Solution is
   type Content_Type is (File, Directory);
   type Content (Kind : Content_Type := File) is record
     case Kind is
@@ -80,9 +79,7 @@ function Day07 return Solution is
   Current_Directory : Unbounded_String;
 begin
   declare
-    F : File_Type;
   begin
-    Open (F, In_File, "input/2022/day07.txt");
     while not End_Of_File (F) loop
       declare
         Line : String := Get_Line (F);
@@ -117,7 +114,6 @@ begin
         end if;
       end;
     end loop;
-    Close (F);
   end;
   
   Fill_Directory_Size (Directory_Listings, "/");

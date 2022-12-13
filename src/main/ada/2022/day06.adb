@@ -1,9 +1,8 @@
 with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Ordered_Sets;
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day06 return Solution is
+function Day06 (F : Aoc_File) return Solution is
   function Find_Marker (S : String ; Size : Positive) return Positive is
     package Character_Set is new Ada.Containers.Ordered_Sets(
       Element_Type => Character
@@ -25,13 +24,10 @@ function Day06 return Solution is
   end Find_Marker;
 
   function Read_File return String is
-    F : File_Type;
   begin
-    Open (F, In_File, "input/2022/day06.txt");
     declare
       Line : String := Get_Line (F);
     begin
-      Close (F);
       return Line;
     end;
   end Read_File;

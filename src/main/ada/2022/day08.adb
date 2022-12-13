@@ -1,7 +1,6 @@
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day08 return Solution is
+function Day08 (F : Aoc_File) return Solution is
   type Tree_Heightmap_Array is array(Natural range <>, Natural range <>) of Character;
 
   type Tree_Viewing_Result is record
@@ -30,14 +29,11 @@ function Day08 return Solution is
     return (Distance, True);
   end Tree_Viewing_Distance;
 
-  F : File_Type;
   Width : Natural := 0;
   Height : Natural := 0;
   Trees_Visible : Natural := 0;
   Best_Scenic_Score : Natural := 0;
 begin
-  Open (F, In_File, "input/2022/day08.txt");
-
   while not End_Of_File (F) loop
     declare
       Line : String := Get_Line (F);
@@ -63,8 +59,6 @@ begin
       end;
       Row := Row + 1;
     end loop;
-
-    Close (F);
 
     for Row in Tree_Heightmap'Range(1) loop
       if Row = Tree_Heightmap'First(1) or Row = Tree_Heightmap'Last(1) then

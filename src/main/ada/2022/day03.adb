@@ -1,8 +1,7 @@
 with Ada.Containers.Ordered_Sets;
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day03 return Solution is
+function Day03 (F : Aoc_File) return Solution is
   package Contents_Container is new
     Ada.Containers.Ordered_Sets (Element_Type => Character);
   subtype Contents is Contents_Container.Set;
@@ -22,7 +21,7 @@ function Day03 return Solution is
     case C is
       when 'a' .. 'z' => return Character'Pos (C) - Character'Pos ('a') + 1;
       when 'A' .. 'Z' => return Character'Pos (C) - Character'Pos ('A') + 27;
-      when others => raise Name_Error with "Invalid character " & C;
+      when others => raise Program_Error with "Invalid character " & C;
     end case;
   end Get_Priority;
 
@@ -30,11 +29,9 @@ function Day03 return Solution is
   Total_Group_Priority : Priority := 0;
 begin
   declare
-    F : File_Type;
     Group_Contents : array (1 .. 3) of Contents;
     Group_Contents_Idx : Positive := Group_Contents'First;
   begin
-    Open (F, In_File, "input/2022/day03.txt");
     while not End_Of_File (F) loop
       declare
         Line : String := Get_Line (F);
@@ -56,7 +53,6 @@ begin
         end if;
       end;
     end loop;
-    Close (F);
   end;
 
   return New_Solution (Total_Compartment_Priority'Image, Total_Group_Priority'Image);

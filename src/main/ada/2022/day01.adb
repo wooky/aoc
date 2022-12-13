@@ -1,9 +1,8 @@
 with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Vectors;
-with Ada.Text_IO; use Ada.Text_IO;
 with AOC; use AOC;
 
-function Day01 return Solution is
+function Day01 (F : Aoc_File) return Solution is
   package Elves_Calories_Vector is new
     Ada.Containers.Vectors
       (Index_Type => Natural,
@@ -13,10 +12,8 @@ function Day01 return Solution is
   Elves_Calories : Elves_Calories_Vector.Vector;
 begin
   declare
-    F : File_Type;
     Elf_Calories : Natural := 0;
   begin
-    Open (F, In_File, "input/2022/day01.txt");
     while not End_Of_File (F) loop
       declare
         Line : String := Get_Line (F);
@@ -29,7 +26,6 @@ begin
         end if;
       end;
     end loop;
-    Close (F);
   end;
 
   Elves_Calories_Vector_Sorting.Sort (Elves_Calories);
