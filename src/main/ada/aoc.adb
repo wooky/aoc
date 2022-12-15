@@ -45,4 +45,37 @@ package body AOC is
     File.Pos := 1;
     File.Eof := False;
   end Reset;
+
+  function Read_Rectangle (File : Aoc_File) return Rectangle is
+    Width : Natural := 0;
+    Height : Natural := 0;
+  begin
+    while not End_Of_File (File) loop
+      declare
+        Line : String := Get_Line (File);
+      begin
+        Width := Line'Length;
+        Height := Height + 1;
+      end;
+    end loop;
+
+    Reset (File);
+
+    declare
+      Result : Rectangle (1 .. Height, 1 .. Width);
+      Row : Natural := 1;
+    begin
+      while not End_Of_File (File) loop
+        declare
+          Line : String := Get_Line (File);
+        begin
+          for Column in Result'Range(2) loop
+            Result (Row, Column) := Line (Column);
+          end loop;
+        end;
+        Row := Row + 1;
+      end loop;
+      return Result;
+    end;
+  end Read_Rectangle;
 end AOC;

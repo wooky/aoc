@@ -14,11 +14,14 @@ package AOC is
 
   function New_Solution (S1, S2 : String) return Solution;
 
+  type Rectangle is array(Positive range <>, Positive range <>) of Character;
+
   type Aoc_File is private;
   function New_File (Input : chars_ptr) return Aoc_File;
   function End_Of_File (File : Aoc_File) return Boolean;
   function Get_Line (File : Aoc_File) return String;
   procedure Reset (File : Aoc_File);
+  function Read_Rectangle (File : Aoc_File) return Rectangle;
 
 private
 
