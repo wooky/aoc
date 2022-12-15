@@ -1,47 +1,38 @@
-with Ada.Containers.Ordered_Sets;
+with Ada.Containers.Hashed_Sets;
 with AOC; use AOC;
+with AOC.Coordinates; use AOC.Coordinates;
 
 function Day09 (F : Aoc_File) return Solution is
-  type Coordinate is record
-    X, Y : Integer := 0;
-  end record;
-
-  function "<" (L, R : Coordinate) return Boolean is
-  begin
-    if L.X = R.X then
-      return L.Y < R.Y;
-    end if;
-    return L.X < R.X;
-  end "<";
-
   procedure Move_Head_Coord (Head_Coord : in out Coordinate ; Direction : Character) is
   begin
     case Direction is
-      when 'U' => Head_Coord.Y := Head_Coord.Y + 1;
-      when 'D' => Head_Coord.Y := Head_Coord.Y - 1;
-      when 'L' => Head_Coord.X := Head_Coord.X - 1;
-      when 'R' => Head_Coord.X := Head_Coord.X + 1;
+      when 'U' => Head_Coord.Translate (1, 0);
+      when 'D' => Head_Coord.Translate (-1, 0);
+      when 'L' => Head_Coord.Translate (0, -1);
+      when 'R' => Head_Coord.Translate (0, 1);
       when others => raise Program_Error with "Invalid direction " & Direction;
     end case;
   end Move_Head_Coord;
 
   procedure Move_Subsequent_Coord (Subsequent_Coord : in out Coordinate ; Head_Coord : Coordinate) is
-    Delta_X : Integer := Head_Coord.X - Subsequent_Coord.X;
-    Delta_Y : Integer := Head_Coord.Y - Subsequent_Coord.Y;
+    Delta_X : Integer := Head_Coord.Column - Subsequent_Coord.Column;
+    Delta_Y : Integer := Head_Coord.Row - Subsequent_Coord.Row;
   begin
     if abs Delta_X <= 1 and abs Delta_Y <= 1 then
       return;
     end if;
     if Delta_X /= 0 then
-      Subsequent_Coord.X := Subsequent_Coord.X + Delta_X / abs Delta_X;
+      Subsequent_Coord.Translate (0, Delta_X / abs Delta_X);
     end if;
     if Delta_Y /= 0 then
-      Subsequent_Coord.Y := Subsequent_Coord.Y + Delta_Y / abs Delta_Y;
+      Subsequent_Coord.Translate(Delta_Y / abs Delta_Y, 0);
     end if;
   end Move_Subsequent_Coord;
 
-  package Tail_Visit_Set is new Ada.Containers.Ordered_Sets (
-    Element_Type => Coordinate
+  package Tail_Visit_Set is new Ada.Containers.Hashed_Sets (
+    Element_Type => Coordinate,
+    Hash => Hash,
+    Equivalent_Elements => "="
   );
 
   type Knot_Coordinates is array(Positive range <>) of Coordinate;
