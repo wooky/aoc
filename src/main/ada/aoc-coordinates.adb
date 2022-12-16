@@ -17,4 +17,31 @@ package body AOC.Coordinates is
     return Result;
   end Translate;
 
+  function Direct_Neighbors (C : Coordinate) return Direct_Neighbors_Array is
+  begin
+    return (
+      C.Translate (-1, 0),
+      C.Translate (1, 0),
+      C.Translate (0, -1),
+      C.Translate (0, 1)
+    );
+  end Direct_Neighbors;
+
+  function Distance (From, To : Coordinate) return Natural is
+  begin
+    return abs (From.Row - To.Row) + abs (From.Column - To.Column);
+  end Distance;
+
+  function Find (Where : Rectangle ; What : Character) return Coordinate is
+  begin
+    for Row in Where'Range(1) loop
+      for Column in Where'Range(2) loop
+        if Where (Row, Column) = What then
+          return (Row => Row, Column => Column);
+        end if;
+      end loop;
+    end loop;
+    raise Program_Error with "Not found!";
+  end Find;
+
 end AOC.Coordinates;

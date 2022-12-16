@@ -13,4 +13,8 @@ library project AOC is
   package Compiler is
     for Default_Switches ("Ada") use ("-g");
   end Compiler;
+
+  package Binder is
+    for Switches ("Ada") use ("-Es");
+  end Binder;
 end AOC;
