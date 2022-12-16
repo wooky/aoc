@@ -13,6 +13,7 @@ with Day11;
 with Day12;
 with Day13;
 with Day14;
+with Day15;
 
 function Run_2022 (File : Aoc_File ; Day : Positive) return Solution is
 begin
@@ -31,6 +32,7 @@ begin
     when 12 => return Day12 (File);
     when 13 => return Day13 (File);
     when 14 => return Day14 (File);
+    when 15 => return Day15 (File);
     when others => raise Program_Error with "Invalid day " & Day'Image;
   end case;
 end Run_2022;
