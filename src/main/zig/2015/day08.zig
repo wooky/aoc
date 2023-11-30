@@ -11,23 +11,19 @@ pub fn run(problem: *aoc.Problem) aoc.Solution {
         for (line) |c| {
             if (skip > 0) {
                 skip -= 1;
-            }
-            else if (saw_backtick) {
+            } else if (saw_backtick) {
                 saw_backtick = false;
                 if (c == 'x') {
                     skip = 2;
                     unprintable += 3;
-                }
-                else {
+                } else {
                     unprintable += 1;
                     extra += 1;
                 }
-            }
-            else if (c == '\\') {
+            } else if (c == '\\') {
                 extra += 1;
                 saw_backtick = true;
-            }
-            else if (c == '"') {
+            } else if (c == '"') {
                 unprintable += 1;
                 extra += 1;
             }

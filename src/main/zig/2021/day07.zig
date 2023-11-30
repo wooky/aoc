@@ -13,8 +13,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var res = try positions.getOrPut(pos);
         if (res.found_existing) {
             res.value_ptr.* += 1;
-        }
-        else {
+        } else {
             res.value_ptr.* = 1;
             if (pos < pos_left) {
                 pos_left = pos;
@@ -31,7 +30,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     return problem.solution(constant_fuel, pyramidal_fuel);
 }
 
-fn calcFuel(positions: *const std.AutoHashMap(u16, u8), pos_left: u16, pos_right: u16, fuelModifier: fn (usize)usize) usize {
+fn calcFuel(positions: *const std.AutoHashMap(u16, u8), pos_left: u16, pos_right: u16, fuelModifier: *const fn (usize) usize) usize {
     var min_fuel: usize = std.math.maxInt(usize);
     var target: isize = pos_left;
     while (target <= pos_right) : (target += 1) {

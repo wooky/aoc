@@ -9,7 +9,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     while (problem.line()) |line| {
         var col: isize = 0;
         for (line) |h| {
-            try heights.putNoClobber(aoc.Coord.init(.{row, col}), h - '0');
+            try heights.putNoClobber(aoc.Coord.init(.{ row, col }), h - '0');
             col += 1;
         }
         row += 1;
@@ -31,14 +31,14 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try basin_sizes.append(try calcBasinSize(problem.allocator, &heights, kv.key_ptr.*));
     }
 
-    std.sort.sort(usize, basin_sizes.items, {}, comptime std.sort.desc(usize));
+    std.sort.insertion(usize, basin_sizes.items, {}, comptime std.sort.desc(usize));
     const basin_product = basin_sizes.items[0] * basin_sizes.items[1] * basin_sizes.items[2];
 
     return problem.solution(risk_level, basin_product);
 }
 
 fn getNeighbors(coord: aoc.Coord) [4]aoc.Coord {
-    return [_] aoc.Coord {
+    return [_]aoc.Coord{
         coord.add(aoc.PredefinedCoord.UP),
         coord.add(aoc.PredefinedCoord.DOWN),
         coord.add(aoc.PredefinedCoord.LEFT),

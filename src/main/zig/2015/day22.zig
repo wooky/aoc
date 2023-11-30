@@ -6,7 +6,9 @@ const HitPoints = u8;
 const Mana = u16;
 
 const TurnResult = enum {
-    CONTINUE, WIN, FAIL,
+    CONTINUE,
+    WIN,
+    FAIL,
 };
 
 const InstantSpell = struct { cost: Mana, heal: HitPoints, damage: HitPoints };
@@ -48,11 +50,10 @@ const Player = struct {
         if (self.shield_effect_timer != 0) {
             self.armor = shield_effect;
             self.shield_effect_timer -= 1;
-        }
-        else {
+        } else {
             self.armor = 0;
         }
-        
+
         if (self.recharge_effect_timer != 0) {
             self.mana_remaining += recharge_effect;
             self.recharge_effect_timer -= 1;
@@ -143,7 +144,7 @@ const Boss = struct {
     }
 };
 
-const spells = [_]Spell {
+const spells = [_]Spell{
     .{ .Instant = .{ .cost = 53, .heal = 0, .damage = 4 } },
     .{ .Instant = .{ .cost = 73, .heal = 2, .damage = 2 } },
     .{ .Shield = {} },
@@ -153,23 +154,24 @@ const spells = [_]Spell {
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var tokens = std.mem.tokenize(u8, problem.input, ": \n");
-    _ = tokens.next().?; _ = tokens.next().?;
+    _ = tokens.next().?;
+    _ = tokens.next().?;
     const boss_hp = try std.fmt.parseInt(HitPoints, tokens.next().?, 10);
     _ = tokens.next().?;
     const boss_atk = try std.fmt.parseInt(HitPoints, tokens.next().?, 10);
 
     const res1 = blk: {
-        var player = Player {};
-        var boss = Boss { .hp = boss_hp, .atk = boss_atk };
+        var player = Player{};
+        var boss = Boss{ .hp = boss_hp, .atk = boss_atk };
         break :blk getMinManaUsed(&player, &boss, std.math.maxInt(Mana), 0);
     };
 
     const res2 = blk: {
-        var player = Player {};
-        var boss = Boss { .hp = boss_hp, .atk = boss_atk };
+        var player = Player{};
+        var boss = Boss{ .hp = boss_hp, .atk = boss_atk };
         break :blk getMinManaUsed(&player, &boss, std.math.maxInt(Mana), 1);
     };
-    
+
     return problem.solution(res1, res2);
 }
 

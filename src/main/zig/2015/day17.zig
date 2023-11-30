@@ -3,9 +3,7 @@ const std = @import("std");
 
 const target_volume = 150;
 
-const Params = struct {
-    containers: []u8, combos: u16 = 0, smallest_container_qty: u8 = 255, smallest_container_combo: u8 = 255
-};
+const Params = struct { containers: []u8, combos: u16 = 0, smallest_container_qty: u8 = 255, smallest_container_combo: u8 = 255 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var containers: [21]u8 = undefined;
@@ -16,7 +14,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         container_idx += 1;
     }
 
-    var params = Params { .containers = &containers };
+    var params = Params{ .containers = &containers };
     calcCombos(&params, 0, 0, 1);
     return problem.solution(params.combos, params.smallest_container_combo);
 }
@@ -28,12 +26,10 @@ fn calcCombos(params: *Params, idx: usize, total_volume: u8, container_qty: u8) 
         if (container_qty < params.smallest_container_qty) {
             params.smallest_container_qty = container_qty;
             params.smallest_container_combo = 1;
-        }
-        else if (container_qty == params.smallest_container_qty) {
+        } else if (container_qty == params.smallest_container_qty) {
             params.smallest_container_combo += 1;
         }
-    }
-    else if (new_volume < target_volume) {
+    } else if (new_volume < target_volume) {
         const new_qty = container_qty + 1;
         var new_idx = idx + 1;
         while (new_idx < params.containers.len) : (new_idx += 1) {

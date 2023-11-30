@@ -14,13 +14,12 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         for (std.mem.trimRight(u8, group, "\n")) |c| {
             if (c == '\n') {
                 people += 1;
-            }
-            else {
+            } else {
                 const e = try yeses.getOrPutValue(c, 0);
                 e.value_ptr.* += 1;
             }
         }
-        
+
         var iter = yeses.iterator();
         while (iter.next()) |kv| {
             any_yeses += 1;

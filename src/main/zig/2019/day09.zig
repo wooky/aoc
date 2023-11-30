@@ -15,9 +15,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             const output = try intcode.run(&state);
             if (output) |o| {
                 last_output = o;
-            }
-            else {
-                break :blk @intCast(usize, last_output);
+            } else {
+                break :blk @as(usize, @intCast(last_output));
             }
         }
     };
@@ -26,7 +25,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var state = intcode.newState();
         defer state.deinit();
         try state.inputs.append(2);
-        break :blk @intCast(usize, (try intcode.run(&state)).?);
+        break :blk @as(usize, @intCast((try intcode.run(&state)).?));
     };
 
     return problem.solution(res1, res2);

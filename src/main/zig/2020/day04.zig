@@ -7,14 +7,14 @@ const Validation = struct {
     validators: Validators,
 
     fn init(allocator: std.mem.Allocator) !Validation {
-        var validation = Validation { .validators = Validators.init(allocator) };
+        var validation = Validation{ .validators = Validators.init(allocator) };
         return validation.addRegex("byr", "^(19[2-9][0-9]|200[0-2])$")
-                         .addRegex("iyr", "^20(1[0-9]|20)$")
-                         .addRegex("eyr", "^20(2[0-9]|30)$")
-                         .addRegex("hgt", "^((1[5-8][0-9]|19[0-3])cm|(59|6[0-9]|7[0-6])in)$")
-                         .addRegex("hcl", "^#[0-9a-f]{6}$")
-                         .addRegex("ecl", "^(amb|blu|brn|gry|grn|hzl|oth)$")
-                         .addRegex("pid", "^[0-9]{9}$");
+            .addRegex("iyr", "^20(1[0-9]|20)$")
+            .addRegex("eyr", "^20(2[0-9]|30)$")
+            .addRegex("hgt", "^((1[5-8][0-9]|19[0-3])cm|(59|6[0-9]|7[0-6])in)$")
+            .addRegex("hcl", "^#[0-9a-f]{6}$")
+            .addRegex("ecl", "^(amb|blu|brn|gry|grn|hzl|oth)$")
+            .addRegex("pid", "^[0-9]{9}$").*;
     }
 
     fn deinit(self: *Validation) void {
@@ -25,9 +25,9 @@ const Validation = struct {
         self.validators.deinit();
     }
 
-    fn addRegex(self: *Validation, field: []const u8, pattern: [:0]const u8) Validation {
+    fn addRegex(self: *Validation, field: []const u8, pattern: [:0]const u8) *Validation {
         self.validators.putNoClobber(field, aoc.Regex.compilez(pattern)) catch unreachable;
-        return self.*;
+        return self;
     }
 
     fn validate(self: *const Validation, field: []const u8, value: []const u8) ?bool {

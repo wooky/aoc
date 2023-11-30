@@ -16,8 +16,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer pair_counts.deinit();
     var atom_counts = AtomCounts.init(problem.allocator);
     defer atom_counts.deinit();
-    for (polymer_template[0..polymer_template.len - 1]) |atom, idx| {
-        (try pair_counts.getOrPutValue(polymer_template[idx..idx + 2], 0)).value_ptr.* += 1;
+    for (polymer_template[0 .. polymer_template.len - 1], 0..) |atom, idx| {
+        (try pair_counts.getOrPutValue(polymer_template[idx .. idx + 2], 0)).value_ptr.* += 1;
         (try atom_counts.getOrPutValue(atom, 0)).value_ptr.* += 1;
     }
     (try atom_counts.getOrPutValue(polymer_template[polymer_template.len - 1], 0)).value_ptr.* += 1;
@@ -31,9 +31,11 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             while (iter.next()) |old_pair_count| {
                 const rule = pair_insertions.getEntry(old_pair_count.key_ptr.*).?;
                 var buf: [2]u8 = undefined;
-                buf[0] = old_pair_count.key_ptr.*[0]; buf[1] = rule.value_ptr.*;
+                buf[0] = old_pair_count.key_ptr.*[0];
+                buf[1] = rule.value_ptr.*;
                 (try new_pair_counts.getOrPutValue(pair_insertions.getEntry(&buf).?.key_ptr.*, 0)).value_ptr.* += old_pair_count.value_ptr.*;
-                buf[0] = rule.value_ptr.*; buf[1] = old_pair_count.key_ptr.*[1];
+                buf[0] = rule.value_ptr.*;
+                buf[1] = old_pair_count.key_ptr.*[1];
                 (try new_pair_counts.getOrPutValue(pair_insertions.getEntry(&buf).?.key_ptr.*, 0)).value_ptr.* += old_pair_count.value_ptr.*;
                 (try atom_counts.getOrPutValue(rule.value_ptr.*, 0)).value_ptr.* += old_pair_count.value_ptr.*;
             }

@@ -2,21 +2,20 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Octopus = union(enum) {
-    Normal: u8,     // power level
-    Flashing: usize,   // step number
+    Normal: u8, // power level
+    Flashing: usize, // step number
 };
 const Octopuses = std.AutoHashMap(aoc.Coord, Octopus);
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var octopuses = Octopuses.init(problem.allocator);
     defer octopuses.deinit();
-    var coord = aoc.Coord.init(.{0, 0});
+    var coord = aoc.Coord.init(.{ 0, 0 });
     for (problem.input) |c| {
         if (c == '\n') {
             coord.row += 1;
             coord.col = 0;
-        }
-        else {
+        } else {
             try octopuses.putNoClobber(coord, Octopus{ .Normal = c - '0' });
             coord.col += 1;
         }
@@ -59,8 +58,7 @@ fn tickOctopus(kv_opt: ?Octopuses.Entry, step: usize, octopuses: *const Octopuse
                 while (neighbors.next()) |neighbor| {
                     tickOctopus(octopuses.getEntry(neighbor), step, octopuses, flashes);
                 }
-            }
-            else {
+            } else {
                 power.* += 1;
             }
         },

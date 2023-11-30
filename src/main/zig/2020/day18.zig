@@ -10,7 +10,7 @@ const ShuntingYard = struct {
     output_stack: OutputStack,
 
     fn init(allocator: Allocator) ShuntingYard {
-        return ShuntingYard { 
+        return ShuntingYard{
             .operator_stack = OperatorStack.init(allocator),
             .output_stack = OutputStack.init(allocator),
         };
@@ -28,19 +28,16 @@ const ShuntingYard = struct {
             }
             if (token >= '0' and token <= '9') {
                 try self.output_stack.append(token - '0');
-            }
-            else if (token == '(') {
+            } else if (token == '(') {
                 try self.operator_stack.append(token);
-            }
-            else if (token == ')') {
+            } else if (token == ')') {
                 while (self.operator_stack.popOrNull()) |op| {
                     if (op == '(') {
                         break;
                     }
                     try self.processOp(op);
                 }
-            }
-            else {
+            } else {
                 while (self.operator_stack.popOrNull()) |op| {
                     if (op == '(' or (precedence and token == '+' and op == '*')) {
                         try self.operator_stack.append(op);
@@ -64,7 +61,7 @@ const ShuntingYard = struct {
         try self.output_stack.append(switch (op) {
             '+' => lhs + rhs,
             '*' => lhs * rhs,
-            else => unreachable
+            else => unreachable,
         });
     }
 };

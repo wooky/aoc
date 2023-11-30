@@ -2,8 +2,9 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Solution = struct {
-    all: i64 = 0, nonred: i64 = 0,
-    
+    all: i64 = 0,
+    nonred: i64 = 0,
+
     fn append(self: *Solution, other: Solution) void {
         self.all += other.all;
         self.nonred += other.nonred;
@@ -18,44 +19,44 @@ const Solution = struct {
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var json = std.json.Parser.init(problem.allocator, false);
+    var json = try std.json.parseFromSlice(std.json.Value, problem.allocator, problem.input, .{});
     defer json.deinit();
-    const solution = switch ((try json.parse(problem.input)).root) {
-        std.json.Value.Array => |arr| parse_array(arr),
+    const solution = switch (json.value) {
+        .array => |arr| parse_array(arr),
         else => unreachable,
     };
     return problem.solution(solution.all, solution.nonred);
 }
 
 fn parse_object(obj: std.json.ObjectMap) Solution {
-    var solution = Solution {};
+    var solution = Solution{};
     var red = false;
     var iter = obj.iterator();
     while (iter.next()) |kv| {
         solution.append(switch (kv.value_ptr.*) {
-            std.json.Value.Object => |o| parse_object(o),
-            std.json.Value.Array => |a| parse_array(a),
-            std.json.Value.Integer => |i| Solution { .all = i, .nonred = i },
-            std.json.Value.String => |s| blk: {
+            .object => |o| parse_object(o),
+            .array => |a| parse_array(a),
+            .integer => |i| Solution{ .all = i, .nonred = i },
+            .string => |s| blk: {
                 if (std.mem.eql(u8, s, "red")) {
                     red = true;
                 }
-                break :blk Solution {};
+                break :blk Solution{};
             },
-            else => Solution {},
+            else => Solution{},
         });
     }
     return solution.apply_red(red).*;
 }
 
 fn parse_array(arr: std.json.Array) Solution {
-    var solution = Solution {};
+    var solution = Solution{};
     for (arr.items) |item| {
         solution.append(switch (item) {
-            std.json.Value.Array => |a| parse_array(a),
-            std.json.Value.Object => |o| parse_object(o),
-            std.json.Value.Integer => |i| Solution { .all = i, .nonred = i },
-            else => Solution {},
+            .array => |a| parse_array(a),
+            .object => |o| parse_object(o),
+            .integer => |i| Solution{ .all = i, .nonred = i },
+            else => Solution{},
         });
     }
     return solution;

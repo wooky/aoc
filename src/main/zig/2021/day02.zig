@@ -13,12 +13,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         if (std.mem.eql(u8, command, "forward")) {
             hor += units;
             depth_aimed += aim * units;
-        }
-        else if (std.mem.eql(u8, command, "down")) {
+        } else if (std.mem.eql(u8, command, "down")) {
             depth_naive += units;
             aim += units;
-        }
-        else if (std.mem.eql(u8, command, "up")) {
+        } else if (std.mem.eql(u8, command, "up")) {
             depth_naive -= units;
             aim -= units;
         }
@@ -26,6 +24,6 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     return problem.solution(
         @as(u32, hor) * depth_naive,
-        @as(u32, hor) * @intCast(u32, depth_aimed),
+        @as(u32, hor) * @as(u32, @intCast(depth_aimed)),
     );
 }

@@ -29,9 +29,8 @@ const RawRules = struct {
         const raw_rule = colon.next().?;
         const rule = blk: {
             if (raw_rule[0] == '"') {
-                break :blk Rule { .Literal = raw_rule[1..2] };
-            }
-            else {
+                break :blk Rule{ .Literal = raw_rule[1..2] };
+            } else {
                 var goto = std.ArrayList([][]const u8).init(self.arena.allocator());
                 var pipe = std.mem.split(u8, raw_rule, " | ");
                 while (pipe.next()) |chunk| {
@@ -40,9 +39,9 @@ const RawRules = struct {
                     while (tokens.next()) |token| {
                         try indexes.append(token);
                     }
-                    try goto.append(indexes.toOwnedSlice());
+                    try goto.append(try indexes.toOwnedSlice());
                 }
-                break :blk Rule { .Goto = goto.toOwnedSlice() };
+                break :blk Rule{ .Goto = try goto.toOwnedSlice() };
             }
         };
         try self.unprocessed_rule_map.put(rule_idx, rule);
@@ -60,34 +59,22 @@ const RawRules = struct {
         switch (self.processed_rule_map.get(rule_idx).?) {
             .Literal => |l| return l,
             .Goto => |goto| {
-                var pattern = try std.fmt.allocPrint(
-                    self.arena.allocator(),
-                    "({s}",
-                    .{ try self.formMessageFromSingleRule(goto[0]) }
-                );
+                var pattern = try std.fmt.allocPrint(self.arena.allocator(), "({s}", .{try self.formMessageFromSingleRule(goto[0])});
                 for (goto[1..]) |rule| {
-                    pattern = try std.fmt.allocPrint(
-                        self.arena.allocator(),
-                        "{s}|{s}",
-                        .{ pattern, try self.formMessageFromSingleRule(rule) }
-                    );
+                    pattern = try std.fmt.allocPrint(self.arena.allocator(), "{s}|{s}", .{ pattern, try self.formMessageFromSingleRule(rule) });
                 }
                 pattern = try std.fmt.allocPrint(self.arena.allocator(), "{s})", .{pattern});
                 try self.processed_rule_map.put(rule_idx, .{ .Literal = pattern });
                 return pattern;
-            }
+            },
         }
     }
 
     fn formMessageFromSingleRule(self: *RawRules, rules: [][]const u8) anyerror![]const u8 {
-        var pattern: []const u8 = &[_]u8 {};
+        var pattern: []const u8 = &[_]u8{};
 
         for (rules) |rule| {
-            pattern = try std.fmt.allocPrint(
-                self.arena.allocator(),
-                "{s}{s}",
-                .{ pattern, try self.formMessage(rule) }
-            );
+            pattern = try std.fmt.allocPrint(self.arena.allocator(), "{s}{s}", .{ pattern, try self.formMessage(rule) });
         }
 
         return pattern;
@@ -95,7 +82,7 @@ const RawRules = struct {
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var raw_rules = RawRules {};
+    var raw_rules = RawRules{};
     raw_rules.init(problem.allocator);
     defer raw_rules.deinit();
 

@@ -3,24 +3,27 @@ const std = @import("std");
 const LINE_SIZE = 8;
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var lines = std.ArrayList([]const u8).init(problem.allocator);
-    defer lines.deinit();
-    while (problem.line()) |line| {
-        try lines.append(line);
-    }
+    // var lines = std.ArrayList([]const u8).init(problem.allocator);
+    // defer lines.deinit();
+    // while (problem.line()) |line| {
+    //     try lines.append(line);
+    // }
 
-    var loop: std.event.Loop = undefined;
-    try loop.init();
-    defer loop.deinit();
-    var most_common: [LINE_SIZE]u8 = undefined;
-    var least_common: [LINE_SIZE]u8 = undefined;
-    var idx: u8 = 0;
-    while (idx < LINE_SIZE) : (idx += 1) {
-        try loop.runDetached(problem.allocator, doCodes, .{problem.allocator, lines.items, &most_common, &least_common, idx});
-    }
-    loop.run();
+    // var loop: std.event.Loop = undefined;
+    // try loop.init();
+    // defer loop.deinit();
+    // var most_common: [LINE_SIZE]u8 = undefined;
+    // var least_common: [LINE_SIZE]u8 = undefined;
+    // var idx: u8 = 0;
+    // while (idx < LINE_SIZE) : (idx += 1) {
+    //     try loop.runDetached(problem.allocator, doCodes, .{ problem.allocator, lines.items, &most_common, &least_common, idx });
+    // }
+    // loop.run();
 
-    return problem.solution(&most_common, &least_common);
+    // return problem.solution(&most_common, &least_common);
+
+    // TODO https://github.com/wooky/aoc/issues/9
+    return problem.solution("TODO #9", "TODO #9");
 }
 
 // lmao multhreading is marginally faster
@@ -37,8 +40,7 @@ fn doCodes(allocator: std.mem.Allocator, lines: [][]const u8, most_common: []u8,
     while (iter.next()) |entry| {
         if (entry.value_ptr.* > most_common_entry.value_ptr.*) {
             most_common_entry = entry;
-        }
-        else if (entry.value_ptr.* < least_common_entry.value_ptr.*) {
+        } else if (entry.value_ptr.* < least_common_entry.value_ptr.*) {
             least_common_entry = entry;
         }
     }

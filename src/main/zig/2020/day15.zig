@@ -9,7 +9,7 @@ const MemoryGame = struct {
     last_spoken: usize = undefined,
 
     fn init(allocator: std.mem.Allocator) MemoryGame {
-        return MemoryGame { .numbers_turns = NumbersTurns.init(allocator) };
+        return MemoryGame{ .numbers_turns = NumbersTurns.init(allocator) };
     }
 
     fn deinit(self: *MemoryGame) void {
@@ -26,8 +26,7 @@ const MemoryGame = struct {
             if (self.numbers_turns.getEntry(self.last_spoken)) |kv| {
                 self.last_spoken = self.turn - 1 - kv.value_ptr.*;
                 kv.value_ptr.* = self.turn - 1;
-            }
-            else {
+            } else {
                 try self.numbers_turns.putNoClobber(self.last_spoken, self.turn - 1);
                 self.last_spoken = 0;
             }
@@ -45,8 +44,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try memory_game.append(try std.fmt.parseInt(usize, number, 10));
     }
 
-    return problem.solution(
-        try memory_game.fetchTargetNumber(2020),
-        try memory_game.fetchTargetNumber(30000000)
-    );
+    return problem.solution(try memory_game.fetchTargetNumber(2020), try memory_game.fetchTargetNumber(30000000));
 }

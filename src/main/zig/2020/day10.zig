@@ -8,7 +8,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     while (problem.line()) |line| {
         try joltages.append(try std.fmt.parseInt(Joltage, line, 10));
     }
-    std.sort.sort(Joltage, joltages.items, {}, comptime std.sort.asc(Joltage));
+    std.sort.insertion(Joltage, joltages.items, {}, comptime std.sort.asc(Joltage));
 
     const res1 = blk: {
         var last_joltage: Joltage = 0;
@@ -18,7 +18,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             switch (joltage - last_joltage) {
                 1 => diff1 += 1,
                 3 => diff3 += 1,
-                else => unreachable
+                else => unreachable,
             }
             last_joltage = joltage;
         }
@@ -31,7 +31,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try diversions.put(0, 1);
         for (joltages.items) |joltage| {
             var diversion_count: usize = 0;
-            var prev_joltage = std.math.max(joltage, 3) - 3;
+            var prev_joltage = @max(joltage, 3) - 3;
             while (prev_joltage < joltage) : (prev_joltage += 1) {
                 if (diversions.get(prev_joltage)) |prev_diversions| {
                     diversion_count += prev_diversions;
@@ -39,7 +39,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             }
             try diversions.put(joltage, diversion_count);
         }
-        break :blk diversions.get(joltages.items[joltages.items.len-1]).?;
+        break :blk diversions.get(joltages.items[joltages.items.len - 1]).?;
     };
 
     return problem.solution(res1, res2);

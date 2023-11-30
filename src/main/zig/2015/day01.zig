@@ -4,9 +4,9 @@ const std = @import("std");
 pub fn run(problem: *aoc.Problem) aoc.Solution {
     var floor: i16 = 0;
     var basement_idx: usize = 0;
-    for (problem.input) |c, idx| {
+    for (problem.input, 0..) |c, idx| {
         floor += switch (c) {
-            '(' => @intCast(i16, 1),
+            '(' => @as(i16, @intCast(1)),
             ')' => -1,
             else => unreachable,
         };

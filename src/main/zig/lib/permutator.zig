@@ -6,11 +6,14 @@ pub fn Permutator(comptime T: type) type {
         const Self = @This();
         const Elements = std.ArrayList(T);
 
-        elements: Elements, started: bool = undefined, completed: bool = undefined,
-        c: [32]usize = undefined, i: usize = undefined,
+        elements: Elements,
+        started: bool = undefined,
+        completed: bool = undefined,
+        c: [32]usize = undefined,
+        i: usize = undefined,
 
         pub fn init(allocator: Allocator) !Self {
-            var permutator = Self { .elements = Elements.init(allocator) };
+            var permutator = Self{ .elements = Elements.init(allocator) };
             permutator.reset();
             return permutator;
         }
@@ -47,16 +50,13 @@ pub fn Permutator(comptime T: type) type {
                 if (self.c[self.i] < self.i) {
                     if (self.i % 2 == 0) {
                         self.swap(0, self.i);
-                    }
-                    else {
+                    } else {
                         self.swap(self.c[self.i], self.i);
                     }
                     self.c[self.i] += 1;
                     self.i = 0;
                     return self.elements.items;
-                    
-                }
-                else {
+                } else {
                     self.c[self.i] = 0;
                     self.i += 1;
                 }

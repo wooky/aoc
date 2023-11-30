@@ -10,7 +10,7 @@ pub fn StringMultimap(comptime V: type) type {
         backing: BackingMap,
 
         pub fn init(allocator: Allocator) Self {
-            return Self { .backing = BackingMap.init(allocator) };
+            return Self{ .backing = BackingMap.init(allocator) };
         }
 
         pub fn deinit(self: *Self) void {
@@ -30,8 +30,7 @@ pub fn StringMultimap(comptime V: type) type {
             var opt_sublist = self.backing.getPtr(key);
             if (opt_sublist) |v| {
                 try v.append(value);
-            }
-            else {
+            } else {
                 var sublist = BackingSubList.init(self.backing.allocator);
                 try sublist.append(value);
                 _ = try self.backing.put(key, sublist);

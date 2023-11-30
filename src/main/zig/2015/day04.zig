@@ -8,16 +8,19 @@ const HashCounter = struct {
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var counter = HashCounter {};
-    var loop: std.event.Loop = undefined;
-    try loop.init();
-    defer loop.deinit();
-    for (loop.extra_threads) |_| {
-        try loop.runDetached(problem.allocator, doHash, .{problem.input, &counter});
-    }
-    loop.run();
+    // var counter = HashCounter{};
+    // var loop: std.event.Loop = undefined;
+    // try loop.init();
+    // defer loop.deinit();
+    // for (loop.extra_threads) |_| {
+    //     try loop.runDetached(problem.allocator, doHash, .{ problem.input, &counter });
+    // }
+    // loop.run();
 
-    return problem.solution(counter.count5.?, counter.count6.?);
+    // return problem.solution(counter.count5.?, counter.count6.?);
+
+    // TODO https://github.com/wooky/aoc/issues/9
+    return problem.solution("TODO #9", "TODO #9");
 }
 
 // not thread safe btw
@@ -26,13 +29,12 @@ fn doHash(input: []const u8, counter: *HashCounter) void {
     var hash: [std.crypto.hash.Md5.digest_length]u8 = undefined;
     while (counter.count6 == null) {
         const count = @atomicRmw(usize, &counter.count, .Add, 1, .SeqCst);
-        const hash_input = std.fmt.bufPrint(&buf, "{s}{d}", .{input, count}) catch unreachable;
+        const hash_input = std.fmt.bufPrint(&buf, "{s}{d}", .{ input, count }) catch unreachable;
         std.crypto.hash.Md5.hash(hash_input, &hash, .{});
         if (hash[0] == 0 and hash[1] == 0) {
             if (hash[2] == 0) {
                 counter.count6 = count;
-            }
-            else if (counter.count5 == null and hash[2] & 0xF0 == 0) {
+            } else if (counter.count5 == null and hash[2] & 0xF0 == 0) {
                 counter.count5 = count;
             }
         }

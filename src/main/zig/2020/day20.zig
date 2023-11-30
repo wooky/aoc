@@ -8,7 +8,7 @@ const TileMap = struct {
     tile_map: std.AutoHashMap(aoc.Coord, Tile),
 
     fn init(allocator: std.mem.Allocator) TileMap {
-        return TileMap {
+        return TileMap{
             .unprocessed_tiles = std.ArrayList(Tile).init(allocator),
             .queue = std.ArrayList(aoc.Coord).init(allocator),
             .tile_map = std.AutoHashMap(aoc.Coord, Tile).init(allocator),
@@ -57,7 +57,7 @@ const Tile = struct {
     matrix: aoc.SquareMatrix,
 
     fn fromGroup(group: []const u8) !Tile {
-        var tile = Tile {
+        var tile = Tile{
             .id = try std.fmt.parseInt(u16, group[5..9], 10),
             .matrix = aoc.SquareMatrix.init(VECTOR_SIZE),
         };
@@ -76,7 +76,7 @@ const Tile = struct {
                     coord.row += 1;
                     coord.col = 0;
                 },
-                else => unreachable
+                else => unreachable,
             }
         }
         return tile;
@@ -107,13 +107,13 @@ const Tile = struct {
     }
 
     fn topMatches(self: *const Tile, other: *const Tile) bool {
-        const other_bottom = other.matrix.submatrix(aoc.Coord.init(.{VECTOR_SIZE - 1, 0}), aoc.Coord.init(.{1, VECTOR_SIZE}));
-        return self.matrix.submatrix(aoc.PredefinedCoord.ORIGIN, aoc.Coord.init(.{1, VECTOR_SIZE})).equals(&other_bottom);
+        const other_bottom = other.matrix.submatrix(aoc.Coord.init(.{ VECTOR_SIZE - 1, 0 }), aoc.Coord.init(.{ 1, VECTOR_SIZE }));
+        return self.matrix.submatrix(aoc.PredefinedCoord.ORIGIN, aoc.Coord.init(.{ 1, VECTOR_SIZE })).equals(&other_bottom);
     }
 
     fn leftMatches(self: *const Tile, other: *const Tile) bool {
-        const other_right = other.matrix.submatrix(aoc.Coord.init(.{0, VECTOR_SIZE - 1}), aoc.Coord.init(.{VECTOR_SIZE, 1}));
-        return self.matrix.submatrix(aoc.PredefinedCoord.ORIGIN, aoc.Coord.init(.{VECTOR_SIZE, 1})).equals(&other_right);
+        const other_right = other.matrix.submatrix(aoc.Coord.init(.{ 0, VECTOR_SIZE - 1 }), aoc.Coord.init(.{ VECTOR_SIZE, 1 }));
+        return self.matrix.submatrix(aoc.PredefinedCoord.ORIGIN, aoc.Coord.init(.{ VECTOR_SIZE, 1 })).equals(&other_right);
     }
 };
 
@@ -121,24 +121,24 @@ const Image = struct {
     const TILES_SIZE: usize = 12;
     const BORDERLESS_TILE_SIZE: usize = Tile.VECTOR_SIZE - 2;
     const ROW_BITS = TILES_SIZE * BORDERLESS_TILE_SIZE;
-    const MONSTER_COORDS = [_]aoc.Coord {
-        aoc.Coord.init(.{0, 18}),
-        aoc.Coord.init(.{1, 0}),
-        aoc.Coord.init(.{1, 5}),
-        aoc.Coord.init(.{1, 6}),
-        aoc.Coord.init(.{1, 11}),
-        aoc.Coord.init(.{1, 12}),
-        aoc.Coord.init(.{1, 17}),
-        aoc.Coord.init(.{1, 18}),
-        aoc.Coord.init(.{1, 19}),
-        aoc.Coord.init(.{2, 1}),
-        aoc.Coord.init(.{2, 4}),
-        aoc.Coord.init(.{2, 7}),
-        aoc.Coord.init(.{2, 10}),
-        aoc.Coord.init(.{2, 13}),
-        aoc.Coord.init(.{2, 16}),
+    const MONSTER_COORDS = [_]aoc.Coord{
+        aoc.Coord.init(.{ 0, 18 }),
+        aoc.Coord.init(.{ 1, 0 }),
+        aoc.Coord.init(.{ 1, 5 }),
+        aoc.Coord.init(.{ 1, 6 }),
+        aoc.Coord.init(.{ 1, 11 }),
+        aoc.Coord.init(.{ 1, 12 }),
+        aoc.Coord.init(.{ 1, 17 }),
+        aoc.Coord.init(.{ 1, 18 }),
+        aoc.Coord.init(.{ 1, 19 }),
+        aoc.Coord.init(.{ 2, 1 }),
+        aoc.Coord.init(.{ 2, 4 }),
+        aoc.Coord.init(.{ 2, 7 }),
+        aoc.Coord.init(.{ 2, 10 }),
+        aoc.Coord.init(.{ 2, 13 }),
+        aoc.Coord.init(.{ 2, 16 }),
     };
-    const MONSTER_LIMIT = aoc.Coord.init(.{3, 20});
+    const MONSTER_LIMIT = aoc.Coord.init(.{ 3, 20 });
 
     matrix: aoc.SquareMatrix,
     roughness: usize,
@@ -151,12 +151,9 @@ const Image = struct {
         while (tilemap_iter.next()) |tilemap_coord| {
             const image_superoffset = tilemap_coord.subtract(tilemap.range.first);
             const tile = tilemap.tile_map.get(tilemap_coord).?;
-            var pixel_iter = aoc.CoordRangeIterator.init(
-                aoc.PredefinedCoord.ORIGIN,
-                aoc.Coord.init(.{BORDERLESS_TILE_SIZE - 1, BORDERLESS_TILE_SIZE - 1})
-            );
+            var pixel_iter = aoc.CoordRangeIterator.init(aoc.PredefinedCoord.ORIGIN, aoc.Coord.init(.{ BORDERLESS_TILE_SIZE - 1, BORDERLESS_TILE_SIZE - 1 }));
             while (pixel_iter.next()) |pixel_coord| {
-                if (tile.matrix.get(pixel_coord.add(aoc.Coord.init(.{1, 1}))) == 1) {
+                if (tile.matrix.get(pixel_coord.add(aoc.Coord.init(.{ 1, 1 }))) == 1) {
                     roughness += 1;
                     matrix.set(pixel_coord.add(image_superoffset.multiply(BORDERLESS_TILE_SIZE)), 1);
                 }
@@ -177,10 +174,7 @@ const Image = struct {
         var iter = self.transformation_iterator();
         while (iter.next()) {
             var monsters: usize = 0;
-            var range_iter = aoc.CoordRangeIterator.init(
-                aoc.PredefinedCoord.ORIGIN,
-                aoc.Coord.init(.{ROW_BITS - MONSTER_LIMIT.row - 1, ROW_BITS - MONSTER_LIMIT.col - 1})
-            );
+            var range_iter = aoc.CoordRangeIterator.init(aoc.PredefinedCoord.ORIGIN, aoc.Coord.init(.{ ROW_BITS - MONSTER_LIMIT.row - 1, ROW_BITS - MONSTER_LIMIT.col - 1 }));
             outer: while (range_iter.next()) |coord| {
                 for (MONSTER_COORDS) |monster_coord| {
                     if (self.matrix.get(coord.add(monster_coord)) != 1) {
@@ -225,9 +219,9 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     try tile_map.process();
     const res1 =
-        @intCast(usize, tile_map.tile_map.get(tile_map.range.first).?.id) * 
-        tile_map.tile_map.get(aoc.Coord.init(.{tile_map.range.first.row, tile_map.range.last.col})).?.id *
-        tile_map.tile_map.get(aoc.Coord.init(.{tile_map.range.last.row, tile_map.range.first.col})).?.id *
+        @as(usize, @intCast(tile_map.tile_map.get(tile_map.range.first).?.id)) *
+        tile_map.tile_map.get(aoc.Coord.init(.{ tile_map.range.first.row, tile_map.range.last.col })).?.id *
+        tile_map.tile_map.get(aoc.Coord.init(.{ tile_map.range.last.row, tile_map.range.first.col })).?.id *
         tile_map.tile_map.get(tile_map.range.last).?.id;
 
     var image = Image.fromTileMap(&tile_map);

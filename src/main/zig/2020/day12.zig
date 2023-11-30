@@ -7,13 +7,13 @@ const Ship = struct {
         value: isize,
     };
 
-    ship_coord: aoc.Coord2D = aoc.Coord2D.init(.{0, 0}),
+    ship_coord: aoc.Coord2D = aoc.Coord2D.init(.{ 0, 0 }),
     waypoint_coord: aoc.Coord2D,
     target_ship: bool,
 
     fn init(waypoint_x: isize, waypoint_y: isize, target_ship: bool) Ship {
-        return Ship {
-            .waypoint_coord = aoc.Coord2D.init(.{waypoint_x, waypoint_y}),
+        return Ship{
+            .waypoint_coord = aoc.Coord2D.init(.{ waypoint_x, waypoint_y }),
             .target_ship = target_ship,
         };
     }
@@ -28,14 +28,14 @@ const Ship = struct {
             'L' => self.rotateWaypoint(instruction.value, aoc.Coord2D.mutRotate90DegreesCounterclockwise),
             'R' => self.rotateWaypoint(instruction.value, aoc.Coord2D.mutRotate90DegreesClockwise),
             'F' => self.ship_coord.mutAdd(self.waypoint_coord.multiply(instruction.value)),
-            else => unreachable
+            else => unreachable,
         }
     }
 
     fn rotateWaypoint(self: *Ship, degrees: isize, call: anytype) void {
         var i: usize = 0;
-        while (i < @intCast(usize, degrees) / 90) : (i += 1) {
-            @call(.{}, call, .{&self.waypoint_coord});
+        while (i < @as(usize, @intCast(degrees)) / 90) : (i += 1) {
+            @call(.auto, call, .{&self.waypoint_coord});
         }
     }
 
@@ -44,7 +44,7 @@ const Ship = struct {
     }
 
     fn parseInstruction(line: []const u8) !Instruction {
-        return Instruction {
+        return Instruction{
             .action = line[0],
             .value = try std.fmt.parseInt(isize, line[1..], 10),
         };

@@ -12,7 +12,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         while (true) {
             const diagnostic = (try intcode.run(&state)).?;
             if (diagnostic != 0) {
-                break :blk @intCast(usize, diagnostic);
+                break :blk @as(usize, @intCast(diagnostic));
             }
         }
     };
@@ -21,7 +21,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var state = intcode.newState();
         defer state.deinit();
         try state.inputs.append(5);
-        break :blk @intCast(usize, (try intcode.run(&state)).?);
+        break :blk @as(usize, @intCast((try intcode.run(&state)).?));
     };
 
     return problem.solution(res1, res2);

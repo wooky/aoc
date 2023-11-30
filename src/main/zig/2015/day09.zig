@@ -26,11 +26,11 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer permutator.deinit();
     while (permutator.next()) |locations| {
         var dist: u16 = 0;
-        for (locations[1..]) |_, idx| {
+        for (locations[1..], 0..) |_, idx| {
             dist += paths.get(locations[idx], locations[idx + 1]).?;
         }
-        min_dist = std.math.min(min_dist, dist);
-        max_dist = std.math.max(max_dist, dist);
+        min_dist = @min(min_dist, dist);
+        max_dist = @max(max_dist, dist);
     }
     return problem.solution(min_dist, max_dist);
 }

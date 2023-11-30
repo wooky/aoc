@@ -1,7 +1,9 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
-fn ActiveSpots(comptime C: type) type { return std.AutoHashMap(C, void); }
+fn ActiveSpots(comptime C: type) type {
+    return std.AutoHashMap(C, void);
+}
 
 pub fn Conway(comptime C: type) type {
     return struct {
@@ -31,7 +33,7 @@ pub fn Conway(comptime C: type) type {
 
 pub fn ConwayIterator(comptime C: type) type {
     return struct {
-        const Stage = union (enum) {
+        const Stage = union(enum) {
             not_started: void,
             iterate_active: ActiveSpots(C).KeyIterator,
             iterate_inactive: ActiveSpots(C).KeyIterator,
@@ -91,8 +93,7 @@ pub fn ConwayIterator(comptime C: type) type {
         pub fn setActive(self: *Self, active: bool) !void {
             if (active) {
                 try self.next_active_spots.put(self.coord, {});
-            }
-            else if (self.stage == .iterate_inactive) {
+            } else if (self.stage == .iterate_inactive) {
                 try self.inactive_spots.put(self.coord, {});
             }
         }
@@ -105,8 +106,7 @@ pub fn ConwayIterator(comptime C: type) type {
             while (neighbors.next()) |neighbor| {
                 if (self.prev_active_spots.contains(neighbor)) {
                     self.active_neighbors += 1;
-                }
-                else {
+                } else {
                     try self.inactive_spots.put(neighbor, {});
                 }
             }

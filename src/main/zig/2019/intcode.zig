@@ -12,7 +12,7 @@ pub const State = struct {
     relative_base_offset: TapeElement = 0,
 
     fn init(allocator: Allocator) State {
-        return State { .memory = Memory.init(allocator), .inputs = Inputs.init(allocator) };
+        return State{ .memory = Memory.init(allocator), .inputs = Inputs.init(allocator) };
     }
 
     pub fn deinit(self: *State) void {
@@ -31,7 +31,7 @@ allocator: Allocator,
 tape: Tape,
 
 pub fn init(allocator: std.mem.Allocator, code: []const u8) !Self {
-    var intcode = Self { .allocator = allocator, .tape = Tape.init(allocator) };
+    var intcode = Self{ .allocator = allocator, .tape = Tape.init(allocator) };
     var tokens = std.mem.tokenize(u8, code, ",\n");
     while (tokens.next()) |token| {
         try intcode.tape.append(try std.fmt.parseInt(TapeElement, token, 10));
@@ -49,7 +49,7 @@ pub fn newState(self: *const Self) State {
 
 pub fn run(self: *const Self, state: *State) !?TapeElement {
     while (true) {
-        const op = @intCast(Opcode, self.getMemory(state, state.idx));
+        const op = @as(Opcode, @intCast(self.getMemory(state, state.idx)));
         const output = try switch (op % 100) {
             1 => self.math(state, op, std.math.add),
             2 => self.math(state, op, std.math.mul),
@@ -61,7 +61,7 @@ pub fn run(self: *const Self, state: *State) !?TapeElement {
             8 => self.cmp(state, op, std.math.CompareOperator.eq),
             9 => self.adj_relative_base(state, op),
             99 => return null,
-            else => unreachable
+            else => unreachable,
         };
         if (output) |o| {
             return o;
@@ -69,7 +69,7 @@ pub fn run(self: *const Self, state: *State) !?TapeElement {
     }
 }
 
-fn math(self: *const Self, state: *State, opcode: Opcode, comptime alu_op: fn(comptime type, anytype, anytype)TapeElement) !?TapeElement {
+fn math(self: *const Self, state: *State, opcode: Opcode, comptime alu_op: fn (comptime type, anytype, anytype) TapeElement) !?TapeElement {
     const p1 = self.getMemoryByOpcode(state, state.idx + 1, opcode / 100);
     const p2 = self.getMemoryByOpcode(state, state.idx + 2, opcode / 1000);
     const res = try alu_op(TapeElement, p1, p2);
@@ -97,9 +97,8 @@ fn outputFromMemory(self: *const Self, state: *State, opcode: Opcode) !?TapeElem
 fn jump(self: *const Self, state: *State, opcode: Opcode, nonzero: bool) !?TapeElement {
     const param = self.getMemoryByOpcode(state, state.idx + 1, opcode / 100);
     if ((param != 0) == nonzero) {
-        state.idx = @intCast(TapeIndex, self.getMemoryByOpcode(state, state.idx + 2, opcode / 1000));
-    }
-    else {
+        state.idx = @as(TapeIndex, @intCast(self.getMemoryByOpcode(state, state.idx + 2, opcode / 1000)));
+    } else {
         state.idx += 3;
     }
     return null;
@@ -129,17 +128,17 @@ pub fn getMemory(self: *const Self, state: *const State, idx: TapeIndex) TapeEle
 
 fn getMemoryByOpcode(self: *const Self, state: *const State, idx: TapeIndex, opcode: Opcode) TapeElement {
     return switch (opcode % 10) {
-        0 => self.getMemory(state, @intCast(TapeIndex, self.getMemory(state, idx))),
+        0 => self.getMemory(state, @as(TapeIndex, @intCast(self.getMemory(state, idx)))),
         1 => self.getMemory(state, idx),
-        2 => self.getMemory(state, @intCast(TapeIndex, self.getMemory(state, idx) + state.relative_base_offset)),
-        else => unreachable
+        2 => self.getMemory(state, @as(TapeIndex, @intCast(self.getMemory(state, idx) + state.relative_base_offset))),
+        else => unreachable,
     };
 }
 
 fn getDestByOpcode(self: *const Self, state: *const State, idx: TapeIndex, opcode: Opcode) TapeIndex {
-    return @intCast(TapeIndex, switch (opcode % 10) {
+    return @as(TapeIndex, @intCast(switch (opcode % 10) {
         0 => self.getMemory(state, idx),
         2 => self.getMemory(state, idx) + state.relative_base_offset,
-        else => unreachable
-    });
+        else => unreachable,
+    }));
 }

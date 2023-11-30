@@ -18,7 +18,7 @@ const Player = struct {
         while (tokenizer.next()) |card| {
             try deck.append(try std.fmt.parseInt(u8, card, 10));
         }
-        return Player { .deck = deck, .player2 = player2 };
+        return Player{ .deck = deck, .player2 = player2 };
     }
 
     fn deinit(self: *Player) void {
@@ -36,7 +36,7 @@ const Player = struct {
 
     fn score(self: *const Player) usize {
         var winning_score: usize = 0;
-        for (self.deck.items) |card, idx| {
+        for (self.deck.items, 0..) |card, idx| {
             winning_score += card * (self.deck.items.len - idx);
         }
         return winning_score;
@@ -45,7 +45,7 @@ const Player = struct {
     fn copy(self: *const Player) !Player {
         var deck = Deck.init(self.deck.allocator);
         try deck.appendSlice(self.deck.items);
-        return Player { .deck = deck, .player2 = self.player2 };
+        return Player{ .deck = deck, .player2 = self.player2 };
     }
 };
 
@@ -54,7 +54,7 @@ const Combat = struct {
     player2: Player,
 
     fn init(player1: *const Player, player2: *const Player) !Combat {
-        return Combat { .player1 = try player1.copy(), .player2 = try player2.copy() };
+        return Combat{ .player1 = try player1.copy(), .player2 = try player2.copy() };
     }
 
     fn deinit(self: *Combat) void {
@@ -63,7 +63,7 @@ const Combat = struct {
     }
 
     fn play(self: *Combat) !*const Player {
-        while(true) {
+        while (true) {
             if (self.checkEmptyDeck()) |winner| {
                 return winner;
             }
@@ -87,8 +87,7 @@ const Combat = struct {
     fn checkLargestCard(self: *Combat) !void {
         if (self.player1.last_card > self.player2.last_card) {
             try self.player1.stealCard(&self.player2);
-        }
-        else {
+        } else {
             try self.player2.stealCard(&self.player1);
         }
     }
@@ -103,7 +102,7 @@ const RecursiveCombat = struct {
     cards_seen: CardsSeen,
 
     fn init(allocator: Allocator, player1: *const Player, player2: *const Player) !RecursiveCombat {
-        return RecursiveCombat {
+        return RecursiveCombat{
             .arena = ArenaAllocator.init(allocator),
             .combat = try Combat.init(player1, player2),
             .cards_seen = CardsSeen.init(allocator),
@@ -144,13 +143,11 @@ const RecursiveCombat = struct {
                 subgame.combat.player2.deck.shrinkRetainingCapacity(self.combat.player2.last_card);
                 if ((try subgame.play()).player2) {
                     try self.combat.player2.stealCard(&self.combat.player1);
-                }
-                else {
+                } else {
                     try self.combat.player1.stealCard(&self.combat.player2);
                 }
                 // std.debug.print("<<<\n", .{});
-            }
-            else {
+            } else {
                 try self.combat.checkLargestCard();
             }
         }

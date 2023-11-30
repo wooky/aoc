@@ -5,13 +5,13 @@ const Instruction = [3][]const u8;
 
 const Computer = struct {
     const Registers = std.StringHashMap(usize);
-    const Instructions = std.StringHashMap(fn(*Computer, Instruction)std.fmt.ParseIntError!isize);
+    const Instructions = std.StringHashMap(*const fn (*Computer, Instruction) std.fmt.ParseIntError!isize);
 
     registers: Registers,
     instructions: Instructions,
 
     fn init(allocator: std.mem.Allocator) !Computer {
-        var computer = Computer { .registers = Registers.init(allocator), .instructions = Instructions.init(allocator) };
+        var computer = Computer{ .registers = Registers.init(allocator), .instructions = Instructions.init(allocator) };
 
         try computer.instructions.putNoClobber("hlf", hlf);
         try computer.instructions.putNoClobber("tpl", tpl);
@@ -34,7 +34,7 @@ const Computer = struct {
 
         var pc: isize = 0;
         while (pc >= 0 and pc < instructions.len) {
-            const instruction = instructions[@intCast(usize, pc)];
+            const instruction = instructions[@as(usize, @intCast(pc))];
             const callback = self.instructions.get(instruction[0]).?;
             pc += try callback(self, instruction);
         }
@@ -92,8 +92,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try instructions.append(instruction);
     }
 
-    return problem.solution(
-        try computer.execute(instructions.items, 0),
-        try computer.execute(instructions.items, 1)
-    );
+    return problem.solution(try computer.execute(instructions.items, 0), try computer.execute(instructions.items, 1));
 }

@@ -14,7 +14,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         switch (direction) {
             'L' => delta.mutRotate90DegreesCounterclockwise(),
             'R' => delta.mutRotate90DegreesClockwise(),
-            else => unreachable
+            else => unreachable,
         }
 
         var step_pos = curr_pos;
@@ -28,8 +28,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
     }
 
-    return problem.solution(
-        curr_pos.distanceFromOrigin(),
-        already_visited.?.distanceFromOrigin()
-    );
+    return problem.solution(curr_pos.distanceFromOrigin(), already_visited.?.distanceFromOrigin());
 }

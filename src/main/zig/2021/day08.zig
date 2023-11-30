@@ -6,8 +6,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var sum: usize = 0;
 
     while (problem.line()) |line| {
-        var unprocessed_digits = [_]u7 {0} ** 6;
-        var definite_digits = [_]u7 {0} ** 10;
+        var unprocessed_digits = [_]u7{0} ** 6;
+        var definite_digits = [_]u7{0} ** 10;
         var tokens = std.mem.tokenize(u8, line, " ");
 
         var unprocessed_digits_idx: u8 = 0;
@@ -24,7 +24,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 else => {
                     unprocessed_digits[unprocessed_digits_idx] = bitmask;
                     unprocessed_digits_idx += 1;
-                }
+                },
             }
         }
 
@@ -40,11 +40,9 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                     if (@popCount(dig) == 5) {
                         if (dig & definite_digits[9] != dig) {
                             definite_digits[2] = dig;
-                        }
-                        else if (dig & definite_digits[1] == definite_digits[1]) {
+                        } else if (dig & definite_digits[1] == definite_digits[1]) {
                             definite_digits[3] = dig;
-                        }
-                        else {
+                        } else {
                             definite_digits[5] = dig;
                         }
                         unprocessed_digits[unprocessed_digits_idx] = 0;
@@ -53,15 +51,13 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                     if (definite_digits[5] != 0) {
                         if (dig & definite_digits[5] == definite_digits[5]) {
                             definite_digits[6] = dig;
-                        }
-                        else {
+                        } else {
                             definite_digits[0] = dig;
                         }
                         unprocessed_digits[unprocessed_digits_idx] = 0;
                         continue :blk;
                     }
-                }
-                else {
+                } else {
                     const four_seven = definite_digits[4] | definite_digits[7];
                     if (four_seven & dig == four_seven) {
                         definite_digits[9] = dig;
@@ -77,7 +73,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         while (tokens.next()) |token| {
             const bitmask = segmentToBitmask(token);
             const n = blk: {
-                for (definite_digits) |dd, idx| {
+                for (definite_digits, 0..) |dd, idx| {
                     if (bitmask == dd) {
                         break :blk idx;
                     }
@@ -88,7 +84,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
             switch (token.len) {
                 2, 3, 4, 7 => easy_digs += 1,
-                else => {}
+                else => {},
             }
         }
         sum += output;
@@ -100,7 +96,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 fn segmentToBitmask(segment: []const u8) u7 {
     var bitmask: u7 = 0;
     for (segment) |s| {
-        bitmask |= @intCast(u7, 1) << @intCast(u3, s - 'a');
+        bitmask |= @as(u7, @intCast(1)) << @as(u3, @intCast(s - 'a'));
     }
     return bitmask;
 }

@@ -7,7 +7,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     var map = Map.init(problem.allocator);
     defer map.deinit();
-    var last_coord = aoc.Coord.init(.{0, 0});
+    var last_coord = aoc.Coord.init(.{ 0, 0 });
     while (problem.line()) |line| {
         last_coord.col = 0;
         for (line) |c| {
@@ -21,14 +21,16 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     var two_iters: usize = undefined;
     const fifty_iters = blk: {
-        var first_coord = aoc.Coord.init(.{-1, -1});
+        var first_coord = aoc.Coord.init(.{ -1, -1 });
         var out_of_bounds_pixel: u1 = 0;
         var iterations: u8 = 0;
         while (iterations < 50) : ({
             iterations += 1;
-            first_coord.row -= 1; first_coord.col -= 1;
-            last_coord.row += 1; last_coord.col += 1;
-            out_of_bounds_pixel ^= @boolToInt(image_enhancement_algorithm[0] == '#');
+            first_coord.row -= 1;
+            first_coord.col -= 1;
+            last_coord.row += 1;
+            last_coord.col += 1;
+            out_of_bounds_pixel ^= @intFromBool(image_enhancement_algorithm[0] == '#');
         }) {
             if (iterations == 2) {
                 two_iters = map.count();
@@ -42,12 +44,11 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 while (neighbors.next()) |neighbor| {
                     const pixel =
                         if (map.contains(neighbor))
-                            1
-                        else if (neighbor.row <= first_coord.row or neighbor.col <= first_coord.col or neighbor.row >= last_coord.row or neighbor.col >= last_coord.col)
-                            out_of_bounds_pixel
-                        else
-                            0
-                        ;
+                        1
+                    else if (neighbor.row <= first_coord.row or neighbor.col <= first_coord.col or neighbor.row >= last_coord.row or neighbor.col >= last_coord.col)
+                        out_of_bounds_pixel
+                    else
+                        0;
                     iea_idx = (iea_idx << 1) | pixel;
                 }
                 if (image_enhancement_algorithm[iea_idx] == '#') {

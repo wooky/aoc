@@ -19,7 +19,7 @@ const Combinator = struct {
     max_bitmask: usize = undefined,
 
     pub fn init(allocator: Allocator, elements: Elements) Combinator {
-        return Combinator {
+        return Combinator{
             .elements = elements,
             .unprocessed_buf = ResultBuf.init(allocator),
         };
@@ -31,8 +31,8 @@ const Combinator = struct {
 
     pub fn reset_with_combinations(self: *Combinator, r: u6) void {
         self.r = r;
-        self.last_bitmask = (@intCast(usize, 1) << r) - 1;
-        self.max_bitmask = self.last_bitmask << (@intCast(u6, self.elements.len) - r);
+        self.last_bitmask = (@as(usize, @intCast(1)) << r) - 1;
+        self.max_bitmask = self.last_bitmask << (@as(u6, @intCast(self.elements.len)) - r);
     }
 
     pub fn next(self: *Combinator) !?CombinationResult {
@@ -41,14 +41,13 @@ const Combinator = struct {
             self.last_bitmask += 1;
             if (@popCount(bitmask) == self.r) {
                 self.unprocessed_buf.items.len = 0;
-                var result = CombinationResult {};
+                var result = CombinationResult{};
                 var idx: usize = 0;
                 while (idx < self.elements.len) : (idx += 1) {
                     const element = self.elements[idx];
-                    if ((@intCast(usize, 1) << @intCast(u6, idx)) & bitmask == 0) {
+                    if ((@as(usize, @intCast(1)) << @as(u6, @intCast(idx))) & bitmask == 0) {
                         try self.unprocessed_buf.append(element);
-                    }
-                    else {
+                    } else {
                         result.sum += element;
                         result.product *= element;
                     }
@@ -69,7 +68,7 @@ const QuantumEntanglement = struct {
     total_weight: usize = 0,
 
     fn init(allocator: Allocator) QuantumEntanglement {
-        return QuantumEntanglement { .allocator = allocator, .weights = Weights.init(allocator) };
+        return QuantumEntanglement{ .allocator = allocator, .weights = Weights.init(allocator) };
     }
 
     fn deinit(self: *QuantumEntanglement) void {
@@ -92,7 +91,8 @@ const QuantumEntanglement = struct {
             combinator.reset_with_combinations(r);
             while (try combinator.next()) |result| {
                 if (result.sum == target_weight and result.product < min_qe and
-                        try self.isValidGroup(result.unprocessed, groups - 1, r, target_weight)) {
+                    try self.isValidGroup(result.unprocessed, groups - 1, r, target_weight))
+                {
                     min_qe = result.product;
                 }
             }

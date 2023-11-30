@@ -10,10 +10,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try numbers.append(try std.fmt.parseInt(u16, line, 10));
     }
 
-    return problem.solution(
-        mult(numbers.items, 0, 1, 1).?,
-        mult(numbers.items, 0, 1, 2).?
-    );
+    return problem.solution(mult(numbers.items, 0, 1, 1).?, mult(numbers.items, 0, 1, 2).?);
 }
 
 fn mult(numbers: []const u16, sum: u16, prod: usize, cnt: u8) ?usize {
@@ -31,8 +28,7 @@ fn mult(numbers: []const u16, sum: u16, prod: usize, cnt: u8) ?usize {
             if (curr_sum == TARGET) {
                 return curr_prod;
             }
-        }
-        else if (mult(numbers[cnt+1..], curr_sum, curr_prod, cnt - 1)) |res| {
+        } else if (mult(numbers[cnt + 1 ..], curr_sum, curr_prod, cnt - 1)) |res| {
             return res;
         }
     }

@@ -19,8 +19,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         if (row == 1) {
             row = col + 1;
             col = 1;
-        }
-        else {
+        } else {
             row -= 1;
             col += 1;
         }

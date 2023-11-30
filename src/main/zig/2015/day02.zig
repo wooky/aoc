@@ -13,9 +13,9 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         const area1 = dim1 * dim2;
         const area2 = dim1 * dim3;
         const area3 = dim2 * dim3;
-        
-        const slack = std.math.min(std.math.min(area1, area2), area3);
-        const present_wrap = 2 * (dim1 + dim2 + dim3 - std.math.max(std.math.max(dim1, dim2), dim3));
+
+        const slack = @min(@min(area1, area2), area3);
+        const present_wrap = 2 * (dim1 + dim2 + dim3 - @max(@max(dim1, dim2), dim3));
         const bow = dim1 * dim2 * dim3;
 
         wrapping_paper += 2 * (area1 + area2 + area3) + slack;

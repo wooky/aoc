@@ -10,7 +10,7 @@ pub fn StringTable(comptime V: type) type {
         backing: StringBackingMap,
 
         pub fn init(allocator: Allocator) Self {
-            return Self { .backing = StringBackingMap.init(allocator) };
+            return Self{ .backing = StringBackingMap.init(allocator) };
         }
 
         pub fn get(self: Self, k1: []const u8, k2: []const u8) ?V {
@@ -18,12 +18,11 @@ pub fn StringTable(comptime V: type) type {
             return sub.get(k2);
         }
 
-        pub fn put(self: *Self, k1: []const u8, k2: [] const u8, v: V) !void {
+        pub fn put(self: *Self, k1: []const u8, k2: []const u8, v: V) !void {
             var opt_submap = self.backing.getPtr(k1);
             if (opt_submap) |submap| {
                 _ = try submap.put(k2, v);
-            }
-            else {
+            } else {
                 var submap = StringBackingSubmap.init(self.backing.allocator);
                 _ = try submap.put(k2, v);
                 _ = try self.backing.put(k1, submap);

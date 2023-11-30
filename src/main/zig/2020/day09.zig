@@ -13,8 +13,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         idx = 0;
         outer: while (true) : (idx += 1) {
             const last_number = try std.fmt.parseInt(usize, problem.line().?, 10);
-            for (numbers.items[idx..numbers.items.len-1]) |a, i| {
-                for (numbers.items[idx+i+1..]) |b| {
+            for (numbers.items[idx .. numbers.items.len - 1], 0..) |a, i| {
+                for (numbers.items[idx + i + 1 ..]) |b| {
                     if (a + b == last_number) {
                         try numbers.append(last_number);
                         continue :outer;
@@ -27,9 +27,9 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     const res2 = blk: {
         const range = blk2: {
-            outer: for (numbers.items[0..numbers.items.len-1]) |a, i| {
+            outer: for (numbers.items[0 .. numbers.items.len - 1], 0..) |a, i| {
                 var sum = a;
-                for (numbers.items[i+1..]) |b, j| {
+                for (numbers.items[i + 1 ..], 0..) |b, j| {
                     sum += b;
                     if (sum > res1) {
                         continue :outer;
@@ -43,7 +43,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         };
 
         const subarray = numbers.items[range.from..range.to];
-        std.sort.sort(usize, subarray, {}, comptime std.sort.asc(usize));
+        std.sort.insertion(usize, subarray, {}, comptime std.sort.asc(usize));
         break :blk subarray[0] + subarray[subarray.len - 1];
     };
 

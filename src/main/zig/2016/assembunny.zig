@@ -10,8 +10,7 @@ const Operand = union(enum) {
         return if (str[0] <= '9')
             Operand{ .Immediate = try std.fmt.parseInt(i8, str, 10) }
         else
-            Operand{ .Register = convertRegister(str) }
-        ;
+            Operand{ .Register = convertRegister(str) };
     }
 
     fn fetch(self: Operand, registers: []isize) isize {
@@ -22,9 +21,7 @@ const Operand = union(enum) {
     }
 };
 
-const DualArgument = struct {
-    op1: Operand, op2: Operand
-};
+const DualArgument = struct { op1: Operand, op2: Operand };
 
 const Instruction = union(enum) {
     Copy: DualArgument,
@@ -51,25 +48,25 @@ pub fn deinit(self: *Assembunny) void {
 }
 
 pub fn reset(self: *Assembunny) *Assembunny {
-    self.registers = [_]isize {0} ** 4;
+    self.registers = [_]isize{0} ** 4;
     return self;
 }
 
 pub fn feed(self: *Assembunny, line: []const u8) !void {
     var tokens = std.mem.tokenize(u8, line, " ");
-        const opcode = tokens.next().?;
-        const x = tokens.next().?;
-        const y = tokens.next();
+    const opcode = tokens.next().?;
+    const x = tokens.next().?;
+    const y = tokens.next();
 
-        const instruction = switch (opcode[0]) {
-            'c' => Instruction{ .Copy = .{ .op1 = try Operand.detect(x), .op2 = try Operand.detect(y.?) } },
-            'i' => Instruction{ .Increment = try Operand.detect(x) },
-            'd' => Instruction{ .Decrement = try Operand.detect(x) },
-            'j' => Instruction{ .JumpNotZero = .{ .op1 = try Operand.detect(x), .op2 = try Operand.detect(y.?) } },
-            't' => Instruction{ .Toggle = try Operand.detect(x) },
-            else => unreachable
-        };
-        try self.instructions.append(instruction);
+    const instruction = switch (opcode[0]) {
+        'c' => Instruction{ .Copy = .{ .op1 = try Operand.detect(x), .op2 = try Operand.detect(y.?) } },
+        'i' => Instruction{ .Increment = try Operand.detect(x) },
+        'd' => Instruction{ .Decrement = try Operand.detect(x) },
+        'j' => Instruction{ .JumpNotZero = .{ .op1 = try Operand.detect(x), .op2 = try Operand.detect(y.?) } },
+        't' => Instruction{ .Toggle = try Operand.detect(x) },
+        else => unreachable,
+    };
+    try self.instructions.append(instruction);
 }
 
 pub fn runAndFetchRegisterA(self: *Assembunny) !isize {
@@ -77,26 +74,28 @@ pub fn runAndFetchRegisterA(self: *Assembunny) !isize {
     defer self.instructions.allocator.free(instructions);
     var pc: isize = 0;
     while (pc < instructions.len) : (pc += 1) {
-        switch (instructions[@intCast(u7, pc)]) {
+        switch (instructions[@as(u7, @intCast(pc))]) {
             .Copy => |c| switch (c.op2) {
                 .Register => |dest| self.registers[dest] = c.op1.fetch(&self.registers),
-                else => {}
+                else => {},
             },
             .Increment => |op| switch (op) {
                 .Register => |dest| self.registers[dest] += 1,
-                else => {}
+                else => {},
             },
             .Decrement => |op| switch (op) {
                 .Register => |dest| self.registers[dest] -= 1,
-                else => {}
+                else => {},
             },
-            .JumpNotZero => |j| if (j.op1.fetch(&self.registers) != 0) { pc += j.op2.fetch(&self.registers) - 1; },
+            .JumpNotZero => |j| if (j.op1.fetch(&self.registers) != 0) {
+                pc += j.op2.fetch(&self.registers) - 1;
+            },
             .Toggle => |op| blk: {
                 const targetPcMaybe = pc + op.fetch(&self.registers);
                 if (targetPcMaybe < 0 or targetPcMaybe >= instructions.len) {
                     break :blk;
                 }
-                const targetPc = @intCast(usize, targetPcMaybe);
+                const targetPc = @as(usize, @intCast(targetPcMaybe));
                 instructions[targetPc] = switch (instructions[targetPc]) {
                     .Copy => |c| Instruction{ .JumpNotZero = c },
                     .Increment => |i| Instruction{ .Decrement = i },
@@ -116,5 +115,5 @@ pub inline fn setRegister(self: *Assembunny, reg: []const u8, value: isize) *Ass
 }
 
 inline fn convertRegister(str: []const u8) Register {
-    return @intCast(Register, str[0] - 'a');
+    return @as(Register, @intCast(str[0] - 'a'));
 }

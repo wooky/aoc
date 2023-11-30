@@ -2,7 +2,7 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    const input = try std.fmt.parseInt(usize, std.mem.trim(u8, problem.input, &std.ascii.spaces), 10);
+    const input = try std.fmt.parseInt(usize, std.mem.trim(u8, problem.input, &std.ascii.whitespace), 10);
     var res1: ?usize = null;
     var res2: ?usize = null;
 
@@ -31,8 +31,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
         if (res1 == null and factor1_sum * 10 >= input) {
             res1 = house;
-        }
-        else if (res2 == null and factor2_sum * 11 >= input) {
+        } else if (res2 == null and factor2_sum * 11 >= input) {
             res2 = house;
         }
     }

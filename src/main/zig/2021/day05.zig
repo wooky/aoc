@@ -59,8 +59,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try diag_intersector.process(from, to);
     }
 
-    return problem.solution(
-        straight_intersector.coords_crossed.count(), 
-        diag_intersector.coords_crossed.count()
-    );
+    return problem.solution(straight_intersector.coords_crossed.count(), diag_intersector.coords_crossed.count());
 }

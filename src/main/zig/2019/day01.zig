@@ -16,5 +16,5 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 }
 
 fn getFuel(mass: usize) usize {
-    return std.math.max(mass / 3, 2) - 2;
+    return @max(mass / 3, 2) - 2;
 }

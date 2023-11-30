@@ -30,13 +30,13 @@ pub fn main() !void {
             std.debug.print("Invalid year/day provided\n", .{});
             std.process.exit(1);
         },
-        else => return err
+        else => return err,
     };
     defer problem.deinit();
 
     var solution = try run(&problem, year, day);
     defer solution.deinit(std.heap.page_allocator);
-    std.debug.print("{s}\n{s}\n", .{solution.s1, solution.s2});
+    std.debug.print("{s}\n{s}\n", .{ solution.s1, solution.s2 });
 }
 
 fn usage(args: [][]const u8) noreturn {

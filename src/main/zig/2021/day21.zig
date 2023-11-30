@@ -8,13 +8,13 @@ const DeterministicDie = struct {
     fn roll(self: *DeterministicDie) [1]u8 {
         self.current = if (self.current == 100) 1 else self.current + 1;
         self.rolls += 1;
-        return [_]u8{ self.current };
+        return [_]u8{self.current};
     }
 };
 
 const DiracDie = struct {
     fn roll(_: *DiracDie) [3]u8 {
-        return [_]u8 { 1, 2, 3 };
+        return [_]u8{ 1, 2, 3 };
     }
 };
 
@@ -51,12 +51,12 @@ fn Game(comptime Die: type, comptime max_score: u16) type {
         fn init(player1_position: u8, player2_position: u8) Self {
             return .{
                 .player1 = .{ .position = player1_position },
-                .player2= .{ .position = player2_position },
+                .player2 = .{ .position = player2_position },
             };
         }
 
         fn play(self: *Self) Stats {
-            var stats = Stats {};
+            var stats = Stats{};
             for (self.die.roll()) |roll| {
                 var new_game = self.*;
                 new_game.playRecursive(&stats, roll, 1);

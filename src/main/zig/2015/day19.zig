@@ -29,7 +29,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         try defab.putNoClobber(value, key);
         try defab_order.append(value);
     }
-    std.sort.sort([]const u8, defab_order.items, {}, compareLengths);
+    std.sort.insertion([]const u8, defab_order.items, {}, compareLengths);
 
     const uniquePossibilities = blk: {
         var arena = Arena.init(problem.allocator);
@@ -82,9 +82,7 @@ fn nextAtom(molecule: []const u8, idx: usize) ?usize {
 }
 
 fn replaceString(arena: *Arena, molecule: []const u8, idx: usize, end_idx: usize, replacement: []const u8) ![]u8 {
-    return std.fmt.allocPrint(arena.allocator(), "{s}{s}{s}", .{
-        molecule[0..idx], replacement, molecule[end_idx..]
-    });
+    return std.fmt.allocPrint(arena.allocator(), "{s}{s}{s}", .{ molecule[0..idx], replacement, molecule[end_idx..] });
 }
 
 fn compareLengths(_: void, a: []const u8, b: []const u8) bool {

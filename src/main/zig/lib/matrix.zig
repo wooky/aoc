@@ -29,21 +29,15 @@ pub const SquareMatrix = struct {
     }
 
     pub fn get(self: *const SquareMatrix, coord: aoc.Coord) f64 {
-        return c.gsl_matrix_get(self.matrix, @intCast(usize, coord.row), @intCast(usize, coord.col));
+        return c.gsl_matrix_get(self.matrix, @as(usize, @intCast(coord.row)), @as(usize, @intCast(coord.col)));
     }
 
     pub fn set(self: *SquareMatrix, coord: aoc.Coord, x: f64) void {
-        c.gsl_matrix_set(self.matrix, @intCast(usize, coord.row), @intCast(usize, coord.col), x);
+        c.gsl_matrix_set(self.matrix, @as(usize, @intCast(coord.row)), @as(usize, @intCast(coord.col)), x);
     }
 
     pub fn submatrix(self: *const SquareMatrix, begin: aoc.Coord, dimensions: aoc.Coord) MatrixView {
-        return .{ .view = c.gsl_matrix_const_submatrix(
-            self.matrix,
-            @intCast(usize, begin.row),
-            @intCast(usize, begin.col),
-            @intCast(usize, dimensions.row),
-            @intCast(usize, dimensions.col)
-        ) };
+        return .{ .view = c.gsl_matrix_const_submatrix(self.matrix, @as(usize, @intCast(begin.row)), @as(usize, @intCast(begin.col)), @as(usize, @intCast(dimensions.row)), @as(usize, @intCast(dimensions.col))) };
     }
 
     pub fn rotate90DegreesClockwise(self: *SquareMatrix) void {
@@ -69,7 +63,7 @@ pub const SquareMatrix = struct {
             flip_matrix = SquareMatrix.init(self.size());
             var i: isize = 0;
             while (i < self.size()) : (i += 1) {
-                flip_matrix.?.set(aoc.Coord.init(.{i, @intCast(isize, self.size()) - i - 1}), 1);
+                flip_matrix.?.set(aoc.Coord.init(.{ i, @as(isize, @intCast(self.size())) - i - 1 }), 1);
             }
         }
         return flip_matrix.?;

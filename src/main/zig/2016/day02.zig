@@ -9,7 +9,7 @@ const Keypad = struct {
     buf_size: u8 = 0,
 
     fn init(keys: []const u8, dim: u8, idx: u8) Keypad {
-        return Keypad { .keys = keys, .dim = dim, .idx = idx };
+        return Keypad{ .keys = keys, .dim = dim, .idx = idx };
     }
 
     fn feed(self: *Keypad, dir: u8) void {
@@ -18,7 +18,7 @@ const Keypad = struct {
             'D' => self.down(),
             'L' => self.left(),
             'R' => self.right(),
-            else => unreachable
+            else => unreachable,
         }
     }
 

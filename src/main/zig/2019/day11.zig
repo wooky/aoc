@@ -3,9 +3,7 @@ const std = @import("std");
 const Intcode = @import("intcode.zig");
 
 const Wall = std.AutoHashMap(aoc.Coord, u1);
-const WallResult = struct {
-    wall: Wall, range: aoc.CoordRange
-};
+const WallResult = struct { wall: Wall, range: aoc.CoordRange };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var intcode = try Intcode.init(problem.allocator, problem.input);
@@ -22,7 +20,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         defer res.wall.deinit();
 
         var reg = std.ArrayList(u8).init(problem.allocator);
-        
+
         var iter = res.range.iterator();
         while (iter.next()) |coord| {
             const chr = res.wall.get(coord) orelse 0;
@@ -51,13 +49,13 @@ fn paintPanels(intcode: *const Intcode, starting_tile: u1) !WallResult {
         const input = wall.get(pos) orelse 0;
         try state.inputs.append(input);
         const color = (try intcode.run(&state)) orelse break;
-        _ = try wall.put(pos, @intCast(u1, color));
+        _ = try wall.put(pos, @as(u1, @intCast(color)));
         range.amend(pos);
 
         switch ((try intcode.run(&state)).?) {
             0 => delta.mutRotate90DegreesCounterclockwise(),
             1 => delta.mutRotate90DegreesClockwise(),
-            else => unreachable
+            else => unreachable,
         }
         pos.mutAdd(delta);
     }

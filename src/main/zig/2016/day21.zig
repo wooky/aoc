@@ -3,8 +3,8 @@ const std = @import("std");
 
 const Command = union(enum) {
     // RotateBased tables for password.len = 8
-    const rotate_based_table = [_]u8 { 7, 6, 5, 4, 2, 1, 0, 7 };
-    const inverse_rotate_based_table = [_]u8 { 1, 1, 6, 2, 7, 3, 0, 4 };
+    const rotate_based_table = [_]u8{ 7, 6, 5, 4, 2, 1, 0, 7 };
+    const inverse_rotate_based_table = [_]u8{ 1, 1, 6, 2, 7, 3, 0, 4 };
 
     SwapPosition: struct { pos_x: u8, pos_y: u8 },
     SwapLetter: struct { letter_x: u8, letter_y: u8 },
@@ -22,15 +22,12 @@ const Command = union(enum) {
             .RotateLeft => |rl| std.mem.rotate(u8, password, rl),
             .RotateRight => |rr| std.mem.rotate(u8, password, password.len - rr),
             .RotateBased => |rb| std.mem.rotate(u8, password, rotate_based_table[std.mem.indexOfScalar(u8, password, rb).?]),
-            .Reverse => |r| std.mem.reverse(u8, password[r.pos_x..r.pos_y+1]),
-            .Move => |m|
-                if (m.pos_x < m.pos_y) {
-                    std.mem.rotate(u8, password[m.pos_x..m.pos_y + 1], 1);
-                }
-                else {
-                    std.mem.rotate(u8, password[m.pos_y..m.pos_x + 1], m.pos_x - m.pos_y);
-                }
-                ,
+            .Reverse => |r| std.mem.reverse(u8, password[r.pos_x .. r.pos_y + 1]),
+            .Move => |m| if (m.pos_x < m.pos_y) {
+                std.mem.rotate(u8, password[m.pos_x .. m.pos_y + 1], 1);
+            } else {
+                std.mem.rotate(u8, password[m.pos_y .. m.pos_x + 1], m.pos_x - m.pos_y);
+            },
             .InverseRotateBased => |irb| std.mem.rotate(u8, password, inverse_rotate_based_table[std.mem.indexOfScalar(u8, password, irb).?]),
         }
     }
@@ -65,8 +62,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 break :blk if (std.mem.eql(u8, instr2, "position"))
                     Command{ .SwapPosition = .{ .pos_x = try std.fmt.parseInt(u8, x, 10), .pos_y = try std.fmt.parseInt(u8, y, 10) } }
                 else
-                    Command{ .SwapLetter = .{ .letter_x = x[0], .letter_y = y[0] } }
-                ;
+                    Command{ .SwapLetter = .{ .letter_x = x[0], .letter_y = y[0] } };
             }
             if (std.mem.eql(u8, instr1, "rotate")) {
                 if (std.mem.eql(u8, instr2, "based")) {
@@ -81,8 +77,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 break :blk if (std.mem.eql(u8, instr2, "left"))
                     Command{ .RotateLeft = x }
                 else
-                    Command{ .RotateRight = x }
-                ;
+                    Command{ .RotateRight = x };
             }
             if (std.mem.eql(u8, instr1, "reverse")) {
                 const x = try std.fmt.parseInt(u8, tokens.next().?, 10);

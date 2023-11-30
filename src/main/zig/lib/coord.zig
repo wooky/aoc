@@ -4,7 +4,7 @@ pub fn GenericCoord(comptime Self: type) type {
     return struct {
         pub fn init(coord: anytype) Self {
             var self: Self = undefined;
-            inline for (@typeInfo(Self).Struct.fields) |field, i| {
+            inline for (@typeInfo(Self).Struct.fields, 0..) |field, i| {
                 @field(self, field.name) = coord[i];
             }
             return self;
@@ -107,11 +107,11 @@ pub const Coord3D = struct {
 };
 
 pub const PredefinedCoord = struct {
-    pub const ORIGIN = Coord.init(.{0, 0});
-    pub const UP = Coord.init(.{-1, 0});
-    pub const RIGHT = Coord.init(.{0, 1});
-    pub const DOWN = Coord.init(.{1, 0});
-    pub const LEFT = Coord.init(.{0, -1});
+    pub const ORIGIN = Coord.init(.{ 0, 0 });
+    pub const UP = Coord.init(.{ -1, 0 });
+    pub const RIGHT = Coord.init(.{ 0, 1 });
+    pub const DOWN = Coord.init(.{ 1, 0 });
+    pub const LEFT = Coord.init(.{ 0, -1 });
 };
 
 pub fn GenericCoordRange(comptime C: type) type {
@@ -135,11 +135,10 @@ pub fn GenericCoordRange(comptime C: type) type {
                 self.first = coord;
                 self.last = coord;
                 self.never_touched = false;
-            }
-            else {
+            } else {
                 inline for (@typeInfo(C).Struct.fields) |field| {
-                    @field(self.first, field.name) = std.math.min(@field(self.first, field.name), @field(coord, field.name));
-                    @field(self.last, field.name) = std.math.max(@field(self.last, field.name), @field(coord, field.name));
+                    @field(self.first, field.name) = @min(@field(self.first, field.name), @field(coord, field.name));
+                    @field(self.last, field.name) = @max(@field(self.last, field.name), @field(coord, field.name));
                 }
             }
         }
@@ -191,13 +190,11 @@ pub fn GenericCoordRangeIterator(comptime C: type) type {
                     if (@field(self.curr, field_name) == @field(self.last, field_name)) {
                         if (field_idx == 1) {
                             self.completed = true;
-                        }
-                        else {
+                        } else {
                             // Next field shall be incremented in the next iteration
                             @field(self.curr, field_name) = @field(self.first, field_name);
                         }
-                    }
-                    else {
+                    } else {
                         @field(self.curr, field_name) += 1;
                         // break; // can't break here, crashes compiler, so next line is used as a hack
                         go = false;
@@ -225,13 +222,7 @@ pub fn GenericCoordNeighborIterator(comptime C: type) type {
             inline for (@typeInfo(C).Struct.fields) |field| {
                 @field(offset, field.name) = 1;
             }
-            return .{
-                .center = if (include_self) null else center,
-                .range_iter = GenericCoordRangeIterator(C).init(
-                    center.subtract(offset),
-                    center.add(offset)
-                )
-            };
+            return .{ .center = if (include_self) null else center, .range_iter = GenericCoordRangeIterator(C).init(center.subtract(offset), center.add(offset)) };
         }
 
         pub fn next(self: *Self) ?C {

@@ -33,7 +33,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                     break;
                 }
                 max_y = cumsum(vy);
-                try choices.put(aoc.Coord2D.init(.{vx, vy}), {});
+                try choices.put(aoc.Coord2D.init(.{ vx, vy }), {});
             }
         }
     }
@@ -42,7 +42,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 }
 
 inline fn calcX(t: isize, vx: isize) isize {
-    const t_capped = std.math.min(vx, t);
+    const t_capped = @min(vx, t);
     return vx * t_capped - cumsum(t_capped - 1);
 }
 

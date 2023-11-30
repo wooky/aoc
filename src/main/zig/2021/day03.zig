@@ -14,13 +14,13 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const s1 = blk: {
         var gamma: usize = 0;
         var i: CODE_TYPE_SHIFT = 0;
-        while (i < std.meta.bitCount(CODE_TYPE)) : (i += 1) {
+        while (i < @bitSizeOf(CODE_TYPE)) : (i += 1) {
             gamma |= @as(usize, commonBit(codes.items, i)) << i;
         }
         const epsilon = std.math.maxInt(CODE_TYPE) & (~gamma);
         break :blk gamma * epsilon;
     };
-    
+
     const s2 = blk: {
         const o2Rating = try calcRating(arena.allocator(), codes.items, false);
         const co2Rating = try calcRating(arena.allocator(), codes.items, true);
@@ -41,9 +41,9 @@ fn commonBit(codes: []const CODE_TYPE, pos: CODE_TYPE_SHIFT) u1 {
 
 fn calcRating(allocator: std.mem.Allocator, codes: []const CODE_TYPE, least_common: bool) !usize {
     var filteredCodes = codes;
-    var i: CODE_TYPE_SHIFT = std.meta.bitCount(CODE_TYPE) - 1;
+    var i: CODE_TYPE_SHIFT = @bitSizeOf(CODE_TYPE) - 1;
     while (true) : (i -= 1) {
-        const bit = commonBit(filteredCodes, i) ^ @boolToInt(least_common);
+        const bit = commonBit(filteredCodes, i) ^ @intFromBool(least_common);
         var newFilteredCodes = std.ArrayList(CODE_TYPE).init(allocator);
         for (filteredCodes) |code| {
             if ((code >> i) & 1 == bit) {

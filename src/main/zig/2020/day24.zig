@@ -4,12 +4,12 @@ const std = @import("std");
 const BlackTiles = std.AutoHashMap(aoc.Coord, void);
 
 const HexCoord = struct {
-    const NW = aoc.Coord.init(.{-1, -1});
-    const NE = aoc.Coord.init(.{-1, 1});
-    const SW = aoc.Coord.init(.{1, -1});
-    const SE = aoc.Coord.init(.{1, 1});
-    const W = aoc.Coord.init(.{0, -2});
-    const E = aoc.Coord.init(.{0, 2});
+    const NW = aoc.Coord.init(.{ -1, -1 });
+    const NE = aoc.Coord.init(.{ -1, 1 });
+    const SW = aoc.Coord.init(.{ 1, -1 });
+    const SE = aoc.Coord.init(.{ 1, 1 });
+    const W = aoc.Coord.init(.{ 0, -2 });
+    const E = aoc.Coord.init(.{ 0, 2 });
 
     underlying: aoc.Coord = aoc.PredefinedCoord.ORIGIN,
 
@@ -30,16 +30,14 @@ const HexCoord = struct {
         neighbors: [6]HexCoord,
 
         fn init(center: HexCoord) NeighborIterator {
-            return .{
-                .neighbors = [_]HexCoord {
-                    center.add(NW),
-                    center.add(NE),
-                    center.add(SW),
-                    center.add(SE),
-                    center.add(W),
-                    center.add(E),
-                }
-            };
+            return .{ .neighbors = [_]HexCoord{
+                center.add(NW),
+                center.add(NE),
+                center.add(SW),
+                center.add(SE),
+                center.add(W),
+                center.add(E),
+            } };
         }
 
         pub fn next(self: *NeighborIterator) ?HexCoord {
@@ -57,7 +55,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var conway = aoc.Conway(HexCoord).init(problem.allocator);
     defer conway.deinit();
     while (problem.line()) |line| {
-        var coord = HexCoord {};
+        var coord = HexCoord{};
         var idx: usize = 0;
         while (idx < line.len) : (idx += 1) {
             const delta = switch (line[idx]) {
@@ -66,7 +64,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                     break :blk switch (line[idx]) {
                         'w' => HexCoord.NW,
                         'e' => HexCoord.NE,
-                        else => unreachable
+                        else => unreachable,
                     };
                 },
                 's' => blk: {
@@ -74,12 +72,12 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                     break :blk switch (line[idx]) {
                         'w' => HexCoord.SW,
                         'e' => HexCoord.SE,
-                        else => unreachable
+                        else => unreachable,
                     };
                 },
                 'w' => HexCoord.W,
                 'e' => HexCoord.E,
-                else => unreachable
+                else => unreachable,
             };
             coord.mutAdd(delta);
         }
@@ -95,10 +93,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var iter = conway.stepIterator();
         defer iter.deinit();
         while (try iter.next()) {
-            try iter.setActive(
-                (iter.active and !(iter.active_neighbors == 0 or iter.active_neighbors > 2)) or
-                (!iter.active and iter.active_neighbors == 2)
-            );
+            try iter.setActive((iter.active and !(iter.active_neighbors == 0 or iter.active_neighbors > 2)) or
+                (!iter.active and iter.active_neighbors == 2));
         }
     }
     const solution2 = conway.active_spots.count();

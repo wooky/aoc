@@ -14,17 +14,11 @@ const SeatIterator = struct {
     height: usize,
     row: isize = 0,
     col: isize = -1,
-    
+
     fn init(allocator: Allocator, seats: []const u8, follow_blanks: bool) !SeatIterator {
-        const width = std.mem.indexOf(u8, seats, &[_]u8 {'\n'}).?;
+        const width = std.mem.indexOf(u8, seats, &[_]u8{'\n'}).?;
         const height = seats.len / (width + 1);
-        return SeatIterator {
-            .allocator = allocator,
-            .seats = try allocator.dupe(u8, seats),
-            .follow_blanks = follow_blanks,
-            .width = width,
-            .height = height
-        };
+        return SeatIterator{ .allocator = allocator, .seats = try allocator.dupe(u8, seats), .follow_blanks = follow_blanks, .width = width, .height = height };
     }
 
     fn deinit(self: *SeatIterator) void {
@@ -50,7 +44,7 @@ const SeatIterator = struct {
     }
 
     fn getIndex(self: *const SeatIterator, row: isize, col: isize) usize {
-        return @intCast(usize, row) * (self.width+1) + @intCast(usize, col);
+        return @as(usize, @intCast(row)) * (self.width + 1) + @as(usize, @intCast(col));
     }
 
     fn getSeat(self: *const SeatIterator, row: isize, col: isize) u8 {
@@ -60,27 +54,29 @@ const SeatIterator = struct {
     fn isOccupied(self: *const SeatIterator, drow: isize, dcol: isize) u8 {
         var row = self.row + drow;
         var col = self.col + dcol;
-        while (row >= 0 and row < self.height and col >= 0 and col < self.width) : ({row += drow; col += dcol;}) {
+        while (row >= 0 and row < self.height and col >= 0 and col < self.width) : ({
+            row += drow;
+            col += dcol;
+        }) {
             switch (self.getSeat(row, col)) {
                 FLOOR => if (!self.follow_blanks) return 0,
                 VACANT => return 0,
                 OCCUPIED => return 1,
-                else => unreachable
+                else => unreachable,
             }
         }
         return 0;
     }
 
     fn getOccupiedNeighbors(self: *const SeatIterator) u8 {
-        return
-            self.isOccupied(-1, -1) +
-            self.isOccupied(-1,  0) +
-            self.isOccupied(-1,  1) +
-            self.isOccupied( 0, -1) +
-            self.isOccupied( 0,  1) +
-            self.isOccupied( 1, -1) +
-            self.isOccupied( 1,  0) +
-            self.isOccupied( 1,  1);
+        return self.isOccupied(-1, -1) +
+            self.isOccupied(-1, 0) +
+            self.isOccupied(-1, 1) +
+            self.isOccupied(0, -1) +
+            self.isOccupied(0, 1) +
+            self.isOccupied(1, -1) +
+            self.isOccupied(1, 0) +
+            self.isOccupied(1, 1);
     }
 
     fn setSeat(self: *SeatIterator, row: isize, col: isize, new_seat: u8) void {
@@ -101,14 +97,12 @@ fn getOccupiedSeats(allocator: Allocator, seats: []const u8, tolerance: u8, foll
         while (prev_arrangement.next()) |prev_seat| {
             const occupiedNeighbors = prev_arrangement.getOccupiedNeighbors();
             var next_seat =
-                if (prev_seat == VACANT and occupiedNeighbors == 0) OCCUPIED
-                else if (prev_seat == OCCUPIED and occupiedNeighbors >= tolerance) VACANT
-                else prev_seat;
+                if (prev_seat == VACANT and occupiedNeighbors == 0) OCCUPIED else if (prev_seat == OCCUPIED and occupiedNeighbors >= tolerance) VACANT else prev_seat;
             next_arrangement.setSeat(prev_arrangement.row, prev_arrangement.col, next_seat);
         }
 
         if (std.mem.eql(u8, prev_arrangement.seats, next_arrangement.seats)) {
-            const res = std.mem.count(u8, prev_arrangement.seats, &[_]u8 {OCCUPIED});
+            const res = std.mem.count(u8, prev_arrangement.seats, &[_]u8{OCCUPIED});
             prev_arrangement.deinit();
             next_arrangement.deinit();
             return res;

@@ -14,9 +14,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var tokens = std.mem.tokenize(u8, line, " xy=");
         if (std.mem.eql(u8, tokens.next().?, "rect")) {
             rect(&screen, try std.fmt.parseInt(u8, tokens.next().?, 10), try std.fmt.parseInt(u8, tokens.next().?, 10));
-        }
-        else {
-            const rotateFn = if (std.mem.eql(u8, tokens.next().?, "row")) rotateRow else rotateColumn;
+        } else {
+            const rotateFn: *const fn (*Screen, u8, u8) void = if (std.mem.eql(u8, tokens.next().?, "row")) rotateRow else rotateColumn;
             const a = try std.fmt.parseInt(u8, tokens.next().?, 10);
             _ = tokens.next().?;
             const b = try std.fmt.parseInt(u8, tokens.next().?, 10);
@@ -48,7 +47,7 @@ fn rotateRow(screen: *Screen, row: u8, amount: u8) void {
     var row_mask: ScreenRowType = 0;
     var offset: usize = SCREEN_WIDTH * row;
     while (offset < @as(usize, SCREEN_WIDTH) * (row + 1)) : (offset += 1) {
-        row_mask = (row_mask << 1) | @boolToInt(screen.isSet(offset));
+        row_mask = (row_mask << 1) | @intFromBool(screen.isSet(offset));
     }
     row_mask = std.math.rotr(ScreenRowType, row_mask, amount);
     offset = SCREEN_WIDTH * row;
@@ -62,7 +61,7 @@ fn rotateColumn(screen: *Screen, col: u8, amount: u8) void {
     var column_mask: ScreenColumnType = 0;
     var row_offset: usize = 0;
     while (row_offset < SCREEN_WIDTH * SCREEN_HEIGHT) : (row_offset += SCREEN_WIDTH) {
-        column_mask = (column_mask << 1) | @boolToInt(screen.isSet(row_offset + col));
+        column_mask = (column_mask << 1) | @intFromBool(screen.isSet(row_offset + col));
     }
     column_mask = std.math.rotr(ScreenColumnType, column_mask, amount);
     row_offset = 0;

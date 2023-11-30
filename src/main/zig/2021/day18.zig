@@ -10,7 +10,7 @@ const SnailfishNumber = struct {
     elements: Elements,
 
     fn initFromLine(allocator: std.mem.Allocator, line: []const u8) !SnailfishNumber {
-        var snailfish_number = SnailfishNumber {
+        var snailfish_number = SnailfishNumber{
             .elements = Elements.init(allocator),
         };
         var depth: u8 = 0;
@@ -19,7 +19,7 @@ const SnailfishNumber = struct {
                 '[' => depth += 1,
                 ']' => depth -= 1,
                 ',' => {},
-                else => try snailfish_number.elements.append(.{ .number = c - '0', .depth = depth - 1 })
+                else => try snailfish_number.elements.append(.{ .number = c - '0', .depth = depth - 1 }),
             }
         }
         return snailfish_number;
@@ -36,7 +36,7 @@ const SnailfishNumber = struct {
         //     std.debug.print("{: >4} ", .{asdf});
         // }
         // std.debug.print("\n", .{});
-        var result = SnailfishNumber {
+        var result = SnailfishNumber{
             .elements = Elements.init(self.elements.allocator),
         };
         for (self.elements.items) |element| {
@@ -54,7 +54,7 @@ const SnailfishNumber = struct {
 
         blk: while (true) {
             // Explode
-            for (result.elements.items) |element, idx| {
+            for (result.elements.items, 0..) |element, idx| {
                 const depth = element.depth;
                 if (depth >= 4 and result.elements.items[idx + 1].depth == depth) {
                     if (idx > 0) {
@@ -75,7 +75,7 @@ const SnailfishNumber = struct {
             }
 
             // Split
-            for (result.elements.items) |element, idx| {
+            for (result.elements.items, 0..) |element, idx| {
                 const number = element.number;
                 if (element.number >= 10) {
                     const depth = element.depth;
@@ -108,8 +108,7 @@ const SnailfishNumber = struct {
             break :blk if (element.depth != depth)
                 self.magnitude(depth + 1, idx)
             else
-                element.number
-            ;
+                element.number;
         };
 
         idx.* += 1;
@@ -119,8 +118,7 @@ const SnailfishNumber = struct {
             break :blk if (element.depth != depth)
                 self.magnitude(depth + 1, idx)
             else
-                element.number
-            ;
+                element.number;
         };
 
         // std.debug.print("={}\n", .{left + right});
@@ -129,7 +127,7 @@ const SnailfishNumber = struct {
 
     fn print(self: *const SnailfishNumber) void {
         for (self.elements.items) |element| {
-            std.debug.print("{: >2}d{} ", .{element.number, element.depth});
+            std.debug.print("{: >2}d{} ", .{ element.number, element.depth });
         }
         std.debug.print("\n", .{});
     }
@@ -149,13 +147,12 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         while (problem.line()) |line| {
             var next = try SnailfishNumber.initFromLine(problem.allocator, line);
             try numbers.append(next);
-            
+
             if (result) |*r| {
                 var next_result = try r.add(&next);
                 r.deinit();
                 result = next_result;
-            }
-            else {
+            } else {
                 result = try numbers.items[0].add(&next);
             }
         }
@@ -177,7 +174,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 var result = try numbers.items[i].add(&numbers.items[j]);
                 defer result.deinit();
                 var idx: u8 = 0;
-                max_sum = std.math.max(max_sum, result.magnitude(0, &idx));
+                max_sum = @max(max_sum, result.magnitude(0, &idx));
             }
         }
         break :blk max_sum;

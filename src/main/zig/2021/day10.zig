@@ -26,7 +26,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                     syntax_error_score += 25137;
                     continue :blk;
                 },
-                else => try openers.append(c)
+                else => try openers.append(c),
             }
         }
 
@@ -42,7 +42,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         }
         try autocomplete_scores.append(score);
     }
-    std.sort.sort(usize, autocomplete_scores.items, {}, comptime std.sort.asc(usize));
+    std.sort.insertion(usize, autocomplete_scores.items, {}, comptime std.sort.asc(usize));
 
     return problem.solution(syntax_error_score, autocomplete_scores.items[autocomplete_scores.items.len / 2]);
 }

@@ -4,13 +4,13 @@ const Allocator = std.mem.Allocator;
 pub const Problem = struct {
     allocator: Allocator,
     input: [:0]const u8 = undefined,
-    tokenizer: ?std.mem.TokenIterator(u8) = null,
-    splitter: ?std.mem.SplitIterator(u8) = null,
+    tokenizer: ?std.mem.TokenIterator(u8, .any) = null,
+    splitter: ?std.mem.SplitIterator(u8, .sequence) = null,
 
     pub fn init(year: u16, day: u16, allocator: Allocator) !Problem {
-        var problem = Problem { .allocator = allocator };
+        var problem = Problem{ .allocator = allocator };
         var buf: [32]u8 = undefined;
-        const filename = try std.fmt.bufPrint(&buf, "input/{}/day{:0>2}.txt", .{year, day});
+        const filename = try std.fmt.bufPrint(&buf, "input/{}/day{:0>2}.txt", .{ year, day });
         const file = try std.fs.cwd().openFile(filename, .{});
         defer file.close();
         problem.input = try file.readToEndAllocOptions(allocator, 262144, null, @alignOf(u8), 0);
@@ -23,14 +23,14 @@ pub const Problem = struct {
 
     pub fn line(self: *Problem) ?[]const u8 {
         if (self.tokenizer == null) {
-            self.tokenizer = std.mem.tokenize(u8, self.input, "\n");
+            self.tokenizer = std.mem.tokenizeAny(u8, self.input, "\n");
         }
         return self.tokenizer.?.next();
     }
 
     pub fn group(self: *Problem) ?[]const u8 {
         if (self.splitter == null) {
-            self.splitter = std.mem.split(u8, self.input, "\n\n");
+            self.splitter = std.mem.splitSequence(u8, self.input, "\n\n");
         }
         return self.splitter.?.next();
     }
@@ -55,10 +55,10 @@ pub const Solution = struct {
     }
 };
 
-usingnamespace @import("lib/conway.zig");
-usingnamespace @import("lib/coord.zig");
-usingnamespace @import("lib/matrix.zig");
-usingnamespace @import("lib/multimap.zig");
-usingnamespace @import("lib/permutator.zig");
-usingnamespace @import("lib/regex.zig");
-usingnamespace @import("lib/table.zig");
+pub usingnamespace @import("lib/conway.zig");
+pub usingnamespace @import("lib/coord.zig");
+pub usingnamespace @import("lib/matrix.zig");
+pub usingnamespace @import("lib/multimap.zig");
+pub usingnamespace @import("lib/permutator.zig");
+pub usingnamespace @import("lib/regex.zig");
+pub usingnamespace @import("lib/table.zig");

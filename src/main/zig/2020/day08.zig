@@ -3,13 +3,9 @@ const std = @import("std");
 const Address = isize;
 
 const SubInstruction = enum { ACC, JMP, NOP };
-const Instruction = struct {
-    instr: SubInstruction, offset: i16
-};
+const Instruction = struct { instr: SubInstruction, offset: i16 };
 
-const ExecutionResult = struct {
-    pc: Address, acc: isize
-};
+const ExecutionResult = struct { pc: Address, acc: isize };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var instructions = std.ArrayList(Instruction).init(problem.allocator);
@@ -17,20 +13,18 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     while (problem.line()) |line| {
         const instr_str = line[0..3];
         const instr =
-            if (std.mem.eql(u8, instr_str, "acc")) SubInstruction.ACC
-            else if (std.mem.eql(u8, instr_str, "jmp")) SubInstruction.JMP
-            else SubInstruction.NOP;
-        const offset = (if (line[4] == '+') @intCast(i16, 1) else -1) * try std.fmt.parseInt(i16, line[5..], 10);
+            if (std.mem.eql(u8, instr_str, "acc")) SubInstruction.ACC else if (std.mem.eql(u8, instr_str, "jmp")) SubInstruction.JMP else SubInstruction.NOP;
+        const offset = (if (line[4] == '+') @as(i16, @intCast(1)) else -1) * try std.fmt.parseInt(i16, line[5..], 10);
         try instructions.append(.{ .instr = instr, .offset = offset });
     }
 
     const res1 = blk: {
         const result = try executeInstructions(instructions.items, problem.allocator);
-        break :blk @intCast(usize, result.acc);
+        break :blk @as(usize, @intCast(result.acc));
     };
 
     const res2 = blk: {
-        for (instructions.items) |instruction, i| {
+        for (instructions.items, 0..) |instruction, i| {
             const old_instr = instruction.instr;
             const new_instr = switch (old_instr) {
                 .ACC => continue,
@@ -40,7 +34,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             instructions.items[i].instr = new_instr;
             const result = try executeInstructions(instructions.items, problem.allocator);
             if (result.pc == instructions.items.len) {
-                break :blk @intCast(usize, result.acc);
+                break :blk @as(usize, @intCast(result.acc));
             }
             instructions.items[i].instr = old_instr;
         }
@@ -57,7 +51,7 @@ fn executeInstructions(instructions: []const Instruction, allocator: std.mem.All
     var acc: isize = 0;
     while (!visited.contains(pc) and pc != instructions.len) {
         try visited.put(pc, {});
-        const instruction = instructions[@intCast(usize, pc)];
+        const instruction = instructions[@as(usize, @intCast(pc))];
         switch (instruction.instr) {
             .ACC => {
                 acc += instruction.offset;

@@ -10,8 +10,7 @@ const Field = struct {
     to2: u16,
 
     fn contains(self: *const Field, what: u16) bool {
-        return (what >= self.from1 and what <= self.to1)
-            or (what >= self.from2 and what <= self.to2);
+        return (what >= self.from1 and what <= self.to1) or (what >= self.from2 and what <= self.to2);
     }
 };
 
@@ -23,7 +22,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         while (lines.next()) |line| {
             const rule = line[0..std.mem.indexOf(u8, line, ":").?];
             var range_tokens = std.mem.tokenize(u8, line[rule.len..], ":- or");
-            try fields.append(Field {
+            try fields.append(Field{
                 .name = rule,
                 .from1 = try std.fmt.parseInt(u16, range_tokens.next().?, 10),
                 .to1 = try std.fmt.parseInt(u16, range_tokens.next().?, 10),
@@ -82,7 +81,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
                 continue;
             }
 
-            for (ticket.items) |ticket_field, idx| {
+            for (ticket.items, 0..) |ticket_field, idx| {
                 for (fields.items) |field| {
                     if (!field.contains(ticket_field)) {
                         _ = possible_fields.items[idx].remove(field.name);
@@ -97,9 +96,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var departures: usize = 1;
         var processed: u8 = 0;
         outer: while (processed != possible_fields.items.len) : (processed += 1) {
-            for (possible_fields.items) |*pi, idx| {
+            for (possible_fields.items, 0..) |*pi, idx| {
                 if (pi.count() == 1) {
-                    const field = pi.iterator().next().?.key_ptr.*;
+                    var iter = pi.iterator();
+                    const field = iter.next().?.key_ptr.*;
                     for (possible_fields.items) |*pi2| {
                         _ = pi2.remove(field);
                     }

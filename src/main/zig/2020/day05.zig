@@ -17,7 +17,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         const row = decode(line[0..7], 'F');
         const col = decode(line[7..10], 'L');
         const seat_id = row * 8 + col;
-        highest_seatid = std.math.max(highest_seatid, seat_id);
+        highest_seatid = @max(highest_seatid, seat_id);
         _ = unoccupied_seats.remove(seat_id);
     }
 
@@ -37,13 +37,12 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
 fn decode(str: []const u8, upper_half_char: u8) u16 {
     var low: u8 = 0;
-    var high = (@intCast(u8, 1) << @intCast(u3, str.len)) - 1;
-    var delta = @intCast(u8, 1) << (@intCast(u3, str.len) - 1);
+    var high = (@as(u8, @intCast(1)) << @as(u3, @intCast(str.len))) - 1;
+    var delta = @as(u8, @intCast(1)) << (@as(u3, @intCast(str.len)) - 1);
     for (str) |c| {
         if (c == upper_half_char) {
             high -= delta;
-        }
-        else {
+        } else {
             low += delta;
         }
         delta /= 2;

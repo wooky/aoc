@@ -1,8 +1,11 @@
 const aoc = @import("../aoc.zig");
 
 const Coord4D = struct {
-    x: i8, y: i8, z: i8, w: i8,
-    usingnamespace aoc.GenericCoord(Coord4D);
+    x: i8,
+    y: i8,
+    z: i8,
+    w: i8,
+    pub usingnamespace aoc.GenericCoord(Coord4D);
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
@@ -12,10 +15,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     defer conway_4d.deinit();
     var y: i8 = 0;
     while (problem.line()) |line| : (y += 1) {
-        for (line) |state, x| {
+        for (line, 0..) |state, x| {
             if (state == '#') {
-                try conway_3d.active_spots.put(aoc.Coord3D.init(.{@intCast(i8, x), y, 0}), {});
-                try conway_4d.active_spots.put(Coord4D.init(.{@intCast(i8, x), y, 0, 0}), {});
+                try conway_3d.active_spots.put(aoc.Coord3D.init(.{ @as(i8, @intCast(x)), y, 0 }), {});
+                try conway_4d.active_spots.put(Coord4D.init(.{ @as(i8, @intCast(x)), y, 0, 0 }), {});
             }
         }
     }

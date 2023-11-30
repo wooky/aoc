@@ -13,10 +13,22 @@ const Part1 = struct {
         }
         switch (c) {
             'a', 'e', 'i', 'o', 'u' => self.vowels += 1,
-            'b' => if (self.last == 'a') {self.dead = true; return;},
-            'd' => if (self.last == 'c') {self.dead = true; return;},
-            'q' => if (self.last == 'p') {self.dead = true; return;},
-            'y' => if (self.last == 'x') {self.dead = true; return;},
+            'b' => if (self.last == 'a') {
+                self.dead = true;
+                return;
+            },
+            'd' => if (self.last == 'c') {
+                self.dead = true;
+                return;
+            },
+            'q' => if (self.last == 'p') {
+                self.dead = true;
+                return;
+            },
+            'y' => if (self.last == 'x') {
+                self.dead = true;
+                return;
+            },
             else => {},
         }
         if (c == self.last) {
@@ -40,7 +52,7 @@ const Part2 = struct {
     pairs: LetterPairs,
 
     fn init(allocator: std.mem.Allocator) Part2 {
-        return Part2 { .pairs = LetterPairs.init(allocator) };
+        return Part2{ .pairs = LetterPairs.init(allocator) };
     }
 
     fn deinit(self: *Part2) void {
@@ -57,8 +69,7 @@ const Part2 = struct {
                 if (idx - inserted_idx > 1) {
                     self.saw_pair = true;
                 }
-            }
-            else {
+            } else {
                 _ = try self.pairs.put(pair, idx);
             }
         }
@@ -76,10 +87,10 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var nice2: u16 = 0;
 
     while (problem.line()) |line| {
-        var part1 = Part1 {};
+        var part1 = Part1{};
         var part2 = Part2.init(problem.allocator);
         defer part2.deinit();
-        for (line) |c, idx| {
+        for (line, 0..) |c, idx| {
             part1.feed(c);
             try part2.feed(c, idx);
         }

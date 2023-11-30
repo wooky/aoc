@@ -3,7 +3,7 @@ const std = @import("std");
 
 const LightMap = struct {
     const Conway = aoc.Conway(aoc.Coord);
-    const bounds = aoc.CoordRange.initWithBounds(aoc.Coord.init(.{0, 0}), aoc.Coord.init(.{99, 99}));
+    const bounds = aoc.CoordRange.initWithBounds(aoc.Coord.init(.{ 0, 0 }), aoc.Coord.init(.{ 99, 99 }));
 
     conway: Conway,
 
@@ -29,16 +29,18 @@ const LightMap = struct {
     }
 
     fn makeDefective(self: *LightMap) !void {
-        try self.activate(aoc.Coord.init(.{0, 0}));
-        try self.activate(aoc.Coord.init(.{0, 99}));
-        try self.activate(aoc.Coord.init(.{99, 0}));
-        try self.activate(aoc.Coord.init(.{99, 99}));
+        try self.activate(aoc.Coord.init(.{ 0, 0 }));
+        try self.activate(aoc.Coord.init(.{ 0, 99 }));
+        try self.activate(aoc.Coord.init(.{ 99, 0 }));
+        try self.activate(aoc.Coord.init(.{ 99, 99 }));
     }
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var map_good = LightMap.init(problem.allocator); defer map_good.deinit();
-    var map_bad = LightMap.init(problem.allocator); defer map_bad.deinit();
+    var map_good = LightMap.init(problem.allocator);
+    defer map_good.deinit();
+    var map_bad = LightMap.init(problem.allocator);
+    defer map_bad.deinit();
     var coord = aoc.PredefinedCoord.ORIGIN;
     for (problem.input) |c| {
         switch (c) {

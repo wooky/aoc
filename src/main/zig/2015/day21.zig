@@ -5,14 +5,14 @@ const Item = struct { cost: u16, atk: i8 = 0, def: i8 = 0 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
     const player_hp: u8 = 100;
-    const weapons = [_]Item {
+    const weapons = [_]Item{
         .{ .cost = 8, .atk = 4 },
         .{ .cost = 10, .atk = 5 },
         .{ .cost = 25, .atk = 6 },
         .{ .cost = 40, .atk = 7 },
         .{ .cost = 74, .atk = 8 },
     };
-    const armor = [_]Item {
+    const armor = [_]Item{
         .{ .cost = 0 },
         .{ .cost = 13, .def = 1 },
         .{ .cost = 31, .def = 2 },
@@ -20,7 +20,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         .{ .cost = 75, .def = 4 },
         .{ .cost = 102, .def = 5 },
     };
-    const rings = [_]Item {
+    const rings = [_]Item{
         .{ .cost = 0 },
         .{ .cost = 0 },
         .{ .cost = 25, .atk = 1 },
@@ -32,7 +32,8 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     };
 
     var tokens = std.mem.tokenize(u8, problem.input, ": \n");
-    _ = tokens.next().?; _ = tokens.next().?;
+    _ = tokens.next().?;
+    _ = tokens.next().?;
     const boss_hp = try std.fmt.parseInt(u8, tokens.next().?, 10);
     _ = tokens.next().?;
     const boss_atk = try std.fmt.parseInt(i8, tokens.next().?, 10);
@@ -43,24 +44,23 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
     var expensive_lose: u16 = 0;
     for (weapons) |w| {
         for (armor) |a| {
-            for (rings) |r1, r1i| {
-                for (rings[r1i+1..]) |r2| {
+            for (rings, 0..) |r1, r1i| {
+                for (rings[r1i + 1 ..]) |r2| {
                     const total_cost = w.cost + a.cost + r1.cost + r2.cost;
 
                     const player_atk = w.atk + r1.atk + r2.atk;
                     const player_def = a.def + r1.def + r2.def;
 
-                    const player_hp_delta = @intCast(u8, std.math.max(boss_atk-player_def, 1));
+                    const player_hp_delta = @as(u8, @intCast(@max(boss_atk - player_def, 1)));
                     const player_survives = player_hp / player_hp_delta - if (player_hp % player_hp_delta == 0) @as(u16, 1) else 0;
 
-                    const boss_hp_delta = @intCast(u8, std.math.max(player_atk-boss_def, 1));
+                    const boss_hp_delta = @as(u8, @intCast(@max(player_atk - boss_def, 1)));
                     const boss_survives = boss_hp / boss_hp_delta - if (boss_hp % boss_hp_delta == 0) @as(u16, 1) else 0;
 
                     if (player_survives >= boss_survives) {
-                        cheapest_win = std.math.min(cheapest_win, total_cost);
-                    }
-                    else {
-                        expensive_lose = std.math.max(expensive_lose, total_cost);
+                        cheapest_win = @min(cheapest_win, total_cost);
+                    } else {
+                        expensive_lose = @max(expensive_lose, total_cost);
                     }
                 }
             }

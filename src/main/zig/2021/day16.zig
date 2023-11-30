@@ -2,7 +2,7 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Packet = struct {
-    const Operation = enum (u3) {
+    const Operation = enum(u3) {
         Sum = 0,
         Product = 1,
         Minimum = 2,
@@ -13,7 +13,7 @@ const Packet = struct {
         Equal = 7,
     };
 
-    const SubpacketParsage = union (enum) {
+    const SubpacketParsage = union(enum) {
         Type0: struct {
             end_bit: usize,
         },
@@ -28,7 +28,7 @@ const Packet = struct {
 
     fn parse(input: []const u8, bit: *usize) Packet {
         var version_total: usize = readChunk(u3, input, bit);
-        const operation = @intToEnum(Operation, readChunk(u3, input, bit));
+        const operation = @as(Operation, @enumFromInt(readChunk(u3, input, bit)));
         if (operation == .Literal) {
             var literal: usize = 0;
             var read_next: u1 = 1;
@@ -44,7 +44,7 @@ const Packet = struct {
             SubpacketParsage{ .Type0 = .{ .end_bit = readChunk(u15, input, bit) + bit.* } } // order of operations is very important!
         else
             SubpacketParsage{ .Type1 = .{ .count = readChunk(u11, input, bit) } };
-        
+
         var computation_total = blk: {
             const result = parseSubpacket(input, bit, &subpacket_parsage).?;
             version_total += result.version_total;
@@ -55,12 +55,12 @@ const Packet = struct {
             computation_total = switch (operation) {
                 .Sum => computation_total + subpacket.computation_total,
                 .Product => computation_total * subpacket.computation_total,
-                .Minimum => std.math.min(computation_total, subpacket.computation_total),
-                .Maximum => std.math.max(computation_total, subpacket.computation_total),
+                .Minimum => @min(computation_total, subpacket.computation_total),
+                .Maximum => @max(computation_total, subpacket.computation_total),
                 .Literal => unreachable,
-                .GreaterThan => @boolToInt(computation_total > subpacket.computation_total),
-                .LessThan => @boolToInt(computation_total < subpacket.computation_total),
-                .Equal => @boolToInt(computation_total == subpacket.computation_total),
+                .GreaterThan => @intFromBool(computation_total > subpacket.computation_total),
+                .LessThan => @intFromBool(computation_total < subpacket.computation_total),
+                .Equal => @intFromBool(computation_total == subpacket.computation_total),
             };
             version_total += subpacket.version_total;
         }
@@ -80,28 +80,28 @@ const Packet = struct {
                     return null;
                 }
                 t1.idx += 1;
-            }
+            },
         }
         return parse(input, bit);
     }
 
     fn readChunk(comptime T: type, input: []const u8, bit: *usize) T {
-        const end_bit = bit.* + std.meta.bitCount(T);
+        const end_bit = bit.* + @bitSizeOf(T);
         var result: usize = 0;
         while (bit.* != end_bit) {
-            const from = @intCast(u2, bit.* % 4);
+            const from = @as(u2, @intCast(bit.* % 4));
             const bits_left_to_read = end_bit - bit.*;
-            const to_excl = std.math.min(from + bits_left_to_read, 4);
-            const bits_read = @intCast(u3, to_excl - from);
-            const nibble = readNibble(input[bit.* / 4], from, @intCast(u2, to_excl - 1));
+            const to_excl = @min(from + bits_left_to_read, 4);
+            const bits_read = @as(u3, @intCast(to_excl - from));
+            const nibble = readNibble(input[bit.* / 4], from, @as(u2, @intCast(to_excl - 1)));
             result = (result << bits_read) | nibble;
             bit.* += bits_read;
         }
-        return @intCast(T, result);
+        return @as(T, @intCast(result));
     }
 
     fn readNibble(input: u8, from: u2, to: u2) u4 {
-        var result = if (input <= '9') @intCast(u4, input - '0') else @intCast(u4, input - 'A' + 10);
+        var result = if (input <= '9') @as(u4, @intCast(input - '0')) else @as(u4, @intCast(input - 'A' + 10));
         result <<= from;
         result >>= 3 - (to - from);
         return result;

@@ -2,10 +2,13 @@ const aoc = @import("../aoc.zig");
 const std = @import("std");
 
 const Buffer = struct {
-    allocator: std.mem.Allocator, buf: []u8, size: usize = 0, next: *Buffer = undefined,
+    allocator: std.mem.Allocator,
+    buf: []u8,
+    size: usize = 0,
+    next: *Buffer = undefined,
 
     fn init(allocator: std.mem.Allocator) !Buffer {
-        return Buffer { .allocator = allocator, .buf = try allocator.alloc(u8, 8388608) };
+        return Buffer{ .allocator = allocator, .buf = try allocator.alloc(u8, 8388608) };
     }
 
     fn deinit(self: *Buffer) void {
@@ -14,9 +17,12 @@ const Buffer = struct {
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var buf1 = try Buffer.init(problem.allocator); defer buf1.deinit();
-    var buf2 = try Buffer.init(problem.allocator); defer buf2.deinit();
-    buf1.next = &buf2; buf2.next = &buf1;
+    var buf1 = try Buffer.init(problem.allocator);
+    defer buf1.deinit();
+    var buf2 = try Buffer.init(problem.allocator);
+    defer buf2.deinit();
+    buf1.next = &buf2;
+    buf2.next = &buf1;
     std.mem.copy(u8, buf1.buf, problem.input);
     buf1.size = problem.input.len;
 
@@ -27,9 +33,9 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var last_char: u8 = 0;
         var repeat: usize = 0;
         curr.next.size = 0;
-        for (curr.buf[0..curr.size + 1]) |c| {
+        for (curr.buf[0 .. curr.size + 1]) |c| {
             if (c != last_char and repeat > 0) {
-                const slice = try std.fmt.bufPrint(curr.next.buf[curr.next.size..curr.next.buf.len], "{}{c}", .{repeat, last_char});
+                const slice = try std.fmt.bufPrint(curr.next.buf[curr.next.size..curr.next.buf.len], "{}{c}", .{ repeat, last_char });
                 curr.next.size += slice.len;
                 repeat = 0;
             }

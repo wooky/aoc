@@ -28,7 +28,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
             try folds.append(switch (dir[0]) {
                 'x' => Fold{ .x = line },
                 'y' => Fold{ .y = line },
-                else => unreachable
+                else => unreachable,
             });
         }
         break :blk folds;
@@ -37,7 +37,7 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     var one_fold_dot_count: usize = undefined;
     var screen_size: aoc.Coord2D = undefined;
-    for (folds.items) |fold, idx| {
+    for (folds.items, 0..) |fold, idx| {
         switch (fold) {
             .x => |x| screen_size.x = x,
             .y => |y| screen_size.y = y,
@@ -45,13 +45,13 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
         var next_dots = std.AutoHashMap(aoc.Coord2D, void).init(problem.allocator);
         var iter = dots.keyIterator();
         while (iter.next()) |coord| {
-            const x = if (std.meta.activeTag(fold) == .x and coord.x > fold.x) 2*fold.x - coord.x else coord.x;
-            const y = if (std.meta.activeTag(fold) == .y and coord.y > fold.y) 2*fold.y - coord.y else coord.y;
-            try next_dots.put(aoc.Coord2D.init(.{x, y}), {});
+            const x = if (std.meta.activeTag(fold) == .x and coord.x > fold.x) 2 * fold.x - coord.x else coord.x;
+            const y = if (std.meta.activeTag(fold) == .y and coord.y > fold.y) 2 * fold.y - coord.y else coord.y;
+            try next_dots.put(aoc.Coord2D.init(.{ x, y }), {});
         }
         dots.deinit();
         dots = next_dots;
-        
+
         if (idx == 0) {
             one_fold_dot_count = dots.count();
         }
@@ -59,8 +59,11 @@ pub fn run(problem: *aoc.Problem) !aoc.Solution {
 
     var code = std.ArrayList(u8).init(problem.allocator);
     defer code.deinit();
-    var coord = aoc.Coord2D.init(.{0, 0});
-    while (coord.y < screen_size.y) : ({ coord.x = 0; coord.y += 1; }) {
+    var coord = aoc.Coord2D.init(.{ 0, 0 });
+    while (coord.y < screen_size.y) : ({
+        coord.x = 0;
+        coord.y += 1;
+    }) {
         while (coord.x < screen_size.x) : (coord.x += 1) {
             try code.append(if (dots.contains(coord)) '#' else '.');
         }

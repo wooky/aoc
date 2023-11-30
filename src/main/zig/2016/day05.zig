@@ -11,18 +11,23 @@ const Password = struct {
 };
 
 pub fn run(problem: *aoc.Problem) !aoc.Solution {
-    var password = Password { .input = problem.input };
-    var loop: std.event.Loop = undefined;
-    try loop.init();
-    defer loop.deinit();
-    for (loop.extra_threads) |_| {
-        try loop.runDetached(problem.allocator, doHash, .{&password});
-    }
-    loop.run();
-    
-    const s1 = try std.fmt.allocPrint(problem.allocator, "{x:0>8}", .{password.pwd1}); defer problem.allocator.free(s1);
-    const s2 = try std.fmt.allocPrint(problem.allocator, "{x:0>8}", .{password.pwd2}); defer problem.allocator.free(s2);
-    return problem.solution(s1, s2);
+    // var password = Password{ .input = problem.input };
+    // var loop: std.event.Loop = undefined;
+    // try loop.init();
+    // defer loop.deinit();
+    // for (loop.extra_threads) |_| {
+    //     try loop.runDetached(problem.allocator, doHash, .{&password});
+    // }
+    // loop.run();
+
+    // const s1 = try std.fmt.allocPrint(problem.allocator, "{x:0>8}", .{password.pwd1});
+    // defer problem.allocator.free(s1);
+    // const s2 = try std.fmt.allocPrint(problem.allocator, "{x:0>8}", .{password.pwd2});
+    // defer problem.allocator.free(s2);
+    // return problem.solution(s1, s2);
+
+    // TODO https://github.com/wooky/aoc/issues/9
+    return problem.solution("TODO #9", "TODO #9");
 }
 
 // not thread safe yolo
@@ -31,16 +36,16 @@ fn doHash(password: *Password) void {
     var input_buf: [16]u8 = undefined;
     while (password.pwd2_bitmask != 0xFF) {
         const hash_idx = @atomicRmw(usize, &password.hash_idx, .Add, 1, .SeqCst);
-        const input = std.fmt.bufPrint(&input_buf, "{s}{}", .{password.input, hash_idx}) catch unreachable;
+        const input = std.fmt.bufPrint(&input_buf, "{s}{}", .{ password.input, hash_idx }) catch unreachable;
         std.crypto.hash.Md5.hash(input, &hash, .{});
         if (hash[0] == 0 and hash[1] == 0 and hash[2] & 0xF0 == 0) {
-            const c6 = @intCast(u4, hash[2] & 0x0F);
+            const c6 = @as(u4, @intCast(hash[2] & 0x0F));
             if (password.pwd1_idx < 8) {
                 password.pwd1 = (password.pwd1 << 4) | c6;
                 password.pwd1_idx += 1;
             }
             if (c6 < 8) {
-                const c6_bitpos = @intCast(u3, 7 - c6);
+                const c6_bitpos = @as(u3, @intCast(7 - c6));
                 const c6_bitmask = @as(u8, 1) << c6_bitpos;
                 if (password.pwd2_bitmask & c6_bitmask == 0) {
                     const c7: u32 = hash[3] >> 4;

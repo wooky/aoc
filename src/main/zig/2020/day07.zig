@@ -51,7 +51,7 @@ fn extractBag(statement: []const u8) ?BagsHeld {
     while (true) : (idx -= 1) {
         if (statement[idx] == ' ') {
             if (saw_space) {
-                return BagsHeld { .name = statement[idx+1..], .qty = statement[idx-1] - '0' };
+                return BagsHeld{ .name = statement[idx + 1 ..], .qty = statement[idx - 1] - '0' };
             }
             saw_space = true;
         }
@@ -66,8 +66,7 @@ fn countBags(containing: aoc.StringMultimap(BagsHeld), name: []const u8) usize {
             sum += bag.qty + bag.qty * countBags(containing, bag.name);
         }
         return sum;
-    }
-    else {
+    } else {
         return 0;
     }
 }
