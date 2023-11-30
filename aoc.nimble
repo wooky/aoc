@@ -12,9 +12,8 @@ srcDir        = "src/main/nim"
 requires "nim >= 1.6.0"
 requires "zero_functional >= 1.3.0"
 requires "pixie >= 5.0.0"
-requires "genny >= 0.1.0"
 
-task bindings, "Generate bindings":
+task lib, "Generate library":
 
   proc compile(libName: string, flags = "") =
     exec "nim c -f " & flags & " --app:lib --gc:orc --threads:on --out:" & libName & " --outdir:build/bindings.nim src/main/nim/aoc.nim"

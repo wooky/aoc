@@ -1,11 +1,12 @@
-import aoc/aoc, "aoc/2016/runner", "aoc/2017/runner", genny, pixie
+import aoc/aoc, "aoc/2016/runner", "aoc/2017/runner", pixie
 
 type
   ExportSolution* = object
     s1*: cstring
     s2*: cstring
 
-proc run*(file: string, year: int, day: int): ExportSolution =
+proc run(input: cstring, year: int, day: int): ExportSolution {.cdecl, exportc, dynlib.} =
+  var file = $input
   let solution =
     try:
       case year
@@ -19,12 +20,3 @@ proc run*(file: string, year: int, day: int): ExportSolution =
       echo e.getStackTrace()
       quit(e.msg)
   ExportSolution(s1: solution.s1.cstring, s2: solution.s2.cstring)
-
-exportProcs:
-  run
-
-exportObject ExportSolution:
-  discard
-
-writeFiles("build", "aoc_nim")
-include ../../../build/internal

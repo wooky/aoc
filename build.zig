@@ -18,12 +18,7 @@ pub fn build(b: *Builder) void {
         .target = target,
         .optimize = optimize,
     });
-    lib.addAnonymousModule("aoc_nim", .{ .source_file = .{ .path = "build/aoc_nim.zig" } });
     lib.linkLibC();
-    lib.addLibraryPath(.{ .path = "build/bindings.nim" });
-    lib.addLibraryPath(.{ .path = "build/ada/lib" });
-    lib.linkSystemLibrary("aoc_nim");
-    lib.linkSystemLibrary("aoc_ada");
     lib.linkSystemLibrary("gsl");
 
     const install = b.addInstallArtifact(lib, .{ .dest_dir = .{ .override = .{ .custom = "../build" } } });

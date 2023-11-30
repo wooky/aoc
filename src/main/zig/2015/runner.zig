@@ -26,6 +26,6 @@ pub fn run(problem: *aoc.Problem, day: u16) !aoc.Solution {
         23 => @import("day23.zig").run(problem),
         24 => @import("day24.zig").run(problem),
         25 => @import("day25.zig").run(problem),
-        else => unreachable,
+        else => @panic("Invalid 2015 day"),
     };
 }

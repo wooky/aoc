@@ -6,4 +6,4 @@ function Run (File_C : chars_ptr; Year, Day : Positive) return Solution
   with
     Export => True,
     Convention => C,
-    External_Name => "run_ada";
+    External_Name => "run";

@@ -4,4 +4,4 @@
 build/
 gradle/
 zig-cache/
-zig-out/
+__pycache__/
