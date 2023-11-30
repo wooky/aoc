@@ -9,6 +9,7 @@ library project AOC is
   for Library_Kind use "dynamic";
   for Library_Interface use ("aoc", "run");
   for Library_Standalone use "encapsulated";
+  for Library_Options use ("-lgnatcoll");
 
   package Compiler is
     for Default_Switches ("Ada") use ("-g");

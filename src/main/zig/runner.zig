@@ -3,8 +3,13 @@ const std = @import("std");
 
 pub const io_mode = .evented;
 
-pub fn run(problem: *aoc.Problem, year: u16, day: u16) !aoc.Solution {
-    return try switch (year) {
+const ExportSolution = extern struct {
+    s1: [*:0]const u8,
+    s2: [*:0]const u8,
+};
+
+fn run_zig(problem: *aoc.Problem, year: u16, day: u16) !ExportSolution {
+    var zig_solution = try switch (year) {
         2015 => @import("2015/runner.zig").run(problem, day),
         2016 => @import("2016/runner.zig").run(problem, day),
         2017 => @import("2017/runner.zig").run(problem, day),
@@ -14,29 +19,20 @@ pub fn run(problem: *aoc.Problem, year: u16, day: u16) !aoc.Solution {
         2022 => @import("2022/runner.zig").run(problem, day),
         else => unreachable,
     };
+    defer zig_solution.deinit(problem.allocator);
+    return ExportSolution{
+        .s1 = try problem.allocator.dupeZ(u8, zig_solution.s1),
+        .s2 = try problem.allocator.dupeZ(u8, zig_solution.s2),
+    };
 }
 
-pub fn main() !void {
-    const args = try std.process.argsAlloc(std.heap.page_allocator);
-    defer std.process.argsFree(std.heap.page_allocator, args);
-    if (args.len < 3) {
-        usage(args);
-    }
-    const year = std.fmt.parseInt(u16, args[1], 10) catch usage(args);
-    const day = std.fmt.parseInt(u16, args[2], 10) catch usage(args);
+export fn run(file: [*:0]const u8, year: u16, day: u16) ExportSolution {
+    var problem = aoc.Problem.init(std.heap.page_allocator, file);
 
-    var problem = aoc.Problem.init(year, day, std.heap.page_allocator) catch |err| switch (err) {
-        error.FileNotFound => {
-            std.debug.print("Invalid year/day provided\n", .{});
-            std.process.exit(1);
-        },
-        else => return err,
+    return run_zig(&problem, year, day) catch |err| {
+        const trace = @errorReturnTrace();
+        std.debug.panicExtra(trace, null, "Caught error {s}", .{@errorName(err)});
     };
-    defer problem.deinit();
-
-    var solution = try run(&problem, year, day);
-    defer solution.deinit(std.heap.page_allocator);
-    std.debug.print("{s}\n{s}\n", .{ solution.s1, solution.s2 });
 }
 
 fn usage(args: [][]const u8) noreturn {

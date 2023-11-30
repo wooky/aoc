@@ -12,30 +12,20 @@ pub fn build(b: *Builder) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     const optimize = b.standardOptimizeOption(.{});
 
-    const exe = b.addExecutable(.{
-        .name = "aoc",
+    const lib = b.addSharedLibrary(.{
+        .name = "aoc_zig",
         .root_source_file = .{ .path = "src/main/zig/runner.zig" },
         .target = target,
         .optimize = optimize,
     });
-    exe.addAnonymousModule("aoc_nim", .{ .source_file = .{ .path = "build/aoc_nim.zig" } });
-    exe.linkLibC();
-    exe.addLibraryPath(.{ .path = "build/bindings.nim" });
-    exe.addLibraryPath(.{ .path = "build/ada/lib" });
-    exe.linkSystemLibrary("aoc_nim");
-    exe.linkSystemLibrary("aoc_ada");
-    exe.linkSystemLibrary("gsl");
-    b.installArtifact(exe);
+    lib.addAnonymousModule("aoc_nim", .{ .source_file = .{ .path = "build/aoc_nim.zig" } });
+    lib.linkLibC();
+    lib.addLibraryPath(.{ .path = "build/bindings.nim" });
+    lib.addLibraryPath(.{ .path = "build/ada/lib" });
+    lib.linkSystemLibrary("aoc_nim");
+    lib.linkSystemLibrary("aoc_ada");
+    lib.linkSystemLibrary("gsl");
 
-    const run_cmd = b.addRunArtifact(exe);
-    run_cmd.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
-
-    const run_step = b.step("run", "Run the app");
-    run_step.dependOn(&run_cmd.step);
-
-    var test_step = @import("src/test/zig/index.zig").makeTests(b);
-    test_step.dependOn(&exe.step);
+    const install = b.addInstallArtifact(lib, .{ .dest_dir = .{ .override = .{ .custom = "../build" } } });
+    b.getInstallStep().dependOn(&install.step);
 }

@@ -12,6 +12,7 @@ srcDir        = "src/main/nim"
 requires "nim >= 1.6.0"
 requires "zero_functional >= 1.3.0"
 requires "pixie >= 5.0.0"
+requires "genny >= 0.1.0"
 
 task bindings, "Generate bindings":
 
