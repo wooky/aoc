@@ -14,13 +14,13 @@ pub fn build(b: *Builder) void {
 
     const lib = b.addSharedLibrary(.{
         .name = "aoc_zig",
-        .root_source_file = .{ .path = "src/main/zig/runner.zig" },
+        .root_source_file = .{ .path = "runner.zig" },
         .target = target,
         .optimize = optimize,
     });
     lib.linkLibC();
     lib.linkSystemLibrary("gsl");
 
-    const install = b.addInstallArtifact(lib, .{ .dest_dir = .{ .override = .{ .custom = "../build" } } });
+    const install = b.addInstallArtifact(lib, .{ .dest_dir = .{ .override = .{ .custom = "../../../../build" } } });
     b.getInstallStep().dependOn(&install.step);
 }

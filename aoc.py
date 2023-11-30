@@ -12,8 +12,8 @@ class Solution(Structure):
   ]
 
 class AocLib(ABC):
-  def __init__(self, name: str, subdir: str = "") -> None:
-    self._lib = cdll.LoadLibrary(f"build/{subdir}libaoc_{name}.so")
+  def __init__(self, name: str) -> None:
+    self._lib = cdll.LoadLibrary(f"build/libaoc_{name}.so")
     self._run = self._lib.run
     self._run.argtypes = [c_char_p, c_uint, c_uint]
     self._run.restype = Solution
@@ -29,7 +29,7 @@ class AocLib(ABC):
   
 class AocAda(AocLib):
   def __init__(self) -> None:
-    super().__init__("ada", "ada/lib/")
+    super().__init__("ada")
 
   def __enter__(self):
     self._lib.aoc_adainit()
@@ -41,7 +41,7 @@ class AocAda(AocLib):
 
 class AocNim(AocLib):
   def __init__(self) -> None:
-    super().__init__("nim", "bindings.nim/")
+    super().__init__("nim")
   
 class AocZig(AocLib):
   def __init__(self) -> None:
