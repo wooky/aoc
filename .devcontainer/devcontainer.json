@@ -28,7 +28,8 @@
 				"ziglang.vscode-zig",
 				"AdaCore.ada",
 				"ms-azuretools.vscode-docker",
-				"streetsidesoftware.code-spell-checker"
+				"streetsidesoftware.code-spell-checker",
+				"nadako.vshaxe"
 			]
 		}
 	}
