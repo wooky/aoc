@@ -29,7 +29,7 @@
 				"AdaCore.ada",
 				"ms-azuretools.vscode-docker",
 				"streetsidesoftware.code-spell-checker",
-				"nadako.vshaxe"
+				"ms-vscode.cpptools-extension-pack"
 			]
 		}
 	}
