@@ -11,8 +11,8 @@ public:
   template<typename S1, typename S2>
   Solution(S1 s1, S2 s2)
   {
-    this->s1 = std::to_string(s1).c_str();
-    this->s2 = std::to_string(s2).c_str();
+    this->s1 = (new std::string(std::to_string(s1)))->c_str();
+    this->s2 = (new std::string(std::to_string(s2)))->c_str();
   }
 };
 
