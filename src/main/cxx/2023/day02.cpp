@@ -1,11 +1,10 @@
 #include <algorithm>
-#include <fstream>
-#include <iostream>
 #include <map>
 #include <numeric>
 #include <ranges>
 #include <regex>
 #include <vector>
+#include "../aoc.hpp"
 
 namespace aoc::y2023
 {
@@ -21,17 +20,17 @@ private:
   uint8_t number = 0;
 
 public:
-  Game(const std::string& line)
+  Game(const std::string_view& line)
   {
-    std::smatch match;
-    if (!std::regex_search(line, match, reGame))
+    std::cmatch match;
+    if (!std::regex_search(line.cbegin(), line.cend(), match, reGame))
     {
       return;
     }
     number = std::stoi(match[1].str());
 
-    auto cubeIter = std::sregex_iterator(match.suffix().first, line.cend(), reCube);
-    auto lineEnd = std::sregex_iterator();
+    auto cubeIter = std::cregex_iterator(match.suffix().first, line.cend(), reCube);
+    auto lineEnd = std::cregex_iterator();
     CubeSet cubeSet;
     for (; cubeIter != lineEnd; ++cubeIter)
     {
@@ -53,26 +52,31 @@ public:
 
   uint32_t calcPower()
   {
+    if (number == 0)
+    {
+      return 0;
+    }
     auto cubeQty = highestCubes | std::views::transform([](auto& cube){ return cube.second; });
     return std::reduce(cubeQty.begin(), cubeQty.end(), 1, std::multiplies());
   }
 };
 const std::regex Game::reGame { "Game (\\d+):" };
 const std::regex Game::reCube { " (\\d+) (\\w+)[,;]?" };
-
-} // namespace aoc::y2023
   
-int main()
+aoc::Solution day02(const std::string& input)
 {
-  std::ifstream file("../../../../input/2023/day02.txt");
-  std::string line;
+  auto lines = input
+    | std::views::split('\n')
+    | std::views::transform([](const auto& line){ return std::string_view(&*line.begin(), std::ranges::distance(line)); });
   const aoc::y2023::CubeSet maximums {{"red", 12}, {"green", 13}, {"blue", 14}};
   uint32_t s1 = 0, s2 = 0;
-  while (std::getline(file, line))
+  for (const auto line : lines)
   {
     aoc::y2023::Game game { line };
     s1 += game.isGamePossible(maximums);
     s2 += game.calcPower();
   }
-  std::cout << s1 << "\n" << s2 << "\n";
+  return aoc::Solution(s1, s2);
 }
+
+} // namespace aoc::y2023

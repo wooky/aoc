@@ -28,4 +28,5 @@ runners: dict[int, str|dict[int, str]] = {
   2020: "zig",
   2021: "zig",
   2022: "ada",
+  2023: "cxx",
 }

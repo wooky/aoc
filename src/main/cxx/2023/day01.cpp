@@ -1,7 +1,7 @@
-#include <fstream>
-#include <iostream>
 #include <map>
+#include <ranges>
 #include <regex>
+#include "../aoc.hpp"
 
 namespace aoc::y2023
 {
@@ -31,9 +31,9 @@ private:
     return s[0] - '0';
   }
 
-  uint32_t getCalibration(const std::string& line, const std::regex& re)
+  uint32_t getCalibration(const std::string_view& line, const std::regex& re)
   {
-    std::smatch firstMatch, lastMatch, match;
+    std::cmatch firstMatch, lastMatch, match;
     for (
       auto lineIter = line.cbegin();
       std::regex_search(lineIter, line.cend(), match, re);
@@ -55,31 +55,32 @@ private:
   }
 
 public:
-  inline uint32_t getDigitCalibration(const std::string& line)
+  inline uint32_t getDigitCalibration(const std::string_view& line)
   {
     return getCalibration(line, reDigits);
   }
 
-  inline uint32_t getWordCalibration(const std::string& line)
+  inline uint32_t getWordCalibration(const std::string_view& line)
   {
     return getCalibration(line, reWords);
   }
 };
 
-} // namespace aoc::y2023
-
-int main()
+aoc::Solution day01(const std::string& input)
 {
-  std::ifstream file("../../../../input/2023/day01.txt");
-  std::string line;
-  aoc::y2023::Day01 problem;
+  auto lines = input
+    | std::views::split('\n')
+    | std::views::transform([](const auto& line){ return std::string_view(&*line.begin(), std::ranges::distance(line)); });
+  Day01 problem;
   uint32_t s1 = 0, s2 = 0;
 
-  while (std::getline(file, line))
+  for (const auto line : lines)
   {
     s1 += problem.getDigitCalibration(line);
     s2 += problem.getWordCalibration(line);
   }
-  
-  std::cout << s1 << "\n" << s2 << "\n";
+
+  return aoc::Solution(s1, s2);
 }
+
+} // namespace aoc::y2023

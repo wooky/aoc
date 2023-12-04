@@ -39,6 +39,10 @@ class AocAda(AocLib):
     super().__exit__(exc_type, exc_value, traceback)
     self._lib.aoc_adafinal()
 
+class AocCxx(AocLib):
+  def __init__(self) -> None:
+    super().__init__("cxx")
+
 class AocNim(AocLib):
   def __init__(self) -> None:
     super().__init__("nim")
@@ -56,20 +60,17 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   filename = f"input/{args.year}/day{args.day:02}.txt"
-  try:
-    with open(filename, 'rb') as f:
-      input = f.read()
+  with open(filename, 'rb') as f:
+    input = f.read()
 
-      runner = runners[args.year]
-      if isinstance(runner, dict):
-        runner = runner[args.day]
-      match runner:
-        case "ada": aoc_lib_class = AocAda
-        case "nim": aoc_lib_class = AocNim
-        case "zig": aoc_lib_class = AocZig
-      with aoc_lib_class() as aoc_lib:
-        solution = aoc_lib.run(input, args.year, args.day)
-        print(solution.s1.decode(), solution.s2.decode(), sep="\n")
-  except IOError:
-    print("Cannot open input file (wrong year/day?)")
-    sys.exit(1)
+    runner = runners[args.year]
+    if isinstance(runner, dict):
+      runner = runner[args.day]
+    match runner:
+      case "ada": aoc_lib_class = AocAda
+      case "cxx": aoc_lib_class = AocCxx
+      case "nim": aoc_lib_class = AocNim
+      case "zig": aoc_lib_class = AocZig
+    with aoc_lib_class() as aoc_lib:
+      solution = aoc_lib.run(input, args.year, args.day)
+      print(solution.s1.decode(), solution.s2.decode(), sep="\n")
