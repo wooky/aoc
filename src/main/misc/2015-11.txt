@@ -8,5 +8,5 @@ we can set the last 5 letters to xxyzz, making the next password
 
 xyz is the last increasing straight we can make in the alphabet, so we increment
 the 6th last letter. This allows the last 5 letters to use the smallest possible
-combination, which is aabcc. Hence, the next passwod becomes
+combination, which is aabcc. Hence, the next password becomes
   >> vzcaabcc

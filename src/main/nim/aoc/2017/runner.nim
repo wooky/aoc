@@ -1,5 +1,5 @@
 import ../aoc
-import day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25
+import day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day24, day25
 
 proc run2017*(file: string, day: int): Solution =
   case day
@@ -25,7 +25,6 @@ proc run2017*(file: string, day: int): Solution =
   of 20: day20(file)
   of 21: day21(file)
   of 22: day22(file)
-  of 23: day23(file)
   of 24: day24(file)
   of 25: day25(file)
   else: raise newException(ValueError, "Invalid day")
