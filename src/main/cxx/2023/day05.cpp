@@ -63,8 +63,8 @@ public:
 
 uint64_t processSource(
   const Range& source,
-  const std::vector<std::vector<Sneed>>::const_iterator multiSneed,
-  const std::vector<std::vector<Sneed>>::const_iterator multiSneedEnd
+  const auto& multiSneed,
+  const auto& multiSneedEnd
 )
 {
   if (multiSneed == multiSneedEnd)
@@ -105,24 +105,14 @@ Solution day05(const std::string& input)
     std::advance(line, 2);
   }
 
-  std::vector<std::vector<Sneed>> multiSneeds;
-  std::vector<Sneed> currentSneeds;
-  for (; line != lines.end(); ++line)
-  {
-    if ((*line).back() == ':')
-    {
-      continue;
-    }
-    if ((*line).empty())
-    {
-      multiSneeds.push_back(currentSneeds);
-      currentSneeds = decltype(currentSneeds)();
-      continue;
-    }
-    currentSneeds.emplace_back(*line);
-  }
+  auto multiSneeds = lines
+    | std::views::drop(2)
+    | std::views::filter([](const auto& line){ return line.empty() || line.back() != ':'; })
+    | std::views::split("")
+    | std::views::filter([](const auto& group){ return group.begin() != group.end(); })
+    | std::views::transform([](const auto& group){ return group | std::views::transform([](const auto& line){ return Sneed(line); }); });
 
-  auto lowestLocation = std::views::transform([&](const Range& source){ return processSource(source, multiSneeds.cbegin(), multiSneeds.cend()); });
+  auto lowestLocation = std::views::transform([&](const Range& source){ return processSource(source, multiSneeds.begin(), multiSneeds.end()); });
   auto s1 = std::ranges::min(seeds1 | lowestLocation);
   auto s2 = std::ranges::min(seeds2 | lowestLocation);
 
