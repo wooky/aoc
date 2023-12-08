@@ -21,16 +21,37 @@ Solution day08(const std::string& input)
     network.emplace(line.substr(0, 3), std::make_pair(line.substr(7, 3), line.substr(12, 3)));
   }
 
-  uint32_t steps = 0;
-  std::string_view node {"AAA"}, dest {"ZZZ"};
-  while (node != dest)
+  uint32_t s1 = 0;
   {
-    const auto& pair = network[node];
-    node = directions[steps % directions.size()] == 'L' ? pair.first : pair.second;
-    steps++;
+    std::string_view src {"AAA"}, dest {"ZZZ"};
+    while (src != dest)
+    {
+      const auto& pair = network[src];
+      src = directions[s1 % directions.size()] == 'L' ? pair.first : pair.second;
+      s1++;
+    }
   }
 
-  return {steps, 0};
+  uint64_t s2 = 1;
+  {
+    for (const auto& node : network)
+    {
+      if (node.first[2] == 'A')
+      {
+        uint32_t steps = 0;
+        auto src = node.first;
+        while (src[2] != 'Z')
+        {
+          const auto& pair = network[src];
+          src = directions[steps % directions.size()] == 'L' ? pair.first : pair.second;
+          steps++;
+        }
+        s2 = std::lcm(s2, steps);
+      }
+    }
+  }
+
+  return {s1, s2};
 }
 
 } // namespace aoc::y2023
