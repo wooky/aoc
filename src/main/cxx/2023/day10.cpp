@@ -9,10 +9,22 @@ namespace aoc::y2023
 class PipeMap
 {
 private:
+  struct Coord
+  {
+    int16_t row, col;
+
+    Coord operator+(const Coord& rhs) const
+    {
+      return {static_cast<int16_t>(row + rhs.row), static_cast<int16_t>(col + rhs.col)};
+    }
+
+    friend auto operator<=>(const Coord&, const Coord&) = default;
+  };
+
   struct Node
   {
-    size_t index;
-    uint32_t distance;
+    Coord coord;
+    uint16_t distance;
   };
 
   enum Direction {
@@ -22,52 +34,90 @@ private:
     WEST = 8,
   };
 
-  const std::string& _input;
-  const std::size_t _lineSize;
-  const std::size_t _startPos;
-  std::set<size_t> _processedNodes;
+  std::vector<std::vector<char>> _pipes;
+  uint16_t _columns;
+  Coord _startPos;
+  std::set<Coord> _pipePieces;
   std::queue<Node> _unprocessedNodes;
   static const std::map<char, uint8_t> _directions;
 
 public:
   PipeMap(const std::string& input)
-  : _input(input),
-    _lineSize(input.find('\n') + 1), // line size includes newline character
-    _startPos(input.find('S'))
   {
-    // Do nothing.
+    const auto lineSize = input.find('\n');
+    _columns = lineSize * 2 - 1;
+    const auto lineCount = input.size() / (lineSize + 1);
+    const auto rows = lineCount * 2 - 1;
+
+    for (int16_t lineNumber = 0, rowIdx = 0; lineNumber < lineCount; lineNumber++, rowIdx += 2)
+    {
+      if (rowIdx != 0)
+      {
+        _pipes.emplace_back(_columns, '.');
+      }
+      
+      auto& row = _pipes.emplace_back(_columns, '.');
+      for (int16_t idx = (lineCount + 1) * lineNumber, colIdx = 0; colIdx < _columns; idx++, colIdx += 2)
+      {
+        row[colIdx] = input[idx];
+        if (input[idx] == 'S')
+        {
+          _startPos = {rowIdx, colIdx};
+        }
+      }
+      for (int16_t colIdx = 1; colIdx < _columns; colIdx += 2)
+      {
+        if ((_directions.at(row[colIdx - 1]) & EAST) != 0 && (_directions.at(row[colIdx + 1]) & WEST) != 0)
+        {
+          row[colIdx] = '-';
+        }
+      }
+
+      if (rowIdx != 0)
+      {
+        for (int16_t colIdx = 0; colIdx < _columns; colIdx += 2)
+        {
+          if ((_directions.at(_pipes[rowIdx - 2][colIdx]) & SOUTH) != 0 && (_directions.at(row[colIdx]) & NORTH) != 0)
+          {
+            _pipes[rowIdx - 1][colIdx] = '|';
+          }
+        }
+      }
+    }
   }
 
-  uint32_t calcFurthestDistance()
+  uint16_t calcFurthestDistance()
   {
     _unprocessedNodes.push({_startPos, 0});
-    uint32_t furthestDistance = 0;
+    uint16_t furthestDistance = 0;
     for (; !_unprocessedNodes.empty(); _unprocessedNodes.pop())
     {
       const auto node = _unprocessedNodes.front();
-      _processedNodes.insert(node.index);
+      _pipePieces.insert(node.coord);
       furthestDistance = std::max(furthestDistance, node.distance);
-      tryQueuingNode(node.index - _lineSize, SOUTH, node.distance);
-      tryQueuingNode(node.index - 1, EAST, node.distance);
-      tryQueuingNode(node.index + 1, WEST, node.distance);
-      tryQueuingNode(node.index + _lineSize, NORTH, node.distance);
+      tryQueuingNode(node.coord + Coord{-1, 0}, SOUTH, node.distance);
+      tryQueuingNode(node.coord + Coord{0, -1}, EAST, node.distance);
+      tryQueuingNode(node.coord + Coord{0, +1}, WEST, node.distance);
+      tryQueuingNode(node.coord + Coord{+1, 0}, NORTH, node.distance);
     }
     return furthestDistance;
   }
 
 private:
-  void tryQueuingNode(size_t idx, uint8_t directionTowards, uint32_t prevDistance)
+  void tryQueuingNode(const Coord& coord, uint8_t directionTowards, uint16_t prevDistance)
   {
     if (
-      idx < 0 || idx >= _input.size() ||
-      _processedNodes.find(idx) != _processedNodes.end() ||
-      (_directions.at(_input[idx]) & directionTowards) == 0
+      coord.row < 0 || coord.col < 0 ||
+      coord.row >= _pipes.size() || coord.col >= _columns ||
+      _pipePieces.find(coord) != _pipePieces.end() ||
+      (_directions.at(_pipes[coord.row][coord.col]) & directionTowards) == 0
     )
     {
       return;
     }
     
-    _unprocessedNodes.emplace(idx, prevDistance + 1);
+    // Increment distance on even positions, since odd positions are "virtual"
+    _unprocessedNodes.emplace(coord, (coord.row % 2 == 0 && coord.col % 2 == 0) ? prevDistance + 1 : prevDistance);
   }
 };
 
@@ -79,7 +129,7 @@ decltype(PipeMap::_directions) PipeMap::_directions = {
   {'7', SOUTH | WEST},
   {'F', SOUTH | EAST},
   {'.', 0},
-  {'S', 0},
+  {'S', NORTH | SOUTH | EAST | WEST},
   {'\n', 0},
 };
   
