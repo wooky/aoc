@@ -17,6 +17,7 @@ extern aoc::Solution day11(const std::string& input);
 extern aoc::Solution day12(const std::string& input);
 extern aoc::Solution day13(const std::string& input);
 extern aoc::Solution day14(const std::string& input);
+extern aoc::Solution day15(const std::string& input);
 
 aoc::Solution run(const std::string& input, uint16_t day)
 {
@@ -35,6 +36,7 @@ aoc::Solution run(const std::string& input, uint16_t day)
   case 12: return day12(input);
   case 13: return day13(input);
   case 14: return day14(input);
+  case 15: return day15(input);
   default: throw std::runtime_error("Invalid day for 2023");
   }
 }
