@@ -1,0 +1,112 @@
+#include <algorithm>
+#include <queue>
+#include <set>
+#include "../aoc.hpp"
+#include <iostream>
+
+namespace aoc::y2023
+{
+
+struct Coord
+{
+  int8_t row, col;
+
+  Coord operator+(const Coord& rhs) const
+  {
+    return {static_cast<int8_t>(row + rhs.row), static_cast<int8_t>(col + rhs.col)};
+  }
+
+  Coord operator-() const
+  {
+    return {static_cast<int8_t>(-row), static_cast<int8_t>(-col)};
+  }
+
+  friend auto operator<=>(const Coord&, const Coord&) = default;
+};
+
+class LavaPath
+{
+private:
+  struct Vertex
+  {
+    Coord coord;
+    Coord delta;
+    std::set<Coord> visits;
+    uint32_t heatLoss;
+    uint32_t penalty;
+    uint8_t movesSinceLastTurn;
+
+    Vertex next(const Coord& delta, uint32_t heatLoss, uint32_t penalty, uint8_t movesSinceLastTurn) const
+    {
+      auto visits = this->visits;
+      visits.insert(this->coord);
+      return {this->coord + delta, delta, visits, heatLoss, penalty, movesSinceLastTurn};
+    }
+  };
+
+private:
+  const std::string& _map;
+  const uint8_t _side;
+
+public:
+  LavaPath(const std::string& map)
+  : _map(map),
+    _side(map.find('\n'))
+  {
+    std::cout << "side = " << (int)_side << "\n";
+  }
+
+  uint32_t calcHeatLoss()
+  {
+    const auto vertexPriorityComparison = [&](const Vertex& a, const Vertex& b) { return a.penalty > b.penalty; };
+    std::priority_queue<Vertex, std::vector<Vertex>, decltype(vertexPriorityComparison)> vertices(vertexPriorityComparison);
+    vertices.emplace(Coord{0, 0}, Coord{0, 0}, std::set<Coord>{}, 0, 0);
+
+    while (!vertices.empty())
+    {
+      const auto currentVertex = vertices.top();
+      std::cout << "(" << (int)currentVertex.coord.row << "," << (int)currentVertex.coord.col << ") -> (" << currentVertex.visits.size() << ") " << currentVertex.penalty << "\n"; //<< " (" << (int)currentVertex.lastTurn.row << "," << (int)currentVertex.lastTurn.col << ")\n";
+      if (currentVertex.coord.row == _side - 1 && currentVertex.coord.col == _side - 1)
+      {
+        return currentVertex.heatLoss;
+      }
+
+      vertices.pop();
+      for (const auto& delta : {Coord{1, 0}, Coord{0, 1}, Coord{-1, 0}, Coord{0, -1}})
+      {
+        const auto nextCoord = currentVertex.coord + delta;
+        if (
+          currentVertex.delta == -delta ||
+          nextCoord.row < 0 || nextCoord.col < 0 ||
+          nextCoord.row >= _side || nextCoord.col >= _side ||
+          currentVertex.visits.contains(nextCoord)
+        )
+        {
+          continue;
+        }
+
+        const auto nextMovesSinceLastTurn = (currentVertex.delta == delta) ? currentVertex.movesSinceLastTurn + 1 : 1;
+        if (nextMovesSinceLastTurn >= 3)
+        {
+          continue;
+        }
+
+        const auto nextHeatLoss = currentVertex.heatLoss + _map[(_side + 1) * nextCoord.row + nextCoord.col] - '0';
+        const auto nextPenalty = nextHeatLoss + (_side + _side - nextCoord.row - nextCoord.col);
+        vertices.push(currentVertex.next(delta, nextHeatLoss, nextPenalty, nextMovesSinceLastTurn));
+      }
+    }
+
+    throw "unreachable";
+  }
+};
+
+Solution day17(const std::string& input)
+{
+  LavaPath lavaPath {input};
+  const auto s1 = lavaPath.calcHeatLoss();
+
+  return {s1, 0};
+}
+
+} // namespace aoc::y2023
