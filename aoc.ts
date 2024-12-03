@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno -A
+
 import { run as gleamRun } from "./build/glm-obj/dev/javascript/aoc_glm/aoc_glm.mjs";
 import runners from "./runners.json" with { type: "json" };
 import process from "node:process";
