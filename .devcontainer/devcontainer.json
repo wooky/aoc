@@ -23,13 +23,13 @@
 		"vscode": {
 			"extensions": [
 				"kosz78.nim",
-				"ms-python.vscode-pylance",
-				"ms-python.python",
 				"ziglang.vscode-zig",
 				"AdaCore.ada",
 				"ms-azuretools.vscode-docker",
 				"streetsidesoftware.code-spell-checker",
-				"ms-vscode.cpptools-extension-pack"
+				"ms-vscode.cpptools-extension-pack",
+				"gleam.gleam",
+				"denoland.vscode-deno"
 			]
 		}
 	}
