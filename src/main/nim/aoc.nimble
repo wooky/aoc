@@ -15,6 +15,6 @@ requires "pixie >= 5.0.0"
 task lib, "Generate library":
 
   proc compile(libName: string, flags = "") =
-    exec "nim c -f " & flags & " --app:lib --gc:orc --threads:on --out:" & libName & " --outdir:../../../build aoc.nim"
+    exec "nim c " & flags & " --app:lib --gc:orc --threads:on --out:" & libName & " --outdir:../../../build aoc.nim"
 
   compile "libaoc_nim.so"
