@@ -5,40 +5,41 @@ import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 import gleam/yielder
+import lib/coord.{type Coord, type Delta, Coord, Delta}
 
 pub fn day06(input: String) -> #(String, String) {
-  let ReadState(map, guard_coord, max_row, max_col) =
+  let ReadState(map, guard_coord, max_coord) =
     input
     |> string.to_utf_codepoints()
-    |> list.fold(ReadState(dict.new(), #(-1, -1), 0, 0), fn(read_state, c) {
-      let ReadState(map, guard_coord, row, col) = read_state
-      case string.utf_codepoint_to_int(c) {
-        0x0a -> ReadState(map, guard_coord, row + 1, 0)
-        0x23 ->
-          ReadState(
-            dict.insert(map, #(row, col), True),
-            guard_coord,
-            row,
-            col + 1,
-          )
-        0x2e ->
-          ReadState(
-            dict.insert(map, #(row, col), False),
-            guard_coord,
-            row,
-            col + 1,
-          )
-        0x5e ->
-          ReadState(
-            dict.insert(map, #(row, col), False),
-            #(row, col),
-            row,
-            col + 1,
-          )
-        _ -> panic
-      }
-    })
-  let guard_delta = #(-1, 0)
+    |> list.fold(
+      ReadState(dict.new(), Coord(-1, -1), Coord(0, 0)),
+      fn(read_state, c) {
+        let ReadState(map, guard_coord, curr_coord) = read_state
+        case string.utf_codepoint_to_int(c) {
+          0x0a -> ReadState(map, guard_coord, coord.crlf(curr_coord))
+          0x23 ->
+            ReadState(
+              dict.insert(map, curr_coord, True),
+              guard_coord,
+              coord.next_column(curr_coord),
+            )
+          0x2e ->
+            ReadState(
+              dict.insert(map, curr_coord, False),
+              guard_coord,
+              coord.next_column(curr_coord),
+            )
+          0x5e ->
+            ReadState(
+              dict.insert(map, curr_coord, False),
+              curr_coord,
+              coord.next_column(curr_coord),
+            )
+          _ -> panic
+        }
+      },
+    )
+  let guard_delta = Delta(-1, 0)
 
   let assert Ok(s1_walk) = walk(map, guard_coord, guard_delta, set.new())
   let s1 =
@@ -47,10 +48,10 @@ pub fn day06(input: String) -> #(String, String) {
     |> set.size()
 
   let walk_results = {
-    use row <- yielder.flat_map(yielder.range(0, max_row))
-    use col <- yielder.map(yielder.range(0, max_col))
+    use row <- yielder.flat_map(yielder.range(0, max_coord.row))
+    use col <- yielder.map(yielder.range(0, max_coord.col))
     walk(
-      dict.insert(map, #(row, col), True),
+      dict.insert(map, Coord(row, col), True),
       guard_coord,
       guard_delta,
       set.new(),
@@ -64,20 +65,17 @@ pub fn day06(input: String) -> #(String, String) {
   #(int.to_string(s1), int.to_string(s2))
 }
 
-type Coord =
-  #(Int, Int)
-
 type Visited =
-  Set(#(Coord, Coord))
+  Set(#(Coord, Delta))
 
 type ReadState {
-  ReadState(map: Dict(Coord, Bool), guard_coord: Coord, row: Int, col: Int)
+  ReadState(map: Dict(Coord, Bool), guard_coord: Coord, curr_coord: Coord)
 }
 
 fn walk(
   map: Dict(Coord, Bool),
   guard_coord: Coord,
-  guard_delta: Coord,
+  guard_delta: Delta,
   visited: Visited,
 ) -> Result(Visited, Nil) {
   let value = #(guard_coord, guard_delta)
@@ -85,13 +83,10 @@ fn walk(
     True -> Error(Nil)
     False -> {
       let visited = set.insert(visited, value)
-      let next_coord = #(
-        guard_coord.0 + guard_delta.0,
-        guard_coord.1 + guard_delta.1,
-      )
+      let next_coord = coord.add(guard_coord, guard_delta)
       case dict.get(map, next_coord) {
         Ok(True) ->
-          walk(map, guard_coord, #(guard_delta.1, -guard_delta.0), visited)
+          walk(map, guard_coord, coord.rotate_right(guard_delta), visited)
         Ok(False) -> walk(map, next_coord, guard_delta, visited)
         Error(_) -> Ok(visited)
       }
