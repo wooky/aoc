@@ -21,6 +21,10 @@ pub fn neighbor_deltas() -> List(Delta) {
   ]
 }
 
+pub fn manhattan_deltas() -> List(Delta) {
+  [Delta(-1, 0), Delta(0, -1), Delta(0, 1), Delta(1, 0)]
+}
+
 pub fn add(this: Coord, delta: Delta) -> Coord {
   Coord(this.row + delta.drow, this.col + delta.dcol)
 }
@@ -35,6 +39,12 @@ pub fn diff(from: Coord, to: Coord) -> Delta {
 
 pub fn neighbors(this: Coord) -> Yielder(Coord) {
   neighbor_deltas()
+  |> yielder.from_list()
+  |> yielder.map(fn(x) { add(this, x) })
+}
+
+pub fn manhattan(this: Coord) -> Yielder(Coord) {
+  manhattan_deltas()
   |> yielder.from_list()
   |> yielder.map(fn(x) { add(this, x) })
 }
