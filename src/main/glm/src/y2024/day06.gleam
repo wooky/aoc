@@ -4,11 +4,10 @@ import gleam/list
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
-import gleam/yielder
 import lib/coord.{type Coord, type Delta, Coord, Delta}
 
 pub fn day06(input: String) -> #(String, String) {
-  let ReadState(map, guard_coord, max_coord) =
+  let ReadState(map, guard_coord, _) =
     input
     |> string.to_utf_codepoints()
     |> list.fold(
@@ -41,26 +40,17 @@ pub fn day06(input: String) -> #(String, String) {
     )
   let guard_delta = Delta(-1, 0)
 
-  let assert Ok(s1_walk) = walk(map, guard_coord, guard_delta, set.new())
-  let s1 =
-    s1_walk
-    |> set.fold(set.new(), fn(acc, x) { set.insert(acc, x.0) })
-    |> set.size()
-
-  let walk_results = {
-    use row <- yielder.flat_map(yielder.range(0, max_coord.row))
-    use col <- yielder.map(yielder.range(0, max_coord.col))
-    walk(
-      dict.insert(map, Coord(row, col), True),
-      guard_coord,
-      guard_delta,
-      set.new(),
-    )
-  }
+  let assert Ok(first_walk) = walk(map, guard_coord, guard_delta, set.new())
+  let first_walk =
+    set.fold(first_walk, set.new(), fn(acc, x) { set.insert(acc, x.0) })
+  let s1 = set.size(first_walk)
   let s2 =
-    walk_results
-    |> yielder.filter(fn(x) { result.is_error(x) })
-    |> yielder.length()
+    first_walk
+    |> set.filter(fn(coord) {
+      walk(dict.insert(map, coord, True), guard_coord, guard_delta, set.new())
+      |> result.is_error()
+    })
+    |> set.size()
 
   #(int.to_string(s1), int.to_string(s2))
 }
