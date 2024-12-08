@@ -8,26 +8,31 @@ import gleam/yielder
 import lib/coord.{type Coord, Coord}
 
 pub fn day06(input: String) -> #(String, String) {
-  let assert #(dijkstra, BoundingBox(from, to), _) =
+  let assert #(areas, BoundingBox(from, to)) =
     input
     |> string.split("\n")
+    |> list.fold(#([], NoBox), fn(acc, line) {
+      let #(areas, bounding_box) = acc
+      let assert [Ok(col), Ok(row)] =
+        line |> string.split(", ") |> list.map(int.parse)
+      let coord = Coord(row, col)
+      let bounding_box = case bounding_box {
+        BoundingBox(from, to) ->
+          BoundingBox(
+            Coord(int.min(from.row, row), int.min(from.col, col)),
+            Coord(int.max(to.row, row), int.max(to.col, col)),
+          )
+        NoBox -> BoundingBox(coord, coord)
+      }
+      #([coord, ..areas], bounding_box)
+    })
+  let #(dijkstra, _) =
+    areas
     |> list.fold(
-      #(Dijkstra(dict.new(), set.new(), dict.new(), set.new()), NoBox, 0),
-      fn(acc, line) {
-        let #(dijkstra, bounding_box, id) = acc
-        let assert [Ok(col), Ok(row)] =
-          line |> string.split(", ") |> list.map(int.parse)
-        let coord = Coord(row, col)
-        let dijkstra = want_claim(dijkstra, id, coord)
-        let bounding_box = case bounding_box {
-          BoundingBox(from, to) ->
-            BoundingBox(
-              Coord(int.min(from.row, row), int.min(from.col, col)),
-              Coord(int.max(to.row, row), int.max(to.col, col)),
-            )
-          NoBox -> BoundingBox(coord, coord)
-        }
-        #(dijkstra, bounding_box, id + 1)
+      #(MultiDijkstra(dict.new(), set.new(), dict.new(), set.new()), 0),
+      fn(acc, coord) {
+        let #(dijkstra, id) = acc
+        #(want_claim(dijkstra, id, coord), id + 1)
       },
     )
   let dijkstra = process_claims(dijkstra, from, to)
@@ -39,7 +44,14 @@ pub fn day06(input: String) -> #(String, String) {
       }
     })
 
-  #(int.to_string(s1), "TODO")
+  let midpoint =
+    Coord(
+      { to.row - from.row } / 2 + from.row,
+      { to.col - from.col } / 2 + from.col,
+    )
+  let s2 = expand(areas, set.from_list([midpoint]), set.new()) |> set.size()
+
+  #(int.to_string(s1), int.to_string(s2))
 }
 
 type BoundingBox {
@@ -47,8 +59,8 @@ type BoundingBox {
   NoBox
 }
 
-type Dijkstra {
-  Dijkstra(
+type MultiDijkstra {
+  MultiDijkstra(
     wanted: Dict(Coord, Set(Int)),
     claimed: Set(Coord),
     claim_count: Dict(Int, Int),
@@ -56,8 +68,8 @@ type Dijkstra {
   )
 }
 
-fn want_claim(dijkstra: Dijkstra, id: Int, coord: Coord) -> Dijkstra {
-  Dijkstra(
+fn want_claim(dijkstra: MultiDijkstra, id: Int, coord: Coord) -> MultiDijkstra {
+  MultiDijkstra(
     ..dijkstra,
     wanted: dict.upsert(dijkstra.wanted, coord, fn(x) {
       case x {
@@ -68,9 +80,13 @@ fn want_claim(dijkstra: Dijkstra, id: Int, coord: Coord) -> Dijkstra {
   )
 }
 
-fn process_claims(dijkstra: Dijkstra, from: Coord, to: Coord) -> Dijkstra {
+fn process_claims(
+  dijkstra: MultiDijkstra,
+  from: Coord,
+  to: Coord,
+) -> MultiDijkstra {
   let wanted = dijkstra.wanted
-  let dijkstra = Dijkstra(..dijkstra, wanted: dict.new())
+  let dijkstra = MultiDijkstra(..dijkstra, wanted: dict.new())
   let dijkstra =
     dict.fold(wanted, dijkstra, fn(dijkstra, coord, ids) {
       let new_claimed = set.insert(dijkstra.claimed, coord)
@@ -82,7 +98,7 @@ fn process_claims(dijkstra: Dijkstra, from: Coord, to: Coord) -> Dijkstra {
         || coord.col > to.col
       case does_claim_exist, set.to_list(ids), is_claim_out_of_bounds {
         False, [id], True ->
-          Dijkstra(
+          MultiDijkstra(
             ..dijkstra,
             out_of_bounds: set.insert(dijkstra.out_of_bounds, id),
           )
@@ -100,13 +116,62 @@ fn process_claims(dijkstra: Dijkstra, from: Coord, to: Coord) -> Dijkstra {
                 None -> 1
               }
             })
-          Dijkstra(..dijkstra, claimed: new_claimed, claim_count: claim_count)
+          MultiDijkstra(
+            ..dijkstra,
+            claimed: new_claimed,
+            claim_count: claim_count,
+          )
         }
-        _, _, _ -> Dijkstra(..dijkstra, claimed: new_claimed)
+        _, _, _ -> MultiDijkstra(..dijkstra, claimed: new_claimed)
       }
     })
   case dict.size(dijkstra.wanted) {
     0 -> dijkstra
     _ -> process_claims(dijkstra, from, to)
+  }
+}
+
+fn expand(
+  areas: List(Coord),
+  wanted: Set(Coord),
+  claimed: Set(Coord),
+) -> Set(Coord) {
+  let #(wanted, claimed) =
+    set.fold(wanted, #(set.new(), claimed), fn(acc, want) {
+      let #(wanted, claimed) = acc
+      case set.contains(claimed, want) {
+        True -> acc
+        False -> {
+          let distance =
+            list.try_fold(areas, 0, fn(acc, x) {
+              let diff = coord.diff(x, want)
+              case
+                acc
+                + int.absolute_value(diff.drow)
+                + int.absolute_value(diff.dcol)
+              {
+                distance if distance >= 10_000 -> Error(Nil)
+                distance -> Ok(distance)
+              }
+            })
+          case distance {
+            Error(_) -> acc
+            Ok(_) -> {
+              let wanted =
+                want
+                |> coord.manhattan()
+                |> yielder.fold(wanted, fn(acc, coord) {
+                  set.insert(acc, coord)
+                })
+              let claimed = set.insert(claimed, want)
+              #(wanted, claimed)
+            }
+          }
+        }
+      }
+    })
+  case set.size(wanted) {
+    0 -> claimed
+    _ -> expand(areas, wanted, claimed)
   }
 }
