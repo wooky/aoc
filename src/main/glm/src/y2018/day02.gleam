@@ -1,17 +1,16 @@
 import gleam/dict
 import gleam/int
-import gleam/list.{Continue, Stop}
+import gleam/list
 import gleam/option.{None, Some}
 import gleam/string
 
 pub fn day02(input: String) -> #(String, String) {
-  let lines = string.split(input, "\n")
+  let lines = input |> string.split("\n") |> list.map(string.to_utf_codepoints)
   let res1 =
     lines
     |> list.fold(S1(0, 0), fn(acc, line) {
       let tally =
         line
-        |> string.to_utf_codepoints()
         |> list.fold(dict.new(), fn(tally, c) {
           dict.upsert(tally, c, fn(x) {
             case x {
@@ -45,38 +44,38 @@ type S1 {
 type BoxSearch {
   NoConflict(idx: Int)
   Conflict(conflicting_idx: Int, idx: Int)
-  Failure
 }
 
-fn find_similar(target: String, boxes: List(String)) -> String {
-  let target_chars = string.to_utf_codepoints(target)
+fn find_similar(
+  target: List(UtfCodepoint),
+  boxes: List(List(UtfCodepoint)),
+) -> String {
   let res =
-    list.fold_until(boxes, None, fn(_, box) {
-      let box_chars = string.to_utf_codepoints(box)
-      let assert Ok(zip) = list.strict_zip(target_chars, box_chars)
+    list.try_fold(boxes, Nil, fn(_, box) {
+      let assert Ok(zip) = list.strict_zip(target, box)
       let res =
-        list.fold_until(zip, NoConflict(0), fn(acc, pair) {
+        list.try_fold(zip, NoConflict(0), fn(acc, pair) {
           case pair.0 == pair.1, acc {
-            True, NoConflict(idx) -> Continue(NoConflict(idx: idx + 1))
+            True, NoConflict(idx) -> Ok(NoConflict(idx: idx + 1))
             True, Conflict(conflicting_idx: _, idx: idx) as conflict ->
-              Continue(Conflict(..conflict, idx: idx + 1))
+              Ok(Conflict(..conflict, idx: idx + 1))
             False, NoConflict(idx) ->
-              Continue(Conflict(conflicting_idx: idx, idx: idx + 1))
-            False, Conflict(_, _) -> Stop(Failure)
-            _, _ -> panic
+              Ok(Conflict(conflicting_idx: idx, idx: idx + 1))
+            False, Conflict(_, _) -> Error(Nil)
           }
         })
       case res {
-        Conflict(conflicting_idx, _) -> Stop(Some(conflicting_idx))
-        Failure -> Continue(None)
+        Ok(Conflict(conflicting_idx, _)) -> Error(conflicting_idx)
+        Error(_) -> Ok(Nil)
         _ -> panic
       }
     })
   case res {
-    Some(conflicting_idx) ->
-      string.from_utf_codepoints(list.take(target_chars, conflicting_idx))
-      <> string.from_utf_codepoints(list.drop(target_chars, conflicting_idx + 1))
-    None -> {
+    Error(conflicting_idx) -> {
+      let assert #(before, [_, ..after]) = list.split(target, conflicting_idx)
+      string.from_utf_codepoints(list.append(before, after))
+    }
+    Ok(_) -> {
       let assert [new_target, ..new_boxes] = boxes
       find_similar(new_target, new_boxes)
     }

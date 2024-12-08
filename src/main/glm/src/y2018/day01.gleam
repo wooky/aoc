@@ -1,16 +1,15 @@
 import gleam/int
 import gleam/list
+import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 
 pub fn day01(input: String) -> #(String, String) {
-  let frequencies =
+  let assert Ok(frequencies) =
     input
     |> string.split("\n")
-    |> list.map(fn(line) {
-      let assert Ok(x) = int.parse(line)
-      x
-    })
+    |> list.map(int.parse)
+    |> result.all()
 
   let #(s1, s2) = find_solution(frequencies, 0, set.new())
   #(int.to_string(s1), int.to_string(s2))
@@ -22,33 +21,31 @@ fn find_solution(
   original_encountered: Set(Int),
 ) -> #(Int, Int) {
   let dupe_finder =
-    list.fold_until(
+    list.try_fold(
       frequencies,
       NoDupes(original_frequency, original_encountered),
       fn(acc, x) {
-        let assert NoDupes(frequency, encountered) = acc
-        let new_frequency = frequency + x
-        case set.contains(encountered, new_frequency) {
-          True -> list.Stop(FoundDupe(new_frequency))
+        let new_frequency = acc.frequency + x
+        case set.contains(acc.encountered, new_frequency) {
+          True -> Error(new_frequency)
           False ->
-            list.Continue(NoDupes(
+            Ok(NoDupes(
               new_frequency,
-              set.insert(encountered, new_frequency),
+              set.insert(acc.encountered, new_frequency),
             ))
         }
       },
     )
 
   case dupe_finder {
-    NoDupes(frequency, encountered) -> #(
+    Ok(NoDupes(frequency, encountered)) -> #(
       frequency,
       find_solution(frequencies, frequency, encountered).1,
     )
-    FoundDupe(x) -> #(-666, x)
+    Error(x) -> #(-666, x)
   }
 }
 
-type DupeFinder {
+type NoDupes {
   NoDupes(frequency: Int, encountered: Set(Int))
-  FoundDupe(Int)
 }
