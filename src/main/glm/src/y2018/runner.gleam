@@ -6,6 +6,7 @@ import y2018/day05.{day05}
 import y2018/day06.{day06}
 import y2018/day07.{day07}
 import y2018/day08.{day08}
+import y2018/day09.{day09}
 
 pub fn run(input: String, day: Int) -> #(String, String) {
   case day {
@@ -17,6 +18,7 @@ pub fn run(input: String, day: Int) -> #(String, String) {
     6 -> day06(input)
     7 -> day07(input)
     8 -> day08(input)
+    9 -> day09(input)
     _ -> panic as "Invalid day for 2018"
   }
 }
