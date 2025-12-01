@@ -63,6 +63,19 @@ const runnerMapping = {
   "glm": (input: Uint8Array, year: number, day: number): Solution =>
     gleamRun(input, year, day) as [string, string],
 
+  "go": (input: Uint8Array, year: number, day: number): Solution =>
+    extractSolution(
+      Deno.dlopen(
+        "build/libaoc_go.so",
+        {
+          Run: {
+            parameters: ["buffer", "u16", "u16"],
+            result: { struct: ["pointer", "pointer"] },
+          },
+        },
+      ).symbols.Run(input, year, day),
+    ),
+
   "nim": (input: Uint8Array, year: number, day: number): Solution =>
     extractSolution(
       Deno.dlopen(

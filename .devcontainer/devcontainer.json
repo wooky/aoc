@@ -29,7 +29,8 @@
 				"streetsidesoftware.code-spell-checker",
 				"ms-vscode.cpptools-extension-pack",
 				"gleam.gleam",
-				"denoland.vscode-deno"
+				"denoland.vscode-deno",
+				"golang.go"
 			]
 		}
 	}
