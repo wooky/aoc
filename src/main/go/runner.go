@@ -7,17 +7,21 @@ struct AocSolution {
 };
 */
 import "C"
-
-type Solution struct {
-	S1 string
-	S2 string
-}
+import (
+	y2025 "main/2025"
+)
 
 //export Run
 func Run(input *C.char, year int, day int) C.struct_AocSolution {
-	// file := C.GoString(input)
-	solution := Solution{"Hello", "World"}
-	return C.struct_AocSolution{C.CString(solution.S1), C.CString(solution.S2)}
+	file := C.GoString(input)
+	var s1, s2 string
+	switch year {
+	case 2025:
+		s1, s2 = y2025.Run(file, day)
+	default:
+		panic("Invalid year")
+	}
+	return C.struct_AocSolution{C.CString(s1), C.CString(s2)}
 }
 
 func main() {}
