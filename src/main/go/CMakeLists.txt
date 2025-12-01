@@ -1,11 +1,17 @@
-project(aoc_go)
-
 find_program(go
   NAMES go
   REQUIRED
 )
 
-add_custom_target(${PROJECT_NAME} ALL
-  COMMAND ${go} build -o "${CMAKE_BINARY_DIR}/lib${PROJECT_NAME}.so" -buildmode=c-shared
+file(GLOB_RECURSE GO_SOURCES *.go)
+set(GO_LIB "${CMAKE_BINARY_DIR}/libaoc_go.so")
+
+add_custom_command(
+  OUTPUT ${GO_LIB}
+  COMMAND ${go} build -o "${GO_LIB}" -buildmode=c-shared
+  DEPENDS ${GO_SOURCES}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+add_custom_target(aoc_go ALL
+  DEPENDS ${GO_LIB}
 )

@@ -1,5 +1,3 @@
-project(aoc_cxx)
-
 file(GLOB_RECURSE CXX_SRCS CONFIGURE_DEPENDS "*.cpp")
 
 add_library(${PROJECT_NAME} SHARED ${CXX_SRCS})
