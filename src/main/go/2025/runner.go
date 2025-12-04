@@ -8,6 +8,8 @@ func Run(input string, day int) (string, string) {
 		return day02(input)
 	case 3:
 		return day03(input)
+	case 4:
+		return day04(input)
 	default:
 		panic("Invalid day for 2025")
 	}
