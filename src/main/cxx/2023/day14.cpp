@@ -5,7 +5,9 @@
 #include <vector>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 
 // Forward declaration
@@ -122,8 +124,11 @@ void slideEast(RockGrid& rockGrid)
     blockages[round.row] = round.col;
   }
 }
+} // namespace y2023
+using namespace y2023;
 
-Solution day14(const std::string& input)
+template<>
+Solution run<2023, 14>(const std::string& input)
 {
   RockGrid rockGrid {input};
   uint32_t s1, s2;
@@ -161,4 +166,4 @@ Solution day14(const std::string& input)
   return {s1, s2};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

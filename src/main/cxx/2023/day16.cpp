@@ -2,7 +2,9 @@
 #include <set>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
   
 struct Coord
@@ -91,8 +93,11 @@ private:
     }
   }
 };
+} // namespace y2023
+using namespace y2023;
 
-Solution day16(const std::string& input)
+template<>
+Solution run<2023, 16>(const std::string& input)
 {
   const uint8_t mirrorSize = input.find('\n');
   const auto s1 = MirrorGrid(input, mirrorSize).calcEnergized({0, 0}, {0, 1});
@@ -111,4 +116,4 @@ Solution day16(const std::string& input)
   return {s1, s2};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

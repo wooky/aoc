@@ -3,7 +3,9 @@
 #include <ranges>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 
 struct Reflection
@@ -83,8 +85,11 @@ struct Reflection
     return {static_cast<uint16_t>(unsmudged + rhs.unsmudged), static_cast<uint16_t>(smudged + rhs.smudged)};
   }
 };
+} // namespace y2023
+using namespace y2023;
 
-Solution day13(const std::string& input)
+template<>
+Solution run<2023, 13>(const std::string& input)
 {
   const std::string delim {"\n\n"};
   auto groups = std::ranges::split_view(input, delim);
@@ -94,4 +99,4 @@ Solution day13(const std::string& input)
   return {reflectionSums.unsmudged, reflectionSums.smudged};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

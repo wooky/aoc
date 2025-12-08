@@ -6,7 +6,9 @@
 #include <vector>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 
 using CubeSet = std::map<std::string, uint8_t>;
@@ -62,21 +64,24 @@ public:
 };
 const std::regex Game::reGame { "Game (\\d+):" };
 const std::regex Game::reCube { " (\\d+) (\\w+)[,;]?" };
-  
-aoc::Solution day02(const std::string& input)
+} // namespace y2023
+using namespace y2023;
+
+template<>
+Solution run<2023, 2>(const std::string& input)
 {
   auto lines = input
     | std::views::split('\n')
     | std::views::transform([](const auto& line){ return std::string_view(&*line.begin(), std::ranges::distance(line)); });
-  const aoc::y2023::CubeSet maximums {{"red", 12}, {"green", 13}, {"blue", 14}};
+  const CubeSet maximums {{"red", 12}, {"green", 13}, {"blue", 14}};
   uint32_t s1 = 0, s2 = 0;
   for (const auto line : lines)
   {
-    aoc::y2023::Game game { line };
+    Game game { line };
     s1 += game.isGamePossible(maximums);
     s2 += game.calcPower();
   }
-  return aoc::Solution(s1, s2);
+  return Solution(s1, s2);
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

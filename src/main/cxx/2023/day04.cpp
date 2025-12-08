@@ -5,10 +5,10 @@
 #include <vector>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
 {
-  
-Solution day04(const std::string& input)
+template<>
+Solution run<2023, 4>(const std::string& input)
 {
   auto lines = input
     | std::views::split('\n')
@@ -64,4 +64,4 @@ Solution day04(const std::string& input)
   return Solution(totalPoints, totalInstances);
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

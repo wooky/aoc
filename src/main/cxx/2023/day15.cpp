@@ -5,7 +5,9 @@
 #include <vector>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 
 struct LabelLens
@@ -61,8 +63,11 @@ private:
     res = (res + add) * 17;
   }
 };
+} // namespace y2023
+using namespace y2023;
 
-Solution day15(const std::string& input)
+template<>
+Solution run<2023, 15>(const std::string& input)
 {
   auto steps = input
     | std::views::split(',')
@@ -111,4 +116,4 @@ Solution day15(const std::string& input)
   return {s1, s2};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

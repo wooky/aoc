@@ -5,7 +5,9 @@
 #include <set>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 
 struct SpringRow
@@ -94,8 +96,11 @@ std::set<std::string> calcChoices(const std::string& springs, std::queue<uint8_t
   }
   return uniqueChoices;
 }
+} // namespace y2023
+using namespace y2023;
 
-Solution day12(const std::string& input)
+template<>
+Solution run<2023, 12>(const std::string& input)
 {
   auto springRows = input
     | std::views::split('\n')
@@ -108,4 +113,4 @@ Solution day12(const std::string& input)
   return {s1, s2};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

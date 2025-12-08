@@ -3,7 +3,9 @@
 #include <set>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 
 class PipeMap
@@ -239,8 +241,11 @@ decltype(PipeMap::_directions) PipeMap::_directions = {
   {'.', 0},
   {'S', NORTH | SOUTH | EAST | WEST},
 };
-  
-Solution day10(const std::string& input)
+} // namespace y2023
+using namespace y2023;
+
+template<>
+Solution run<2023, 10>(const std::string& input)
 {
   PipeMap pipeMap { input };
   const auto s1 = pipeMap.calcFurthestDistance();
@@ -248,4 +253,4 @@ Solution day10(const std::string& input)
   return {s1, s2};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

@@ -4,7 +4,9 @@
 #include <vector>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 
 struct FirstLast
@@ -28,8 +30,11 @@ FirstLast predict(std::vector<uint64_t> values)
     : predict({values.cbegin() + 1, values.cend()});
   return {prevValue.first - nextValue.first, prevValue.last + nextValue.last};
 }
-  
-Solution day09(const std::string& input)
+} // namespace y2023
+using namespace y2023;
+
+template<>
+Solution run<2023, 9>(const std::string& input)
 {
   auto lines = input
     | std::views::split('\n')
@@ -46,4 +51,4 @@ Solution day09(const std::string& input)
   return {range.last, range.first};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

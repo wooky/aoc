@@ -3,7 +3,9 @@
 #include <regex>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 class Day01
 {
@@ -65,8 +67,11 @@ public:
     return getCalibration(line, reWords);
   }
 };
+} // namespace y2023
+using namespace y2023;
 
-aoc::Solution day01(const std::string& input)
+template<>
+Solution run<2023, 1>(const std::string& input)
 {
   auto lines = input
     | std::views::split('\n')
@@ -83,4 +88,4 @@ aoc::Solution day01(const std::string& input)
   return aoc::Solution(s1, s2);
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

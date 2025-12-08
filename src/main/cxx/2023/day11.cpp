@@ -3,15 +3,20 @@
 #include <vector>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 
 struct Coord
 {
   uint8_t row, col;
 };
-  
-Solution day11(const std::string& input)
+} // namespace y2023
+using namespace y2023;
+
+template<>
+Solution run<2023, 11>(const std::string& input)
 {
   const auto lineSize = input.find('\n') + 1;
   const auto rows = input.size() / lineSize;
@@ -74,4 +79,4 @@ Solution day11(const std::string& input)
   return {s1, s2};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

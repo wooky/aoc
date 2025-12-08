@@ -7,7 +7,9 @@
 #include <vector>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 struct Range {
   uint64_t first, last;
@@ -82,8 +84,11 @@ uint64_t processSource(
   auto lowestLocation = std::reduce(lowestLocations.begin(), lowestLocations.end(), std::numeric_limits<uint64_t>::max(), [](auto a, auto b){ return std::min(a, b); });
   return lowestLocation;
 }
+} // namespace y2023
+using namespace y2023;
 
-Solution day05(const std::string& input)
+template<>
+Solution run<2023, 5>(const std::string& input)
 {
   auto lines = input
     | std::views::split('\n')
@@ -119,4 +124,4 @@ Solution day05(const std::string& input)
   return Solution(s1, s2);
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

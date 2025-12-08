@@ -3,10 +3,10 @@
 #include <ranges>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
 {
-  
-Solution day08(const std::string& input)
+template<>
+Solution run<2023, 8>(const std::string& input)
 {
   auto lines = input
     | std::views::split('\n')
@@ -54,4 +54,4 @@ Solution day08(const std::string& input)
   return {s1, s2};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

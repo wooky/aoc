@@ -5,7 +5,9 @@
 #include <vector>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 using GearParts = std::map<size_t, std::vector<uint32_t>>;
 
@@ -39,8 +41,11 @@ bool symbolExists(
   }
   return foundSymbols;
 }
-  
-aoc::Solution day03(const std::string& input)
+} // namespace y2023
+using namespace y2023;
+
+template<>
+Solution run<2023, 3>(const std::string& input)
 {
   uint32_t partNumberSum = 0;
   uint32_t partNumber = 0;
@@ -92,4 +97,4 @@ aoc::Solution day03(const std::string& input)
   return Solution(partNumberSum, totalGearRatios);
 }
 
-} // namespace aoc::y2023
+} // namespace aoc

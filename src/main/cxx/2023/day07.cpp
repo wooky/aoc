@@ -5,7 +5,9 @@
 #include <set>
 #include "../aoc.hpp"
 
-namespace aoc::y2023
+namespace aoc
+{
+namespace y2023
 {
 using Cards = std::array<uint8_t, 13>;
 
@@ -135,8 +137,11 @@ uint64_t calcTotalWinnings(const auto& handBids)
   }
   return totalWinnings;
 }
+} // namespace y2023
+using namespace y2023;
 
-Solution day07(const std::string& input)
+template<>
+Solution run<2023, 7>(const std::string& input)
 {
   auto lines = input
     | std::views::split('\n')
@@ -159,4 +164,4 @@ Solution day07(const std::string& input)
   return {s1, s2};
 }
 
-} // namespace aoc::y2023
+} // namespace aoc
