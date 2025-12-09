@@ -1,21 +1,18 @@
 package y2025
 
 import (
+	lib "main/lib"
 	"maps"
 	"strconv"
 	"strings"
 )
 
-type Coord struct {
-	x, y int
-}
-
 func day04(input string) (string, string) {
-	grid := make(map[Coord]any)
+	grid := make(map[lib.Coord]any)
 	for y, line := range strings.Split(input, "\n") {
 		for x, c := range line {
 			if c == '@' {
-				grid[Coord{x, y}] = nil
+				grid[lib.Coord{X: x, Y: y}] = nil
 			}
 		}
 	}
@@ -28,7 +25,7 @@ func day04(input string) (string, string) {
 	return strconv.Itoa(s1), strconv.Itoa(s2)
 }
 
-func remove(grid map[Coord]any) int {
+func remove(grid map[lib.Coord]any) int {
 	removed := 0
 	old := maps.Clone(grid)
 	for coord := range old {
@@ -40,14 +37,14 @@ func remove(grid map[Coord]any) int {
 	return removed
 }
 
-func accessible(grid map[Coord]any, coord Coord) bool {
+func accessible(grid map[lib.Coord]any, coord lib.Coord) bool {
 	count := 0
-	for y := coord.y - 1; y <= coord.y+1; y++ {
-		for x := coord.x - 1; x <= coord.x+1; x++ {
-			if x == coord.x && y == coord.y {
+	for y := coord.Y - 1; y <= coord.Y+1; y++ {
+		for x := coord.X - 1; x <= coord.X+1; x++ {
+			if x == coord.X && y == coord.Y {
 				continue
 			}
-			_, present := grid[Coord{x, y}]
+			_, present := grid[lib.Coord{X: x, Y: y}]
 			if present {
 				count++
 			}
