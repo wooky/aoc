@@ -4,6 +4,11 @@ extern "C" aoc::Solution run(const char* input, uint16_t year, uint16_t day)
 {
   switch (year)
   {
+    case 2016:
+      return aoc::delegateRun<
+        2016,
+        11
+      >(input, day);
     case 2023:
       return aoc::delegateRun<
         2023,
